@@ -8,7 +8,7 @@
 ## 使用方法
 
 ```shell
-go install github.com/tx7do/kratos-cli/config-importer@latest
+go install github.com/tx7do/kratos-cli/config-importer
 
 config-importer \
     --type=etcd \
