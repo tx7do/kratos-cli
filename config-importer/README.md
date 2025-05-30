@@ -11,6 +11,7 @@
 go install github.com/tx7do/kratos-cli/config-importer/cmd@latest
 ```
 
+```shell
 go run -mod=mod github.com/tx7do/kratos-cli/config-importer/cmd \
     --type=etcd \
     --addr=localhost:2379 \
