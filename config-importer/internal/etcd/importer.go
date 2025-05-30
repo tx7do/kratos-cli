@@ -75,7 +75,7 @@ func (i *Importer) getServiceConfigFolder(root, app string) string {
 
 // getServiceConfigEtcdKey 获取配置的 Etcd Key
 func (i *Importer) getServiceConfigEtcdKey(project, app, file string) string {
-	return fmt.Sprintf("%s/%s/service/%s", project, app, file)
+	return fmt.Sprintf("/%s/%s/service/%s", project, app, file)
 }
 
 // getConfigFileList 获取配置文件列表
