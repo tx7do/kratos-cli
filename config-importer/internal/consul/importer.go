@@ -2,12 +2,12 @@ package consul
 
 import (
 	"fmt"
-	"github.com/tx7do/kratos-cli/config-importer/internal"
 	"path/filepath"
 	"strings"
 
 	"github.com/hashicorp/consul/api"
 
+	"github.com/tx7do/kratos-cli/config-importer/internal"
 	"github.com/tx7do/kratos-cli/config-importer/internal/utils"
 )
 

@@ -3,11 +3,11 @@ package etcd
 import (
 	"context"
 	"fmt"
-	"github.com/tx7do/kratos-cli/config-importer/internal"
 	"path/filepath"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 
+	"github.com/tx7do/kratos-cli/config-importer/internal"
 	"github.com/tx7do/kratos-cli/config-importer/internal/utils"
 )
 
