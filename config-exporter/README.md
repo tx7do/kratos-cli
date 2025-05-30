@@ -1,25 +1,28 @@
-# 本地配置文件导出到远程配置中心的导出工具
+# Local Config Files → Remote Config System Exporter
 
-支持的远程配置系统：
+Support Remote Config Systems Exporter for Kratos CLI:
 
 - Consul
 - Etcd
 
-## 使用方法
+## Hot To Use
 
 ```shell
-go install github.com/tx7do/kratos-cli/config-exporter
+# Install cfgexp
+go install github.com/tx7do/kratos-cli/config-exporter/cmd/cfgexp@latest
 
-config-exporter \
+# Export local config files to remote config system
+cfgexp \
     --type=etcd \
     --addr=localhost:2379 \
     --proj=kratos_admin
 ```
 
-或者
+Or
 
 ```shell
-go run -mod=mod github.com/tx7do/kratos-cli/config-exporter \
+# Use go run to execute directly
+go run -mod=mod github.com/tx7do/kratos-cli/config-exporter/cmd/cfgexp \
     --type=etcd \
     --addr=localhost:2379 \
     --proj=kratos_admin
