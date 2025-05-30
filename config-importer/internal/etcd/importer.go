@@ -3,12 +3,12 @@ package etcd
 import (
 	"context"
 	"fmt"
+	"github.com/tx7do/kratos-cli/config-importer/internal/options"
 	"path/filepath"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 
 	"github.com/tx7do/kratos-cli/config-importer/internal/utils"
-	"github.com/tx7do/kratos-cli/config-importer/options"
 )
 
 type Importer struct {

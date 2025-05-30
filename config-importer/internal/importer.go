@@ -5,7 +5,7 @@ import (
 
 	"github.com/tx7do/kratos-cli/config-importer/internal/consul"
 	"github.com/tx7do/kratos-cli/config-importer/internal/etcd"
-	"github.com/tx7do/kratos-cli/config-importer/options"
+	"github.com/tx7do/kratos-cli/config-importer/internal/options"
 )
 
 // Importer 远程配置导入器

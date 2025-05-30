@@ -2,13 +2,13 @@ package consul
 
 import (
 	"fmt"
+	"github.com/tx7do/kratos-cli/config-importer/internal/options"
 	"path/filepath"
 	"strings"
 
 	"github.com/hashicorp/consul/api"
 
 	"github.com/tx7do/kratos-cli/config-importer/internal/utils"
-	"github.com/tx7do/kratos-cli/config-importer/options"
 )
 
 type Importer struct {
