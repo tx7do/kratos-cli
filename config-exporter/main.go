@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 
-	"github.com/tx7do/kratos-cli/config-importer/internal"
-	"github.com/tx7do/kratos-cli/config-importer/internal/consul"
-	"github.com/tx7do/kratos-cli/config-importer/internal/etcd"
+	"github.com/tx7do/kratos-cli/config-exporter/internal"
+	"github.com/tx7do/kratos-cli/config-exporter/internal/consul"
+	"github.com/tx7do/kratos-cli/config-exporter/internal/etcd"
 )
 
 func NewImporter() internal.Importer {

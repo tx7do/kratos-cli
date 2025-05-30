@@ -7,8 +7,8 @@ import (
 
 	"github.com/hashicorp/consul/api"
 
-	"github.com/tx7do/kratos-cli/config-importer/internal"
-	"github.com/tx7do/kratos-cli/config-importer/internal/utils"
+	"github.com/tx7do/kratos-cli/config-exporter/internal"
+	"github.com/tx7do/kratos-cli/config-exporter/internal/utils"
 )
 
 type Importer struct {
