@@ -1,8 +1,35 @@
 package main
 
-import "github.com/tx7do/kratos-cli/config-importer/internal"
+import (
+	"flag"
+
+	"github.com/tx7do/kratos-cli/config-importer/internal"
+	"github.com/tx7do/kratos-cli/config-importer/internal/consul"
+	"github.com/tx7do/kratos-cli/config-importer/internal/etcd"
+)
+
+func NewImporter() internal.Importer {
+	var opts internal.Options
+
+	flag.StringVar((*string)(&opts.Service), "type", "consul", "remote config service name, eg: -type consul")
+	flag.StringVar(&opts.Endpoint, "addr", "127.0.0.1:8500", "consul address, eg: -addr 127.0.0.1:8500")
+	flag.StringVar(&opts.ProjectName, "proj", "kratos_admin", "project name, eg: -proj kratos_admin")
+	flag.StringVar(&opts.ProjectRoot, "root", "./", "project root dir, eg: -root ./")
+
+	flag.Parse()
+
+	switch opts.Service {
+	default:
+		fallthrough
+	case internal.Consul:
+		return consul.NewImporter(&opts)
+
+	case internal.Etcd:
+		return etcd.NewImporter(&opts)
+	}
+}
 
 func main() {
-	i := internal.NewImporter()
+	i := NewImporter()
 	_ = i.Import()
 }

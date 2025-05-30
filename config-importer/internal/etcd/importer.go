@@ -3,7 +3,7 @@ package etcd
 import (
 	"context"
 	"fmt"
-	"github.com/tx7do/kratos-cli/config-importer/internal/options"
+	"github.com/tx7do/kratos-cli/config-importer/internal"
 	"path/filepath"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -13,10 +13,10 @@ import (
 
 type Importer struct {
 	client  *clientv3.Client
-	options *options.Options
+	options *internal.Options
 }
 
-func NewImporter(options *options.Options) *Importer {
+func NewImporter(options *internal.Options) *Importer {
 	cli := &Importer{
 		options: options,
 	}

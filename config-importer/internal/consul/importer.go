@@ -2,7 +2,7 @@ package consul
 
 import (
 	"fmt"
-	"github.com/tx7do/kratos-cli/config-importer/internal/options"
+	"github.com/tx7do/kratos-cli/config-importer/internal"
 	"path/filepath"
 	"strings"
 
@@ -13,10 +13,10 @@ import (
 
 type Importer struct {
 	client  *api.Client
-	options *options.Options
+	options *internal.Options
 }
 
-func NewImporter(options *options.Options) *Importer {
+func NewImporter(options *internal.Options) *Importer {
 	cli := &Importer{
 		options: options,
 	}

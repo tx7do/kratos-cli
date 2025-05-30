@@ -1,4 +1,4 @@
-package options
+package internal
 
 type ImporterType string
 
