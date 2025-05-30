@@ -1,6 +1,6 @@
 package main
 
-import "config-importer/internal"
+import "github.com/tx7do/kratos-cli/config-importer/internal"
 
 func main() {
 	i := internal.NewImporter()
