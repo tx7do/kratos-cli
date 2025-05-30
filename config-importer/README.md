@@ -8,11 +8,18 @@
 ## 使用方法
 
 ```shell
-go install github.com/tx7do/kratos-cli/config-importer/cmd@latest
+go install github.com/tx7do/kratos-cli/config-importer@latest
+
+config-importer \
+    --type=etcd \
+    --addr=localhost:2379 \
+    --proj=kratos_admin
 ```
 
+或者
+
 ```shell
-go run -mod=mod github.com/tx7do/kratos-cli/config-importer/cmd \
+go run -mod=mod github.com/tx7do/kratos-cli/config-importer \
     --type=etcd \
     --addr=localhost:2379 \
     --proj=kratos_admin
