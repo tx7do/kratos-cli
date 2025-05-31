@@ -29,16 +29,19 @@ func main() {
 "postgres://user:pass@host:port/dbname"`)
 	schemaPath := flag.String("schema-path", "./ent/schema", "output path for ent schema")
 	flag.Parse()
+
 	if *dsn == "" {
 		log.Println("entimport: data source name (dsn) must be provided")
 		flag.Usage()
 		os.Exit(2)
 	}
+
 	ctx := context.Background()
 	drv, err := mux.Default.OpenImport(*dsn)
 	if err != nil {
 		log.Fatalf("entimport: failed to create import driver - %v", err)
 	}
+
 	i, err := entimport.NewImport(
 		entimport.WithTables(tablesFlag),
 		entimport.WithExcludedTables(excludeTablesFlag),
@@ -47,10 +50,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("entimport: create importer failed: %v", err)
 	}
+
 	mutations, err := i.SchemaMutations(ctx)
 	if err != nil {
 		log.Fatalf("entimport: schema import failed - %v", err)
 	}
+
 	if err = entimport.WriteSchema(mutations, entimport.WithSchemaPath(*schemaPath)); err != nil {
 		log.Fatalf("entimport: schema writing failed - %v", err)
 	}

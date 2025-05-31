@@ -14,6 +14,7 @@ import (
 func init() {
 	Default.RegisterProvider(mysqlProvider, "mysql")
 	Default.RegisterProvider(postgresProvider, "postgres", "postgresql")
+	Default.RegisterProvider(textProvider, "text", "file")
 }
 
 func mysqlProvider(dsn string) (*ImportDriver, error) {
@@ -62,5 +63,12 @@ func postgresProvider(dsn string) (*ImportDriver, error) {
 		Inspector:  drv,
 		Dialect:    dialect.Postgres,
 		SchemaName: schemaName,
+	}, nil
+}
+
+func textProvider(dsn string) (*ImportDriver, error) {
+	return &ImportDriver{
+		SchemaName: dsn,
+		Dialect:    "text",
 	}, nil
 }

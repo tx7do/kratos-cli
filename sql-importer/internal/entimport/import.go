@@ -98,20 +98,30 @@ func NewImport(opts ...ImportOption) (SchemaImporter, error) {
 	for _, apply := range opts {
 		apply(i)
 	}
+
 	switch i.driver.Dialect {
 	case dialect.MySQL:
 		si, err = NewMySQL(i)
 		if err != nil {
 			return nil, err
 		}
+
 	case dialect.Postgres:
 		si, err = NewPostgreSQL(i)
 		if err != nil {
 			return nil, err
 		}
+
+	case "text":
+		si, err = NewText(i)
+		if err != nil {
+			return nil, err
+		}
+
 	default:
 		return nil, fmt.Errorf("entimport: unsupported dialect %q", i.driver.Dialect)
 	}
+
 	return si, err
 }
 
