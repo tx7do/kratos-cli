@@ -51,7 +51,7 @@ func command(cmd *cobra.Command, _ []string) {
 	}
 
 	if dsn == "" {
-		log.Println("sql2orm: dsn must be provided")
+		log.Println("sql2proto: dsn must be provided")
 		_ = cmd.Help()
 		os.Exit(2)
 	}

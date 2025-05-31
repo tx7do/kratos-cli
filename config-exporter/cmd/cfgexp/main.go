@@ -6,9 +6,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	"github.com/tx7do/kratos-cli/config-exporter"
 	"github.com/tx7do/kratos-cli/config-exporter/internal"
-	"github.com/tx7do/kratos-cli/config-exporter/internal/consul"
-	"github.com/tx7do/kratos-cli/config-exporter/internal/etcd"
 )
 
 var rootCmd = &cobra.Command{
@@ -44,20 +43,7 @@ func command(cmd *cobra.Command, _ []string) {
 		return
 	}
 
-	i := NewImporter()
-	_ = i.Import()
-}
-
-func NewImporter() internal.Importer {
-	switch opts.Service {
-	default:
-		fallthrough
-	case internal.Consul:
-		return consul.NewImporter(&opts)
-
-	case internal.Etcd:
-		return etcd.NewImporter(&opts)
-	}
+	_ = cfgexp.Export(string(opts.Service), opts.Endpoint, opts.ProjectName, opts.ProjectRoot)
 }
 
 func main() {

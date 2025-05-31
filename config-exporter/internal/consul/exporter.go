@@ -11,13 +11,13 @@ import (
 	"github.com/tx7do/kratos-cli/config-exporter/internal/utils"
 )
 
-type Importer struct {
+type Exporter struct {
 	client  *api.Client
 	options *internal.Options
 }
 
-func NewImporter(options *internal.Options) *Importer {
-	cli := &Importer{
+func NewExporter(options *internal.Options) *Exporter {
+	cli := &Exporter{
 		options: options,
 	}
 
@@ -26,7 +26,7 @@ func NewImporter(options *internal.Options) *Importer {
 	return cli
 }
 
-func (i *Importer) init() {
+func (i *Exporter) init() {
 	client, err := api.NewClient(&api.Config{
 		Address: i.options.Endpoint,
 	})
@@ -38,17 +38,17 @@ func (i *Importer) init() {
 }
 
 // Import 导入所有的配置
-func (i *Importer) Import() error {
+func (i *Exporter) Export() error {
 	apps := utils.GetFolderNameList(i.options.ProjectRoot + "app/")
 	for _, app := range apps {
-		_ = i.ImportOneService(app)
+		_ = i.ExportOneService(app)
 	}
 
 	return nil
 }
 
 // ImportOneService 导入单个配置
-func (i *Importer) ImportOneService(app string) error {
+func (i *Exporter) ExportOneService(app string) error {
 	files := i.getConfigFileList(i.options.ProjectRoot, app)
 	for _, file := range files {
 		content := utils.ReadFile(i.options.ProjectRoot + "/" + file)
@@ -63,7 +63,7 @@ func (i *Importer) ImportOneService(app string) error {
 }
 
 // writeConfigToConsul 写入配置到Consul
-func (i *Importer) writeConfigToConsul(key string, value []byte) error {
+func (i *Exporter) writeConfigToConsul(key string, value []byte) error {
 	if _, err := i.client.KV().Put(&api.KVPair{Key: key, Value: value}, nil); err != nil {
 		return err
 	}
@@ -71,18 +71,18 @@ func (i *Importer) writeConfigToConsul(key string, value []byte) error {
 }
 
 // getServiceConfigFolder 获取某一个服务的配置文件夹路径
-func (i *Importer) getServiceConfigFolder(root, app string) string {
+func (i *Exporter) getServiceConfigFolder(root, app string) string {
 	return root + "app/" + app + "/" + "service/configs/"
 }
 
-func (i *Importer) getServiceConfigConsulKey(project, app, file string) string {
+func (i *Exporter) getServiceConfigConsulKey(project, app, file string) string {
 	key := project + "/" + app + "/" + "service/" + file
 	key = strings.Replace(key, "\\", "/", -1)
 	return key
 }
 
 // getConfigFileList 获取配置文件列表
-func (i *Importer) getConfigFileList(root, app string) []string {
+func (i *Exporter) getConfigFileList(root, app string) []string {
 	path := i.getServiceConfigFolder(root, app)
 	return utils.GetFileList(path)
 }

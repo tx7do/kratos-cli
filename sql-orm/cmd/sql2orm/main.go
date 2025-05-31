@@ -10,8 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/entimport"
-	"github.com/tx7do/kratos-cli/sql-orm/internal/gorm"
+	"github.com/tx7do/kratos-cli/sql-orm"
 )
 
 var rootCmd = &cobra.Command{
@@ -80,13 +79,7 @@ func command(cmd *cobra.Command, _ []string) {
 
 	ctx := context.Background()
 
-	switch strings.ToLower(strings.TrimSpace(orm)) {
-	case "ent":
-		_ = entimport.Importer(ctx, &dsn, &schemaPath, tables, excludeTables)
-
-	case "gorm":
-		_ = gorm.Importer(ctx, &drv, &dsn, &schemaPath, &daoPath, tables, excludeTables)
-	}
+	_ = sqlorm.Importer(ctx, orm, &drv, &dsn, &schemaPath, &daoPath, tables, excludeTables)
 }
 
 func main() {
