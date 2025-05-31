@@ -88,8 +88,8 @@ func (m *MySQL) field(column *schema.Column) (f ent.Field, err error) {
 }
 
 func (m *MySQL) convertFloat(typ *schema.FloatType, name string) (f ent.Field) {
-	// A precision from 0 to 23 results in a 4-byte single-precision FLOAT column.
-	// A precision from 24 to 53 results in an 8-byte double-precision DOUBLE column:
+	// Precision from 0 to 23 results in a 4-byte single-precision FLOAT column.
+	// Precision from 24 to 53 results in an 8-byte double-precision DOUBLE column:
 	// https://dev.mysql.com/doc/refman/8.0/en/floating-point-types.html
 	if typ.T == mysql.TypeDouble {
 		return field.Float(name)

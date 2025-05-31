@@ -269,11 +269,55 @@ func upsertNode(field fieldFunc, table *schema.Table) (*schemast.UpsertSchema, e
 	upsert := &schemast.UpsertSchema{
 		Name: typeName(table.Name),
 	}
-	if tableName(table.Name) != table.Name {
-		upsert.Annotations = []entschema.Annotation{
-			entsql.Annotation{Table: table.Name},
+
+	//fmt.Println("UpsertSchema", table.Name, table.Attrs)
+
+	withComment := false
+	comment := ""
+	charset := ""
+	collation := ""
+	for _, attr := range table.Attrs {
+		switch a := attr.(type) {
+		case *schema.Comment:
+			comment = a.Text
+			withComment = true
+			//fmt.Println("schema.Comment", comment)
+
+		case *schema.Charset:
+			//fmt.Println("schema.Charset", a.V)
+			charset = a.V
+
+		case *schema.Collation:
+			//fmt.Println("schema.Collation", a.V)
+			collation = a.V
 		}
 	}
+
+	annotation := entsql.Annotation{}
+
+	if withComment {
+		annotation.WithComments = &withComment
+	}
+	if charset != "" {
+		annotation.Charset = charset
+	}
+	if collation != "" {
+		annotation.Collation = collation
+	}
+	if tableName(table.Name) != table.Name {
+		annotation.Table = tableName(table.Name)
+	} else {
+		annotation.Table = table.Name
+	}
+
+	upsert.Annotations = []entschema.Annotation{
+		annotation,
+	}
+
+	if comment != "" {
+		//upsert.Annotations = append(upsert.Annotations, entschema.Comment(comment))
+	}
+
 	fields := make(map[string]ent.Field, len(upsert.Fields))
 	for _, f := range upsert.Fields {
 		fields[f.Descriptor().StorageKey] = f

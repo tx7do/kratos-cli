@@ -17,6 +17,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
+const (
+	pSmallInt = "smallint" // smallint - 2 bytes small-range integer -32768 to +32767.
+	pInteger  = "integer"  // integer - 4 bytes typical choice for integer	-2147483648 to +2147483647.
+	pBigInt   = "bigint"   // bigint - 8 bytes large-range integer	-9223372036854775808 to 9223372036854775807.
+)
+
 // Postgres implements SchemaImporter for PostgreSQL databases.
 type Postgres struct {
 	*ImportOptions
@@ -76,10 +82,12 @@ func (p *Postgres) field(column *schema.Column) (f ent.Field, err error) {
 		f = field.String(name)
 	case *schema.TimeType:
 		f = field.Time(name)
+
 	case *postgres.SerialType:
 		f = p.convertSerial(typ, name)
 	case *postgres.UUIDType:
 		f = field.UUID(name, uuid.New())
+
 	default:
 		return nil, fmt.Errorf("entimport: unsupported type %q for column %v", typ, column.Name)
 	}
@@ -100,14 +108,11 @@ func (p *Postgres) convertFloat(typ *schema.FloatType, name string) (f ent.Field
 
 func (p *Postgres) convertInteger(typ *schema.IntegerType, name string) (f ent.Field) {
 	switch typ.T {
-	// smallint - 2 bytes small-range integer -32768 to +32767.
-	case "smallint":
+	case pSmallInt:
 		f = field.Int16(name)
-	// integer - 4 bytes typical choice for integer	-2147483648 to +2147483647.
-	case "integer":
+	case pInteger:
 		f = field.Int32(name)
-	// bigint - 8 bytes large-range integer	-9223372036854775808 to 9223372036854775807.
-	case "bigint":
+	case pBigInt:
 		// Int64 is not used on purpose.
 		f = field.Int(name)
 	}
