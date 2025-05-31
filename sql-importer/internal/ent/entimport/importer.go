@@ -2,8 +2,9 @@ package entimport
 
 import (
 	"context"
-	"github.com/tx7do/kratos-cli/sql-importer/internal/ent/mux"
 	"log"
+
+	"github.com/tx7do/kratos-cli/sql-importer/internal/ent/mux"
 )
 
 // Importer imports the schema from the database specified by the DSN and writes it to the schemaPath.
