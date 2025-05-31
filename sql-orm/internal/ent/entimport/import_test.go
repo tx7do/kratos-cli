@@ -2,7 +2,7 @@ package entimport_test
 
 import (
 	"context"
-	"github.com/tx7do/kratos-cli/sql-importer/internal/ent/mux"
+	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/mux"
 	"go/ast"
 	"os"
 	"path/filepath"

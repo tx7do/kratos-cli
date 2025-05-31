@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/tx7do/kratos-cli/sql-importer/internal/ent/mux"
+	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/mux"
 
 	"ariga.io/atlas/sql/schema"
 

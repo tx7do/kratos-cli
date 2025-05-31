@@ -1,11 +1,11 @@
-# SQL → Schema Importer
+# SQL → ORM Schema Importer
 
 Copy from <https://github.com/zeevmoney/entimport>
 
 ## HOW TO INSTALL
 
 ```shell
-go install github.com/tx7do/kratos-cli/sql-importer/cmd/sql2orm@latest
+go install github.com/tx7do/kratos-cli/sql-orm/cmd/sql2orm@latest
 ```
 
 ## HOW TO USE

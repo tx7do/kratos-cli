@@ -3,7 +3,7 @@ package entimport_test
 import (
 	"bytes"
 	"context"
-	"github.com/tx7do/kratos-cli/sql-importer/internal/ent/entimport"
+	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/entimport"
 	"go/parser"
 	"go/printer"
 	"go/token"
