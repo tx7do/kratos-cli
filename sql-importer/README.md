@@ -17,15 +17,16 @@ Usage:
   sql2orm [flags]
 
 Flags:
-      --dao-path string          output path for DAO code (for gorm) (default "./daos/")
-      --dsn string               data source name (connection information), for example:
+  -d, --dao-path string          output path for DAO code (for gorm) (default "./daos/")
+  -v, --drv string               Database driver name to use (mysql, postgres, sqlite...) (default "mysql")
+  -n, --dsn string               Data source name (connection information), for example:
                                  "mysql://user:pass@tcp(localhost:3306)/dbname"
                                  "postgres://user:pass@host:port/dbname"
-      --exclude-tables strings   comma-separated list of tables to exclude
+  -e, --exclude-tables strings   comma-separated list of tables to exclude
   -h, --help                     help for sql2orm
-      --orm string               ORM type to use (ent, gorm), default is 'ent' (default "ent")
-      --schema-path string       output path for schema (default "./ent/schema/")
-      --tables strings           comma-separated list of tables to inspect (all if empty)
+  -o, --orm string               ORM type to use (ent, gorm) (default "ent")
+  -s, --schema-path string       output path for schema (default "./ent/schema/")
+  -t, --tables strings           comma-separated list of tables to inspect (all if empty)
 ```
 
 ## Example

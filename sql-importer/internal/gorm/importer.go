@@ -3,6 +3,7 @@ package gorm
 import (
 	"context"
 	"errors"
+	"os"
 
 	"gorm.io/gen"
 )
@@ -20,6 +21,9 @@ func Importer(_ context.Context, drv, dsn, schemaPath, daoPath *string, tables, 
 	if drv == nil {
 		return errors.New("gormimport: drv is nil")
 	}
+
+	_ = os.MkdirAll(*schemaPath, os.ModePerm)
+	_ = os.MkdirAll(*daoPath, os.ModePerm)
 
 	db := NewGormClient(*drv, *dsn)
 

@@ -32,16 +32,16 @@ var (
 )
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&orm, "orm", "ent", "ORM type to use (ent, gorm)")
-	rootCmd.PersistentFlags().StringVar(&orm, "drv", "mysql", "Database driver name to use (mysql, postgres, sqlite...)")
-	rootCmd.PersistentFlags().StringVar(&dsn, "dsn", "", `Data source name (connection information), for example:
+	rootCmd.PersistentFlags().StringVarP(&orm, "orm", "o", "ent", "ORM type to use (ent, gorm)")
+	rootCmd.PersistentFlags().StringVarP(&drv, "drv", "v", "mysql", "Database driver name to use (mysql, postgres, sqlite...)")
+	rootCmd.PersistentFlags().StringVarP(&dsn, "dsn", "n", "", `Data source name (connection information), for example:
 "mysql://user:pass@tcp(localhost:3306)/dbname"
 "postgres://user:pass@host:port/dbname"`)
 
-	rootCmd.PersistentFlags().StringVar(&schemaPath, "schema-path", "./ent/schema/", "output path for schema")
-	rootCmd.PersistentFlags().StringVar(&daoPath, "dao-path", "./daos/", "output path for DAO code (for gorm)")
-	rootCmd.PersistentFlags().StringSliceVar(&tables, "tables", nil, "comma-separated list of tables to inspect (all if empty)")
-	rootCmd.PersistentFlags().StringSliceVar(&excludeTables, "exclude-tables", nil, "comma-separated list of tables to exclude")
+	rootCmd.PersistentFlags().StringVarP(&schemaPath, "schema-path", "s", "./ent/schema/", "output path for schema")
+	rootCmd.PersistentFlags().StringVarP(&daoPath, "dao-path", "d", "./daos/", "output path for DAO code (for gorm)")
+	rootCmd.PersistentFlags().StringSliceVarP(&tables, "tables", "t", nil, "comma-separated list of tables to inspect (all if empty)")
+	rootCmd.PersistentFlags().StringSliceVarP(&excludeTables, "exclude-tables", "e", nil, "comma-separated list of tables to exclude")
 }
 
 func parseDSN(url string) (string, string, error) {
@@ -61,6 +61,9 @@ func command(cmd *cobra.Command, _ []string) {
 	if orm == "" {
 		orm = "ent"
 	}
+
+	fmt.Println("sql2orm: orm is ", orm)
+	fmt.Printf("sql2orm: dsn is %s\n", dsn)
 
 	ctx := context.Background()
 

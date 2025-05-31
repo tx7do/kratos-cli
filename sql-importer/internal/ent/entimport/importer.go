@@ -18,7 +18,7 @@ func Importer(ctx context.Context, dsn, schemaPath *string, tables, excludeTable
 		return errors.New("entimport: dsn is nil")
 	}
 
-	_ = os.Mkdir(*schemaPath, os.ModePerm)
+	_ = os.MkdirAll(*schemaPath, os.ModePerm)
 
 	drv, err := mux.Default.OpenImport(*dsn)
 	if err != nil {
