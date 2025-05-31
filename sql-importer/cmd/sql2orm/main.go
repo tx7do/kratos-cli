@@ -8,12 +8,12 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 
 	"github.com/tx7do/kratos-cli/sql-importer/internal/ent/entimport"
 	"github.com/tx7do/kratos-cli/sql-importer/internal/gorm"
 )
 
-// 定义根命令
 var rootCmd = &cobra.Command{
 	Use:   "sql2orm",
 	Short: "SQL to ORM code Importer",
@@ -52,7 +52,23 @@ func parseDSN(url string) (string, string, error) {
 	return a[0], a[1], nil
 }
 
+// countFlags 统计显式设置的标志数量
+func countFlags(cmd *cobra.Command) int {
+	count := 0
+	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
+		if flag.Changed {
+			count++
+		}
+	})
+	return count
+}
+
 func command(cmd *cobra.Command, _ []string) {
+	if countFlags(cmd) == 0 {
+		_ = cmd.Help()
+		return
+	}
+
 	if dsn == "" {
 		log.Println("sql2orm: dsn must be provided")
 		_ = cmd.Help()
@@ -61,9 +77,6 @@ func command(cmd *cobra.Command, _ []string) {
 	if orm == "" {
 		orm = "ent"
 	}
-
-	fmt.Println("sql2orm: orm is ", orm)
-	fmt.Printf("sql2orm: dsn is %s\n", dsn)
 
 	ctx := context.Background()
 
