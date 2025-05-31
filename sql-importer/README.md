@@ -47,5 +47,5 @@ sql2orm \
   -drv "postgres" \
   -dsn "postgres://postgres:pass@localhost:5432/test?sslmode=disable" \
   -schema-path "./daos/schema" \
-  -dao-path "./daos/" \
+  -dao-path "./daos/"
 ```
