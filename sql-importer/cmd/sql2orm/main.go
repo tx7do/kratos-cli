@@ -32,8 +32,8 @@ var (
 )
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&orm, "orm", "ent", "ORM type to use (ent, gorm), default is 'ent'")
-	rootCmd.PersistentFlags().StringVar(&orm, "drv", "mysql", "Database driver name to use (mysql, postgres, sqlite...), default is 'mysql'")
+	rootCmd.PersistentFlags().StringVar(&orm, "orm", "ent", "ORM type to use (ent, gorm)")
+	rootCmd.PersistentFlags().StringVar(&orm, "drv", "mysql", "Database driver name to use (mysql, postgres, sqlite...)")
 	rootCmd.PersistentFlags().StringVar(&dsn, "dsn", "", `Data source name (connection information), for example:
 "mysql://user:pass@tcp(localhost:3306)/dbname"
 "postgres://user:pass@host:port/dbname"`)
