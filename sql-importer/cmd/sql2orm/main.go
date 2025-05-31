@@ -1,0 +1,80 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"os"
+	"strings"
+
+	"github.com/spf13/cobra"
+
+	"github.com/tx7do/kratos-cli/sql-importer/internal/ent/entimport"
+	"github.com/tx7do/kratos-cli/sql-importer/internal/gorm"
+)
+
+// 定义根命令
+var rootCmd = &cobra.Command{
+	Use:   "sql2orm",
+	Short: "SQL to ORM code Importer",
+	Long:  "SQL to ORM code Importer is a tool to generate ORM code from SQL database schemas.",
+	Run:   command,
+}
+
+var (
+	orm           string
+	drv           string
+	dsn           string
+	schemaPath    string
+	daoPath       string
+	tables        []string
+	excludeTables []string
+)
+
+func init() {
+	rootCmd.PersistentFlags().StringVar(&orm, "orm", "ent", "ORM type to use (ent, gorm), default is 'ent'")
+	rootCmd.PersistentFlags().StringVar(&orm, "drv", "mysql", "Database driver name to use (mysql, postgres, sqlite...), default is 'mysql'")
+	rootCmd.PersistentFlags().StringVar(&dsn, "dsn", "", `Data source name (connection information), for example:
+"mysql://user:pass@tcp(localhost:3306)/dbname"
+"postgres://user:pass@host:port/dbname"`)
+
+	rootCmd.PersistentFlags().StringVar(&schemaPath, "schema-path", "./ent/schema/", "output path for schema")
+	rootCmd.PersistentFlags().StringVar(&daoPath, "dao-path", "./daos/", "output path for DAO code (for gorm)")
+	rootCmd.PersistentFlags().StringSliceVar(&tables, "tables", nil, "comma-separated list of tables to inspect (all if empty)")
+	rootCmd.PersistentFlags().StringSliceVar(&excludeTables, "exclude-tables", nil, "comma-separated list of tables to exclude")
+}
+
+func parseDSN(url string) (string, string, error) {
+	a := strings.SplitN(url, "://", 2)
+	if len(a) != 2 {
+		return "", "", fmt.Errorf(`failed to parse dsn: "%s"`, url)
+	}
+	return a[0], a[1], nil
+}
+
+func command(cmd *cobra.Command, _ []string) {
+	if dsn == "" {
+		log.Println("sql2orm: dsn must be provided")
+		_ = cmd.Help()
+		os.Exit(2)
+	}
+	if orm == "" {
+		orm = "ent"
+	}
+
+	ctx := context.Background()
+
+	switch strings.ToLower(strings.TrimSpace(orm)) {
+	case "ent":
+		_ = entimport.Importer(ctx, &dsn, &schemaPath, tables, excludeTables)
+
+	case "gorm":
+		_ = gorm.Importer(ctx, &drv, &dsn, &schemaPath, &daoPath, tables, excludeTables)
+	}
+}
+
+func main() {
+	if err := rootCmd.Execute(); err != nil {
+		log.Fatalf("execute command failed: %v", err)
+	}
+}
