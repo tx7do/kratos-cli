@@ -2,13 +2,24 @@ package entimport
 
 import (
 	"context"
+	"errors"
 	"log"
+	"os"
 
 	"github.com/tx7do/kratos-cli/sql-importer/internal/ent/mux"
 )
 
 // Importer imports the schema from the database specified by the DSN and writes it to the schemaPath.
 func Importer(ctx context.Context, dsn, schemaPath *string, tables, excludeTables []string) error {
+	if schemaPath == nil {
+		return errors.New("entimport: schema path is nil")
+	}
+	if dsn == nil {
+		return errors.New("entimport: dsn is nil")
+	}
+
+	_ = os.Mkdir(*schemaPath, os.ModePerm)
+
 	drv, err := mux.Default.OpenImport(*dsn)
 	if err != nil {
 		log.Fatalf("entimport: failed to create import driver - %v", err)
