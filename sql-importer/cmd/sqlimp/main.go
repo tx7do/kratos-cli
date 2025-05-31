@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/tx7do/kratos-cli/sql-importer/internal/entimport"
-	"github.com/tx7do/kratos-cli/sql-importer/internal/mux"
 )
 
 var (
@@ -37,28 +36,8 @@ func main() {
 	}
 
 	ctx := context.Background()
-	drv, err := mux.Default.OpenImport(*dsn)
-	if err != nil {
-		log.Fatalf("entimport: failed to create import driver - %v", err)
-	}
 
-	i, err := entimport.NewImport(
-		entimport.WithTables(tablesFlag),
-		entimport.WithExcludedTables(excludeTablesFlag),
-		entimport.WithDriver(drv),
-	)
-	if err != nil {
-		log.Fatalf("entimport: create importer failed: %v", err)
-	}
-
-	mutations, err := i.SchemaMutations(ctx)
-	if err != nil {
-		log.Fatalf("entimport: schema import failed - %v", err)
-	}
-
-	if err = entimport.WriteSchema(mutations, entimport.WithSchemaPath(*schemaPath)); err != nil {
-		log.Fatalf("entimport: schema writing failed - %v", err)
-	}
+	_ = entimport.Importer(ctx, dsn, schemaPath, tablesFlag, excludeTablesFlag)
 }
 
 type tables []string
