@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/tx7do/kratos-cli/sql-importer/internal/ent/mux"
 
 	"ariga.io/atlas/sql/schema"
 
@@ -15,8 +16,6 @@ import (
 	"entgo.io/ent/schema/edge"
 
 	"github.com/go-openapi/inflect"
-
-	"github.com/tx7do/kratos-cli/sql-importer/internal/mux"
 )
 
 const (

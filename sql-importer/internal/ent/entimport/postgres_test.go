@@ -3,6 +3,7 @@ package entimport_test
 import (
 	"bytes"
 	"context"
+	"github.com/tx7do/kratos-cli/sql-importer/internal/ent/entimport"
 	"go/parser"
 	"go/printer"
 	"go/token"
@@ -14,8 +15,6 @@ import (
 	"github.com/go-openapi/inflect"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/stretchr/testify/require"
-
-	"github.com/tx7do/kratos-cli/sql-importer/internal/entimport"
 )
 
 func TestPostgres(t *testing.T) {

@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"github.com/tx7do/kratos-cli/sql-importer/internal/ent/entimport"
+	"github.com/tx7do/kratos-cli/sql-importer/internal/ent/mux"
 	"go/ast"
 	"go/parser"
 	"go/printer"
@@ -12,9 +14,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/tx7do/kratos-cli/sql-importer/internal/entimport"
-	"github.com/tx7do/kratos-cli/sql-importer/internal/mux"
 
 	"entgo.io/ent/dialect"
 	"github.com/go-openapi/inflect"

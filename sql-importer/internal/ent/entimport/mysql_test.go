@@ -3,14 +3,13 @@ package entimport_test
 import (
 	"bytes"
 	"context"
+	"github.com/tx7do/kratos-cli/sql-importer/internal/ent/entimport"
 	"go/parser"
 	"go/printer"
 	"go/token"
 	"testing"
 
 	"ariga.io/atlas/sql/schema"
-	"github.com/tx7do/kratos-cli/sql-importer/internal/entimport"
-
 	"entgo.io/ent/dialect"
 	"github.com/go-openapi/inflect"
 	_ "github.com/go-sql-driver/mysql"

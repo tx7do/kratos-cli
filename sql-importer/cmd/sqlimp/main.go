@@ -4,11 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/tx7do/kratos-cli/sql-importer/internal/ent/entimport"
 	"log"
 	"os"
 	"strings"
-
-	"github.com/tx7do/kratos-cli/sql-importer/internal/entimport"
 )
 
 var (

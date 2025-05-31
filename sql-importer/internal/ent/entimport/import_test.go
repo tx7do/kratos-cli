@@ -2,6 +2,7 @@ package entimport_test
 
 import (
 	"context"
+	"github.com/tx7do/kratos-cli/sql-importer/internal/ent/mux"
 	"go/ast"
 	"os"
 	"path/filepath"
@@ -10,8 +11,6 @@ import (
 	"ariga.io/atlas/sql/mysql"
 	"ariga.io/atlas/sql/postgres"
 	"ariga.io/atlas/sql/schema"
-
-	"github.com/tx7do/kratos-cli/sql-importer/internal/mux"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
