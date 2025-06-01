@@ -145,3 +145,17 @@ func TestWriteEntDataPackageCode(t *testing.T) {
 
 	writeEntDataPackageCode("./app/user/service/internal/", data)
 }
+
+func TestWriteServerCode(t *testing.T) {
+	data := ServerTemplateData{
+		Project: "kratos-admin",
+		Type:    "grpc",
+		Service: "user",
+		Services: map[string]string{
+			"User":   "user",
+			"Tenant": "user",
+		},
+	}
+
+	writeServerPackageCode("./app/user/service/internal/", data)
+}

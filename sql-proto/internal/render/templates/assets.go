@@ -25,3 +25,6 @@ var WireTemplateData []byte
 
 //go:embed init.tpl
 var InitTemplateData []byte
+
+//go:embed grpc_server.tpl
+var GrpcTemplateServerData []byte

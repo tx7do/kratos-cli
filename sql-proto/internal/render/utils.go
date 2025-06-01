@@ -11,17 +11,18 @@ import (
 	"golang.org/x/text/language"
 )
 
-var newlineIfFuncMap = template.FuncMap{
+var funcMap = template.FuncMap{
 	"newlineIf": func(condition bool) string {
 		if condition {
 			return "\n"
 		}
 		return ""
 	},
-}
-
-var newlineFuncMap = template.FuncMap{
 	"newline": func() string { return "\n" },
+	"upper":   strings.ToUpper, // 转换为大写
+	"lower":   strings.ToLower, // 转换为小写
+	"camel":   snakeToCamel,    // 转换为 camelCase
+	"pascal":  snakeToPascal,   // 转换为 PascalCase
 }
 
 // renderTemplate renders a Protobuf template to a file at the specified output path.
@@ -36,8 +37,7 @@ func renderTemplate[T any](outputFileName string, data T, templateName, template
 	tmpl := template.
 		Must(
 			template.New(templateName).
-				Funcs(newlineIfFuncMap).
-				Funcs(newlineFuncMap).
+				Funcs(funcMap).
 				Parse(templateData),
 		)
 

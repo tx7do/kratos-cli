@@ -208,6 +208,31 @@ type MainTemplateData struct {
 	EnableMQTT  bool
 }
 
+type ProtoItem struct {
+	Module string
+	Name   string
+}
+
+type ServerTemplateData struct {
+	Project  string
+	Service  string
+	Type     string
+	Services map[string]string
+}
+
+func (d ServerTemplateData) Modules() []string {
+	modulesMap := make(map[string]struct{})
+	for _, module := range d.Services {
+		modulesMap[module] = struct{}{}
+	}
+
+	var modules []string
+	for module := range modulesMap {
+		modules = append(modules, module)
+	}
+	return modules
+}
+
 func WriteProto(mutations []schemast.Mutator, opts ...internal.ConvertOption) error {
 	return nil
 }
@@ -237,21 +262,27 @@ func writeRestServiceProto(outputPath string, data RestProtoTemplateData) {
 }
 
 func writeEntDataPackageCode(outputPath string, data DataTemplateData) {
+	outputPath = outputPath + "/data/"
+	outputPath = filepath.Clean(outputPath)
+
 	_ = os.MkdirAll(outputPath, os.ModePerm)
 
-	goFileName := outputPath + "/" + strings.ToLower(data.Name) + ".go"
-	goFileName = filepath.Clean(goFileName)
+	outputPath = outputPath + "/" + strings.ToLower(data.Name) + ".go"
+	outputPath = filepath.Clean(outputPath)
 
-	_ = renderTemplate[DataTemplateData](goFileName, data, "ent_data", string(templates.EntDataTemplateData))
+	_ = renderTemplate[DataTemplateData](outputPath, data, "ent_data", string(templates.EntDataTemplateData))
 }
 
 func writeGormDataPackageCode(outputPath string, data DataTemplateData) {
+	outputPath = outputPath + "/data/"
+	outputPath = filepath.Clean(outputPath)
+
 	_ = os.MkdirAll(outputPath, os.ModePerm)
 
-	goFileName := outputPath + "/" + strings.ToLower(data.Name) + ".go"
-	goFileName = filepath.Clean(goFileName)
+	outputPath = outputPath + "/" + strings.ToLower(data.Name) + ".go"
+	outputPath = filepath.Clean(outputPath)
 
-	_ = renderTemplate[DataTemplateData](goFileName, data, "gorm_data", string(templates.GormDataTemplateData))
+	_ = renderTemplate[DataTemplateData](outputPath, data, "gorm_data", string(templates.GormDataTemplateData))
 }
 
 func writeGrpcServicePackageCode(outputPath string, data ServiceTemplateData) {
@@ -296,4 +327,18 @@ func writeMainCode(outputPath string, data MainTemplateData) {
 	data.Service = snakeToPascal(data.Service)
 
 	_ = renderTemplate[MainTemplateData](goFileName, data, "main_"+data.Project, string(templates.MainTemplateData))
+}
+
+func writeServerPackageCode(outputPath string, data ServerTemplateData) {
+	outputPath = outputPath + "/server/"
+	outputPath = filepath.Clean(outputPath)
+
+	_ = os.MkdirAll(outputPath, os.ModePerm)
+
+	goFileName := outputPath + "/" + "grpc.go"
+	goFileName = filepath.Clean(goFileName)
+
+	data.Service = strings.ToLower(data.Service)
+
+	_ = renderTemplate[ServerTemplateData](goFileName, data, "server_"+data.Project, string(templates.GrpcTemplateServerData))
 }
