@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"entgo.io/contrib/schemast"
-	"github.com/jinzhu/inflection"
 
 	"github.com/tx7do/kratos-cli/sql-proto/internal"
 	"github.com/tx7do/kratos-cli/sql-proto/internal/render/templates"
