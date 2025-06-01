@@ -28,3 +28,6 @@ var InitTemplateData []byte
 
 //go:embed grpc_server.tpl
 var GrpcTemplateServerData []byte
+
+//go:embed rest_server.tpl
+var RestTemplateServerData []byte

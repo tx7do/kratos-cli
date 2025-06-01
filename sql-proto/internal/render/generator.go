@@ -330,15 +330,22 @@ func writeMainCode(outputPath string, data MainTemplateData) {
 }
 
 func writeServerPackageCode(outputPath string, data ServerTemplateData) {
+	data.Service = strings.ToLower(data.Service)
+
 	outputPath = outputPath + "/server/"
 	outputPath = filepath.Clean(outputPath)
 
 	_ = os.MkdirAll(outputPath, os.ModePerm)
 
-	goFileName := outputPath + "/" + "grpc.go"
-	goFileName = filepath.Clean(goFileName)
+	switch data.Type {
+	case "grpc":
+		outputPath = outputPath + "/" + "grpc.go"
+		outputPath = filepath.Clean(outputPath)
+		_ = renderTemplate[ServerTemplateData](outputPath, data, "grpc_server_"+data.Project, string(templates.GrpcTemplateServerData))
 
-	data.Service = strings.ToLower(data.Service)
-
-	_ = renderTemplate[ServerTemplateData](goFileName, data, "server_"+data.Project, string(templates.GrpcTemplateServerData))
+	case "rest":
+		outputPath = outputPath + "/" + "rest.go"
+		outputPath = filepath.Clean(outputPath)
+		_ = renderTemplate[ServerTemplateData](outputPath, data, "rest_server_"+data.Project, string(templates.RestTemplateServerData))
+	}
 }
