@@ -2,7 +2,6 @@ package entimport_test
 
 import (
 	"context"
-	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/mux"
 	"go/ast"
 	"os"
 	"path/filepath"
@@ -14,6 +13,8 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+
+	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/mux"
 )
 
 func MockMySQLTableNameDoesNotUsePluralForm() *schema.Schema {

@@ -1,11 +1,15 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+
+	sqlproto "github.com/tx7do/kratos-cli/sql-proto"
+	"github.com/tx7do/kratos-cli/sql-proto/internal"
 )
 
 var rootCmd = &cobra.Command{
@@ -15,22 +19,16 @@ var rootCmd = &cobra.Command{
 	Run:   command,
 }
 
-var (
-	drv           string
-	dsn           string
-	protoPath     string
-	tables        []string
-	excludeTables []string
-)
+var opts internal.Options
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&drv, "drv", "v", "mysql", "Database driver name to use (mysql, postgres, sqlite...)")
-	rootCmd.PersistentFlags().StringVarP(&dsn, "dsn", "n", "", `Data source name (connection information), for example:
+	rootCmd.PersistentFlags().StringVarP(&opts.Driver, "drv", "v", "mysql", "Database driver name to use (mysql, postgres, sqlite...)")
+	rootCmd.PersistentFlags().StringVarP(&opts.Source, "dsn", "n", "", `Data source name (connection information), for example:
 "mysql://user:pass@tcp(localhost:3306)/dbname"
 "postgres://user:pass@host:port/dbname"`)
-	rootCmd.PersistentFlags().StringVarP(&protoPath, "proto-path", "s", "./api/protos/", "output path for protobuf schema files")
-	rootCmd.PersistentFlags().StringSliceVarP(&tables, "tables", "t", nil, "comma-separated list of tables to inspect (all if empty)")
-	rootCmd.PersistentFlags().StringSliceVarP(&excludeTables, "exclude-tables", "e", nil, "comma-separated list of tables to exclude")
+	rootCmd.PersistentFlags().StringVarP(&opts.OutputPath, "proto-path", "s", "./api/protos/", "output path for protobuf schema files")
+	rootCmd.PersistentFlags().StringSliceVarP(&opts.Tables, "tables", "t", nil, "comma-separated list of tables to inspect (all if empty)")
+	rootCmd.PersistentFlags().StringSliceVarP(&opts.ExcludedTables, "exclude-tables", "e", nil, "comma-separated list of tables to exclude")
 }
 
 // countFlags 统计显式设置的标志数量
@@ -50,11 +48,15 @@ func command(cmd *cobra.Command, _ []string) {
 		return
 	}
 
-	if dsn == "" {
+	if opts.Source == "" {
 		log.Println("sql2proto: dsn must be provided")
 		_ = cmd.Help()
 		os.Exit(2)
 	}
+
+	ctx := context.Background()
+
+	_ = sqlproto.Convert(ctx, &opts.Driver, &opts.Source, &opts.OutputPath, opts.Tables, opts.ExcludedTables)
 }
 
 func main() {

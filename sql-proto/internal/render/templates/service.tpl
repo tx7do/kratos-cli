@@ -1,0 +1,112 @@
+﻿package service
+
+import (
+	"context"
+
+	"github.com/go-kratos/kratos/v2/log"
+{{if not .IsGrpc}}
+	"github.com/tx7do/go-utils/trans"
+{{end}}
+	"google.golang.org/protobuf/types/known/emptypb"
+	pagination "github.com/tx7do/kratos-bootstrap/api/gen/go/pagination/v1"
+
+	"{{.Project}}/app/{{.Service}}/service/internal/data"
+
+	{{.TargetApiPackage}} "{{.Project}}/api/gen/go/{{.TargetApi}}/service/v1"
+{{if not .IsSameApi}}	{{.SourceApiPackage}} "{{.Project}}/api/gen/go/{{.SourceApi}}/service/v1"{{end}}
+
+{{if not .IsGrpc}}
+	"{{.Project}}/pkg/middleware/auth"
+{{end -}}
+)
+
+type {{.PascalName}}Service struct {
+	{{.ServiceInterface}}
+
+	log *log.Helper
+
+	{{.DataSourceVar}} {{.DataSourceType}}
+}
+
+func New{{.PascalName}}Service(
+    logger log.Logger,
+    {{.DataSourceVar}} {{.DataSourceType}},
+) *{{.PascalName}}Service {
+	return &{{.PascalName}}Service{
+		log: log.NewHelper(log.With(logger, "module", "{{.LowerName}}/service/{{.Service}}-service")),
+		{{.DataSourceVar}}:  {{.DataSourceVar}},
+	}
+}
+
+func (s *{{.PascalName}}Service) List(ctx context.Context, req *pagination.PagingRequest) (*{{.SourceApiPackage}}.List{{.PascalName}}Response, error) {
+	return s.{{.DataSourceVar}}.List(ctx, req)
+}
+
+func (s *{{.PascalName}}Service) Get(ctx context.Context, req *{{.SourceApiPackage}}.Get{{.PascalName}}Request) (*{{.SourceApiPackage}}.{{.PascalName}}, error) {
+	return s.{{.DataSourceVar}}.Get(ctx, req)
+}
+
+func (s *{{.PascalName}}Service) Create(ctx context.Context, req *{{.SourceApiPackage}}.Create{{.PascalName}}Request) (*emptypb.Empty, error) {
+	if req == nil || req.Data == nil {
+		return nil, {{.SourceApiPackage}}.ErrorBadRequest("invalid parameter")
+	}
+
+{{if not .IsGrpc}}
+	// 获取操作人信息
+	operator, err := auth.FromContext(ctx)
+	if err != nil {
+		return &emptypb.Empty{}, err
+	}
+
+	req.Data.CreateBy = trans.Ptr(operator.UserId)
+{{end}}
+
+{{if not .UseRepo}}
+	if err := s.{{.DataSourceVar}}.Create(ctx, req); err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
+{{else}}
+    return s.{{.DataSourceVar}}.Create(ctx, req)
+{{end -}}
+}
+
+func (s *{{.PascalName}}Service) Update(ctx context.Context, req *{{.SourceApiPackage}}.Update{{.PascalName}}Request) (*emptypb.Empty, error) {
+	if req == nil || req.Data == nil {
+		return nil, {{.SourceApiPackage}}.ErrorBadRequest("invalid parameter")
+	}
+
+{{if not .IsGrpc}}
+	// 获取操作人信息
+	operator, err := auth.FromContext(ctx)
+	if err != nil {
+		return &emptypb.Empty{}, err
+	}
+
+	req.Data.UpdateBy = trans.Ptr(operator.UserId)
+{{end -}}
+
+{{if not .UseRepo}}
+	if err := s.{{.DataSourceVar}}.Update(ctx, req); err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
+{{else}}
+    return s.{{.DataSourceVar}}.Update(ctx, req)
+{{end -}}
+}
+
+func (s *{{.PascalName}}Service) Delete(ctx context.Context, req *{{.SourceApiPackage}}.Delete{{.PascalName}}Request) (*emptypb.Empty, error) {
+    if req == nil {
+        return nil, {{.SourceApiPackage}}.ErrorBadRequest("invalid parameter")
+    }
+
+{{if not .UseRepo}}
+	if err := s.{{.DataSourceVar}}.Delete(ctx, req); err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
+{{else}}
+    return s.{{.DataSourceVar}}.Delete(ctx, req)
+{{end -}}
+}

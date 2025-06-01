@@ -24,6 +24,7 @@ func Importer(ctx context.Context, dsn, schemaPath *string, tables, excludeTable
 	if err != nil {
 		log.Fatalf("entimport: failed to create import driver - %v", err)
 	}
+	defer drv.Close()
 
 	i, err := NewImport(
 		WithTables(tables),
