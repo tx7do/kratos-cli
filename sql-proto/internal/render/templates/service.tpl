@@ -20,7 +20,7 @@ import (
 {{end -}}
 )
 
-type {{.PascalName}}Service struct {
+type {{.ClassName}} struct {
 	{{.ServiceInterface}}
 
 	log *log.Helper
@@ -28,25 +28,25 @@ type {{.PascalName}}Service struct {
 	{{.DataSourceVar}} {{.DataSourceType}}
 }
 
-func New{{.PascalName}}Service(
+func New{{.ClassName}}(
     logger log.Logger,
     {{.DataSourceVar}} {{.DataSourceType}},
-) *{{.PascalName}}Service {
-	return &{{.PascalName}}Service{
+) *{{.ClassName}} {
+	return &{{.ClassName}}{
 		log: log.NewHelper(log.With(logger, "module", "{{.LowerName}}/service/{{.Service}}-service")),
 		{{.DataSourceVar}}:  {{.DataSourceVar}},
 	}
 }
 
-func (s *{{.PascalName}}Service) List(ctx context.Context, req *pagination.PagingRequest) (*{{.SourceApiPackage}}.List{{.PascalName}}Response, error) {
+func (s *{{.ClassName}}) List(ctx context.Context, req *pagination.PagingRequest) (*{{.SourceApiPackage}}.List{{.PascalName}}Response, error) {
 	return s.{{.DataSourceVar}}.List(ctx, req)
 }
 
-func (s *{{.PascalName}}Service) Get(ctx context.Context, req *{{.SourceApiPackage}}.Get{{.PascalName}}Request) (*{{.SourceApiPackage}}.{{.PascalName}}, error) {
+func (s *{{.ClassName}}) Get(ctx context.Context, req *{{.SourceApiPackage}}.Get{{.PascalName}}Request) (*{{.SourceApiPackage}}.{{.PascalName}}, error) {
 	return s.{{.DataSourceVar}}.Get(ctx, req)
 }
 
-func (s *{{.PascalName}}Service) Create(ctx context.Context, req *{{.SourceApiPackage}}.Create{{.PascalName}}Request) (*emptypb.Empty, error) {
+func (s *{{.ClassName}}) Create(ctx context.Context, req *{{.SourceApiPackage}}.Create{{.PascalName}}Request) (*emptypb.Empty, error) {
 	if req == nil || req.Data == nil {
 		return nil, {{.SourceApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
@@ -71,7 +71,7 @@ func (s *{{.PascalName}}Service) Create(ctx context.Context, req *{{.SourceApiPa
 {{end -}}
 }
 
-func (s *{{.PascalName}}Service) Update(ctx context.Context, req *{{.SourceApiPackage}}.Update{{.PascalName}}Request) (*emptypb.Empty, error) {
+func (s *{{.ClassName}}) Update(ctx context.Context, req *{{.SourceApiPackage}}.Update{{.PascalName}}Request) (*emptypb.Empty, error) {
 	if req == nil || req.Data == nil {
 		return nil, {{.SourceApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
@@ -96,7 +96,7 @@ func (s *{{.PascalName}}Service) Update(ctx context.Context, req *{{.SourceApiPa
 {{end -}}
 }
 
-func (s *{{.PascalName}}Service) Delete(ctx context.Context, req *{{.SourceApiPackage}}.Delete{{.PascalName}}Request) (*emptypb.Empty, error) {
+func (s *{{.ClassName}}) Delete(ctx context.Context, req *{{.SourceApiPackage}}.Delete{{.PascalName}}Request) (*emptypb.Empty, error) {
     if req == nil {
         return nil, {{.SourceApiPackage}}.ErrorBadRequest("invalid parameter")
     }
