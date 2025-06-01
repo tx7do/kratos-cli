@@ -6,11 +6,12 @@ import (
 	"github.com/jinzhu/inflection"
 )
 
+// ProtoField protobuf字段定义
 type ProtoField struct {
-	Name    string
-	Type    string
-	Number  int
-	Comment string
+	Number  int    // 字段编号
+	Name    string // 字段名
+	Type    string // 字段类型
+	Comment string // 字段注释
 }
 
 func (f ProtoField) CamelName() string {

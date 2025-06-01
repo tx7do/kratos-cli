@@ -326,6 +326,7 @@ func schemaMutations(field fieldFunc, tables []*schema.Table) ([]schemast.Mutato
 		}
 		mutations[table.Name] = node
 	}
+
 	for _, table := range tables {
 		if t, ok := joinTables[table.Name]; ok {
 			err := upsertManyToMany(mutations, t)
@@ -336,6 +337,7 @@ func schemaMutations(field fieldFunc, tables []*schema.Table) ([]schemast.Mutato
 		}
 		upsertOneToX(mutations, table)
 	}
+
 	ml := make([]schemast.Mutator, 0, len(mutations))
 	for _, mutator := range mutations {
 		ml = append(ml, mutator)

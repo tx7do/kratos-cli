@@ -1,6 +1,8 @@
 package internal
 
-import "github.com/tx7do/kratos-cli/sql-proto/internal/mux"
+import (
+	"github.com/tx7do/kratos-cli/sql-proto/internal/mux"
+)
 
 type Options struct {
 	Driver string `json:"driver"` // Driver name, e.g., "mysql", "postgres"

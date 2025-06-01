@@ -1,26 +1,20 @@
 package internal
 
 import (
-	"context"
-	"database/sql"
 	"fmt"
 	"log"
-	"os"
 
-	"ariga.io/atlas/sql/postgres"
-	"ariga.io/atlas/sql/schema"
-	"entgo.io/contrib/schemast"
-
+	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 
-	_ "github.com/lib/pq"
-)
+	"ariga.io/atlas/sql/schema"
 
-// SchemaConverter is the interface that wraps the SchemaMutations method.
-type SchemaConverter interface {
-	// SchemaMutations imports a given schema from a data source and returns a list of schemast mutators.
-	SchemaMutations(context.Context) ([]schemast.Mutator, error)
-}
+	"github.com/jinzhu/inflection"
+
+	_ "github.com/lib/pq"
+
+	"github.com/tx7do/kratos-cli/sql-proto/internal/render"
+)
 
 func NewConvert(opts ...ConvertOption) (SchemaConverter, error) {
 	var (
@@ -34,55 +28,148 @@ func NewConvert(opts ...ConvertOption) (SchemaConverter, error) {
 
 	switch i.driver.Dialect {
 	case dialect.MySQL:
+		si, err = NewMySQL(i)
+		if err != nil {
+			return nil, err
+		}
 
 	case dialect.Postgres:
+		si, err = NewPostgreSQL(i)
+		if err != nil {
+			return nil, err
+		}
 
 	case "text":
 
 	default:
-		return nil, fmt.Errorf("entimport: unsupported dialect %q", i.driver.Dialect)
+		return nil, fmt.Errorf("sqlproto: unsupported dialect %q", i.driver.Dialect)
 	}
 
 	return si, err
 }
 
-func Convert(ctx context.Context, drv, dsn, schemaPath, outputPath *string, tables, excludeTables []string) {
-	_ = os.MkdirAll(*outputPath, os.ModePerm)
-
-	// 连接数据库
-	db, err := sql.Open("postgres", "postgres://user:pass@localhost:5432/mydb?sslmode=disable")
-	if err != nil {
-		log.Fatalf("failed to connect: %v", err)
+// applyColumnAttributes adds column attributes to a given ent field.
+func applyColumnAttributes(f ent.Field, col *schema.Column) {
+	desc := f.Descriptor()
+	desc.Optional = col.Type.Null
+	for _, attr := range col.Attrs {
+		if a, ok := attr.(*schema.Comment); ok {
+			desc.Comment = a.Text
+		}
 	}
-	defer db.Close()
+}
 
-	// 创建 Atlas 驱动
-	driver, err := postgres.Open(db)
-	if err != nil {
-		log.Fatalf("failed to open driver: %v", err)
+// Note: at this moment ent doesn't support fields on m2m relations.
+func isJoinTable(table *schema.Table) bool {
+	if table.PrimaryKey == nil || len(table.PrimaryKey.Parts) != 2 || len(table.ForeignKeys) != 2 {
+		return false
+	}
+	// Make sure that the foreign key columns exactly match primary key column.
+	for _, fk := range table.ForeignKeys {
+		if len(fk.Columns) != 1 {
+			return false
+		}
+		if fk.Columns[0] != table.PrimaryKey.Parts[0].C && fk.Columns[0] != table.PrimaryKey.Parts[1].C {
+			return false
+		}
+	}
+	return true
+}
+
+func schemaTables(fnc fieldTypeFunc, tables []*schema.Table) ([]*TableData, error) {
+	tableDatas := make([]*TableData, 0)
+	joinTables := make(map[string]*schema.Table)
+	for _, table := range tables {
+		if isJoinTable(table) {
+			joinTables[table.Name] = table
+			continue
+		}
+
+		log.Println("***********", table.Name)
+
+		node, err := convertTable(fnc, table)
+		if err != nil {
+			return nil, fmt.Errorf("entimport: issue with table %v: %w", table.Name, err)
+		}
+
+		tableDatas = append(tableDatas, node)
 	}
 
-	// 获取数据库模式
-	sch, err := driver.InspectSchema(ctx, "public", &schema.InspectOptions{
-		Tables: []string{"users"}, // 指定要检查的表，留空则获取所有表
-	})
-	if err != nil {
-		log.Fatalf("failed to inspect schema: %v", err)
+	return tableDatas, nil
+}
+
+func convertTable(fnc fieldTypeFunc, table *schema.Table) (*TableData, error) {
+	var tableData TableData
+
+	tableData.Name = table.Name
+
+	for _, attr := range table.Attrs {
+		switch a := attr.(type) {
+		case *schema.Comment:
+			tableData.Comment = a.Text
+			//fmt.Println("schema.Comment", comment)
+
+		case *schema.Charset:
+			//fmt.Println("schema.Charset", a.V)
+			tableData.Charset = a.V
+
+		case *schema.Collation:
+			//fmt.Println("schema.Collation", a.V)
+			tableData.Collation = a.V
+		}
 	}
 
-	// 打印表结构
-	for _, table := range sch.Tables {
-		fmt.Printf("表名: %s\n", table.Name)
-		fmt.Println("列信息:")
-		//for _, col := range table.Columns {
-		//	fmt.Printf("  - %s (%s)\n", col.Name, col.Type)
-		//}
-		//fmt.Println("索引:")
-		//for _, idx := range table.Indexes {
-		//	fmt.Printf("  - %s (unique: %v, columns: %v)\n",
-		//		idx.Name, idx.Unique, cols)
-		//}
-		//fmt.Println("------------------------")
+	for _, column := range table.Columns {
+		//log.Println(column.Name)
+
+		fieldData := FieldData{
+			Name: column.Name,
+			Type: fnc(column.Type.Raw),
+			Null: column.Type.Null,
+		}
+
+		for _, attr := range column.Attrs {
+			switch a := attr.(type) {
+			case *schema.Comment:
+				fieldData.Comment = a.Text
+			}
+		}
+
+		tableData.Fields = append(tableData.Fields, fieldData)
 	}
 
+	return &tableData, nil
+}
+
+func WriteProto(tables []*TableData, opts ...ConvertOption) error {
+	o := &ConvertOptions{}
+	for _, apply := range opts {
+		apply(o)
+	}
+
+	data := render.GrpcProtoTemplateData{
+		Version: "v1",
+	}
+
+	for i := 0; i < len(tables); i++ {
+		table := tables[i]
+
+		data.Module = inflection.Singular(table.Name)
+		data.Name = inflection.Singular(table.Name)
+		data.Comment = render.RemoveTableCommentSuffix(table.Comment)
+
+		for n := 0; n < len(table.Fields); n++ {
+			field := table.Fields[n]
+			data.Fields = append(data.Fields, render.ProtoField{
+				Number:  i + 1,
+				Name:    field.Name,
+				Comment: field.Comment,
+				Type:    field.Type,
+			})
+		}
+
+		render.WriteGrpcServiceProto(o.protoPath, data)
+	}
+
+	return nil
 }

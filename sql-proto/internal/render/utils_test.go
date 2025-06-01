@@ -22,3 +22,11 @@ func TestMakeEntSetNillableFunc(t *testing.T) {
 	fmt.Println(makeEntSetNillableFuncWithTransfer("last_login_time", "timeutil.TimestamppbToTime"))
 	fmt.Println(makeEntSetNillableFuncWithTransfer("last_login_time", "timeutil.StringTimeToTime"))
 }
+
+func TestRemoveTableCommentSuffix(t *testing.T) {
+	str := "产品表"
+	fmt.Println(RemoveTableCommentSuffix(str)) // 输出: 产品
+
+	str2 := "product table"
+	fmt.Println(RemoveTableCommentSuffix(str2)) // 输出: product
+}

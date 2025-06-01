@@ -8,7 +8,6 @@ import (
 
 	"github.com/tx7do/kratos-cli/sql-proto/internal"
 	"github.com/tx7do/kratos-cli/sql-proto/internal/mux"
-	"github.com/tx7do/kratos-cli/sql-proto/internal/render"
 )
 
 // Convert converts the database schema into a protocol buffer definition.
@@ -37,12 +36,12 @@ func Convert(ctx context.Context, drv, dsn, outputPath *string, tables, excludeT
 		log.Fatalf("sqlproto: create importer failed: %v", err)
 	}
 
-	mutations, err := i.SchemaMutations(ctx)
+	tableDatas, err := i.SchemaTables(ctx)
 	if err != nil {
 		log.Fatalf("sqlproto: schema import failed - %v", err)
 	}
 
-	if err = render.WriteProto(mutations, internal.WithProtoPath(*outputPath)); err != nil {
+	if err = internal.WriteProto(tableDatas, internal.WithProtoPath(*outputPath)); err != nil {
 		log.Fatalf("sqlproto: schema writing failed - %v", err)
 	}
 

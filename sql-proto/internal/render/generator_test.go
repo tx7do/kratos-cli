@@ -14,6 +14,14 @@ func TestPlural(t *testing.T) {
 	t.Log(inflection.Plural("adminLoginLog"))
 }
 
+func TestSingular(t *testing.T) {
+	t.Log(inflection.Singular("users"))
+	t.Log(inflection.Singular("dicts"))
+	t.Log(inflection.Singular("admin_login_logs"))
+	t.Log(inflection.Singular("admin-login-logs"))
+	t.Log(inflection.Singular("adminLoginLogs"))
+}
+
 func TestWriteGrpcServiceProto(t *testing.T) {
 	data := GrpcProtoTemplateData{
 		Module:  "user",
@@ -27,7 +35,7 @@ func TestWriteGrpcServiceProto(t *testing.T) {
 		},
 	}
 
-	writeGrpcServiceProto("./api/protos", data)
+	WriteGrpcServiceProto("./api/protos", data)
 }
 
 func TestWriteRestServiceProto(t *testing.T) {
@@ -39,7 +47,7 @@ func TestWriteRestServiceProto(t *testing.T) {
 		Comment:      "用户",
 	}
 
-	writeRestServiceProto("./api/protos", data)
+	WriteRestServiceProto("./api/protos", data)
 }
 
 func TestWriteInitWireCode(t *testing.T) {
@@ -51,7 +59,7 @@ func TestWriteInitWireCode(t *testing.T) {
 			"Tenant",
 		},
 	}
-	writeInitWireCode("./app/user/internal/", serviceInit)
+	WriteInitWireCode("./app/user/internal/", serviceInit)
 
 	dataInit := InitWireTemplateData{
 		Package: "data",
@@ -61,7 +69,7 @@ func TestWriteInitWireCode(t *testing.T) {
 			"Tenant",
 		},
 	}
-	writeInitWireCode("./app/user/internal/", dataInit)
+	WriteInitWireCode("./app/user/internal/", dataInit)
 
 	serverInit := InitWireTemplateData{
 		Package: "server",
@@ -71,7 +79,7 @@ func TestWriteInitWireCode(t *testing.T) {
 			"GRPC",
 		},
 	}
-	writeInitWireCode("./app/user/service/internal/", serverInit)
+	WriteInitWireCode("./app/user/service/internal/", serverInit)
 }
 
 func TestWriteWireCode(t *testing.T) {
@@ -79,7 +87,7 @@ func TestWriteWireCode(t *testing.T) {
 		Project: "kratos-admin",
 		Service: "user",
 	}
-	writeWireCode("./app/user/service/cmd/server", serviceInit)
+	WriteWireCode("./app/user/service/cmd/server", serviceInit)
 }
 
 func TestWriteMainCode(t *testing.T) {
@@ -92,7 +100,7 @@ func TestWriteMainCode(t *testing.T) {
 		EnableSSE:   false,
 		EnableKafka: false,
 	}
-	writeMainCode("./app/user/service/cmd/server", serviceInit)
+	WriteMainCode("./app/user/service/cmd/server", serviceInit)
 }
 
 func TestWriteRestServicePackageCode(t *testing.T) {
@@ -109,7 +117,7 @@ func TestWriteRestServicePackageCode(t *testing.T) {
 		UseRepo: false,
 		IsGrpc:  false,
 	}
-	writeGrpcServicePackageCode("./app/user/service/internal/", dataUser)
+	WriteGrpcServicePackageCode("./app/user/service/internal/", dataUser)
 
 	dataTenant := ServiceTemplateData{
 		Project: "kratos-admin",
@@ -124,7 +132,7 @@ func TestWriteRestServicePackageCode(t *testing.T) {
 		UseRepo: true,
 		IsGrpc:  true,
 	}
-	writeGrpcServicePackageCode("./app/user/service/internal/", dataTenant)
+	WriteGrpcServicePackageCode("./app/user/service/internal/", dataTenant)
 }
 
 func TestWriteEntDataPackageCode(t *testing.T) {
@@ -143,7 +151,7 @@ func TestWriteEntDataPackageCode(t *testing.T) {
 		},
 	}
 
-	writeEntDataPackageCode("./app/user/service/internal/", data)
+	WriteEntDataPackageCode("./app/user/service/internal/", data)
 }
 
 func TestWriteServerCode(t *testing.T) {
@@ -156,7 +164,7 @@ func TestWriteServerCode(t *testing.T) {
 			"Tenant": "user",
 		},
 	}
-	writeServerPackageCode("./app/user/service/internal/", dataGrpc)
+	WriteServerPackageCode("./app/user/service/internal/", dataGrpc)
 
 	dataRest := ServerTemplateData{
 		Project: "kratos-admin",
@@ -167,5 +175,5 @@ func TestWriteServerCode(t *testing.T) {
 			"Tenant": "user",
 		},
 	}
-	writeServerPackageCode("./app/user/service/internal/", dataRest)
+	WriteServerPackageCode("./app/user/service/internal/", dataRest)
 }

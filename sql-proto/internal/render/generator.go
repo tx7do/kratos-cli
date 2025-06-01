@@ -5,17 +5,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"entgo.io/contrib/schemast"
-
-	"github.com/tx7do/kratos-cli/sql-proto/internal"
 	"github.com/tx7do/kratos-cli/sql-proto/internal/render/templates"
 )
 
-func WriteProto(mutations []schemast.Mutator, opts ...internal.ConvertOption) error {
-	return nil
-}
-
-func writeGrpcServiceProto(outputPath string, data GrpcProtoTemplateData) {
+// WriteGrpcServiceProto GRPC service proto file
+func WriteGrpcServiceProto(outputPath string, data GrpcProtoTemplateData) {
 	outputPath = outputPath + "/" + strings.ToLower(data.Module) + "/service/" + strings.ToLower(data.Version)
 	outputPath = filepath.Clean(outputPath)
 
@@ -27,7 +21,8 @@ func writeGrpcServiceProto(outputPath string, data GrpcProtoTemplateData) {
 	_ = renderTemplate[GrpcProtoTemplateData](outputPath, data, "grpc_proto", string(templates.GrpcProtoTemplateData))
 }
 
-func writeRestServiceProto(outputPath string, data RestProtoTemplateData) {
+// WriteRestServiceProto REST service proto file
+func WriteRestServiceProto(outputPath string, data RestProtoTemplateData) {
 	outputPath = outputPath + "/" + strings.ToLower(data.TargetModule) + "/service/" + strings.ToLower(data.Version)
 	outputPath = filepath.Clean(outputPath)
 
@@ -39,7 +34,8 @@ func writeRestServiceProto(outputPath string, data RestProtoTemplateData) {
 	_ = renderTemplate[RestProtoTemplateData](outputPath, data, "rest_proto", string(templates.RestProtoTemplateData))
 }
 
-func writeEntDataPackageCode(outputPath string, data DataTemplateData) {
+// WriteEntDataPackageCode writes the Ent data package code to the specified output path.
+func WriteEntDataPackageCode(outputPath string, data DataTemplateData) {
 	outputPath = outputPath + "/data/"
 	outputPath = filepath.Clean(outputPath)
 
@@ -51,7 +47,8 @@ func writeEntDataPackageCode(outputPath string, data DataTemplateData) {
 	_ = renderTemplate[DataTemplateData](outputPath, data, "ent_data", string(templates.EntDataTemplateData))
 }
 
-func writeGormDataPackageCode(outputPath string, data DataTemplateData) {
+// WriteGormDataPackageCode writes the GORM data package code to the specified output path.
+func WriteGormDataPackageCode(outputPath string, data DataTemplateData) {
 	outputPath = outputPath + "/data/"
 	outputPath = filepath.Clean(outputPath)
 
@@ -63,7 +60,8 @@ func writeGormDataPackageCode(outputPath string, data DataTemplateData) {
 	_ = renderTemplate[DataTemplateData](outputPath, data, "gorm_data", string(templates.GormDataTemplateData))
 }
 
-func writeGrpcServicePackageCode(outputPath string, data ServiceTemplateData) {
+// WriteGrpcServicePackageCode writes the GRPC service package code to the specified output path.
+func WriteGrpcServicePackageCode(outputPath string, data ServiceTemplateData) {
 	outputPath = outputPath + "/service/"
 	outputPath = filepath.Clean(outputPath)
 
@@ -75,7 +73,8 @@ func writeGrpcServicePackageCode(outputPath string, data ServiceTemplateData) {
 	_ = renderTemplate[ServiceTemplateData](outputPath, data, "service", string(templates.ServiceTemplateData))
 }
 
-func writeInitWireCode(outputPath string, data InitWireTemplateData) {
+// WriteInitWireCode writes the initialization wire code to the specified output path.
+func WriteInitWireCode(outputPath string, data InitWireTemplateData) {
 	outputPath = outputPath + "/" + data.Package + "/"
 	outputPath = filepath.Clean(outputPath)
 	_ = os.MkdirAll(outputPath, os.ModePerm)
@@ -85,7 +84,8 @@ func writeInitWireCode(outputPath string, data InitWireTemplateData) {
 	_ = renderTemplate[InitWireTemplateData](goFileName, data, "init_"+data.Package, string(templates.InitTemplateData))
 }
 
-func writeWireCode(outputPath string, data WireTemplateData) {
+// WriteWireCode writes the wire code to the specified output path.
+func WriteWireCode(outputPath string, data WireTemplateData) {
 	_ = os.MkdirAll(outputPath, os.ModePerm)
 
 	goFileName := outputPath + "/" + "wire" + GoFilePostfix
@@ -96,7 +96,8 @@ func writeWireCode(outputPath string, data WireTemplateData) {
 	_ = renderTemplate[WireTemplateData](goFileName, data, "wire_"+data.Project, string(templates.WireTemplateData))
 }
 
-func writeMainCode(outputPath string, data MainTemplateData) {
+// WriteMainCode writes the main code to the specified output path.
+func WriteMainCode(outputPath string, data MainTemplateData) {
 	_ = os.MkdirAll(outputPath, os.ModePerm)
 
 	goFileName := outputPath + "/" + "main" + GoFilePostfix
@@ -107,7 +108,8 @@ func writeMainCode(outputPath string, data MainTemplateData) {
 	_ = renderTemplate[MainTemplateData](goFileName, data, "main_"+data.Project, string(templates.MainTemplateData))
 }
 
-func writeServerPackageCode(outputPath string, data ServerTemplateData) {
+// WriteServerPackageCode writes the server package code to the specified output path.
+func WriteServerPackageCode(outputPath string, data ServerTemplateData) {
 	data.Service = strings.ToLower(data.Service)
 
 	outputPath = outputPath + "/server/"
