@@ -161,6 +161,8 @@ func getConfigType(fileName string) string {
 		return "xml"
 	case ".yaml", ".yml":
 		return "yaml"
+	case ".toml":
+		return "toml"
 	case ".txt":
 		return "text"
 	case ".html", ".htm":
