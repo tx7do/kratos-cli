@@ -37,7 +37,7 @@ func (i *Exporter) init() {
 	i.client = cli
 }
 
-// Import 导入所有的配置
+// Export 导入所有的配置
 func (i *Exporter) Export() error {
 	apps := utils.GetFolderNameList(i.options.ProjectRoot + "app/")
 	for _, app := range apps {
@@ -47,7 +47,7 @@ func (i *Exporter) Export() error {
 	return nil
 }
 
-// ImportOneService 导入单个配置
+// ExportOneService 导入单个配置
 func (i *Exporter) ExportOneService(app string) error {
 	files := i.getConfigFileList(i.options.ProjectRoot, app)
 	for _, file := range files {
@@ -70,12 +70,12 @@ func (i *Exporter) writeConfigToEtcd(key string, value []byte) error {
 
 // getServiceConfigFolder 获取某一个服务的配置文件夹路径
 func (i *Exporter) getServiceConfigFolder(root, app string) string {
-	return root + "app/" + app + "/" + "service/configs/"
+	return root + "app/" + app + "/service/configs/"
 }
 
 // getServiceConfigEtcdKey 获取配置的 Etcd Key
-func (i *Exporter) getServiceConfigEtcdKey(project, app, file string) string {
-	return fmt.Sprintf("/%s/%s/service/%s", project, app, file)
+func (i *Exporter) getServiceConfigEtcdKey(project, app, fileName string) string {
+	return fmt.Sprintf("/%s/%s/service/%s", project, app, fileName)
 }
 
 // getConfigFileList 获取配置文件列表

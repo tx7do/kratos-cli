@@ -24,6 +24,9 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&(opts.Endpoint), "addr", "a", "127.0.0.1:8500", "remote config service address")
 	rootCmd.PersistentFlags().StringVarP(&(opts.ProjectName), "proj", "p", "", "project name, this name is used to key prefix in remote config service")
 	rootCmd.PersistentFlags().StringVarP(&(opts.ProjectRoot), "root", "r", "./", "project root dir")
+	rootCmd.PersistentFlags().StringVarP(&(opts.Group), "group", "g", "DEFAULT_GROUP", "group name, this name is used to key prefix in remote config service")
+	rootCmd.PersistentFlags().StringVarP(&(opts.Env), "env", "e", "dev", "environment name, like dev, test, prod, etc.")
+	rootCmd.PersistentFlags().StringVarP(&(opts.NamespaceId), "ns", "n", "public", "namespace ID, used for Nacos")
 }
 
 // countFlags 统计显式设置的标志数量
@@ -43,7 +46,7 @@ func command(cmd *cobra.Command, _ []string) {
 		return
 	}
 
-	_ = cfgexp.Export(string(opts.Service), opts.Endpoint, opts.ProjectName, opts.ProjectRoot)
+	_ = cfgexp.Export(string(opts.Service), opts.Endpoint, opts.ProjectName, opts.ProjectRoot, opts.Group, opts.Env, opts.NamespaceId)
 }
 
 func main() {

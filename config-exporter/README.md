@@ -20,11 +20,14 @@ Usage:
   cfgexp [flags]
 
 Flags:
-  -a, --addr string   remote config service address (default "127.0.0.1:8500")
-  -h, --help          help for cfgexp
-  -p, --proj string   project name, this name is used to key prefix in remote config service
-  -r, --root string   project root dir (default "./")
-  -t, --type string   remote config service name (consul, etcd, etc.) (default "consul")
+  -a, --addr string    remote config service address (default "127.0.0.1:8500")
+  -e, --env string     environment name, like dev, test, prod, etc. (default "dev")
+  -g, --group string   group name, this name is used to key prefix in remote config service (default "DEFAULT_GROUP")
+  -h, --help           help for cfgexp
+  -n, --ns string      namespace ID, used for Nacos (default "public")
+  -p, --proj string    project name, this name is used to key prefix in remote config service
+  -r, --root string    project root dir (default "./")
+  -t, --type string    remote config service name (consul, etcd, etc.) (default "consul")
 ```
 
 ## Example
@@ -33,16 +36,28 @@ for `etcd` remote config service:
 
 ```shell
 cfgexp \
-    --type "etcd" \
-    --addr "localhost:2379" \
-    --proj "kratos_admin"
+    -t "etcd" \
+    -a "localhost:2379" \
+    -p "kratos_admin"
 ```
 
 for `consul` remote config service:
 
 ```shell
 cfgexp \
-    --type "consul" \
-    --addr "localhost:8500" \
-    --proj "kratos_admin"
+    -t "consul" \
+    -a "localhost:8500" \
+    -p "kratos_admin"
+```
+
+for `nacos` remote config service:
+
+```shell
+cfgexp \
+    -t "nacos" \
+    -a "localhost:8848" \
+    -p "kratos_admin" \
+    -n "public" \
+    -e "dev" \
+    -g "DEFAULT_GROUP"
 ```

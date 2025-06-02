@@ -3,8 +3,12 @@ package internal
 type ImporterType string
 
 const (
-	Consul ImporterType = "consul"
-	Etcd   ImporterType = "etcd"
+	Apollo     ImporterType = "apollo"
+	Consul     ImporterType = "consul"
+	Etcd       ImporterType = "etcd"
+	Kubernetes ImporterType = "kubernetes"
+	Nacos      ImporterType = "nacos"
+	Polaris    ImporterType = "polaris"
 )
 
 // Options 参数
@@ -15,4 +19,8 @@ type Options struct {
 
 	ProjectName string // 项目名
 	ProjectRoot string // 项目根目录
+
+	Group       string // for nacos
+	Env         string // for nacos
+	NamespaceId string // for nacos
 }

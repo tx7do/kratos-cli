@@ -37,7 +37,7 @@ func (i *Exporter) init() {
 	i.client = client
 }
 
-// Import 导入所有的配置
+// Export 导入所有的配置
 func (i *Exporter) Export() error {
 	apps := utils.GetFolderNameList(i.options.ProjectRoot + "app/")
 	for _, app := range apps {
@@ -47,7 +47,7 @@ func (i *Exporter) Export() error {
 	return nil
 }
 
-// ImportOneService 导入单个配置
+// ExportOneService 导入单个配置
 func (i *Exporter) ExportOneService(app string) error {
 	files := i.getConfigFileList(i.options.ProjectRoot, app)
 	for _, file := range files {
@@ -72,11 +72,11 @@ func (i *Exporter) writeConfigToConsul(key string, value []byte) error {
 
 // getServiceConfigFolder 获取某一个服务的配置文件夹路径
 func (i *Exporter) getServiceConfigFolder(root, app string) string {
-	return root + "app/" + app + "/" + "service/configs/"
+	return root + "app/" + app + "/service/configs/"
 }
 
-func (i *Exporter) getServiceConfigConsulKey(project, app, file string) string {
-	key := project + "/" + app + "/" + "service/" + file
+func (i *Exporter) getServiceConfigConsulKey(project, app, fileName string) string {
+	key := project + "/" + app + "/service/" + fileName
 	key = strings.Replace(key, "\\", "/", -1)
 	return key
 }
