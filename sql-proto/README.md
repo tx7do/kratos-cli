@@ -28,7 +28,7 @@ Flags:
   -v, --version string      Version of the module, e.g., 'v1' (default "v1")
 ```
 
-## Example
+## EXAMPLES
 
 generate gRPC service from PostgreSQL database schema:
 

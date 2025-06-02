@@ -30,7 +30,7 @@ Flags:
   -t, --type string    remote config service name (consul, etcd, etc.) (default "consul")
 ```
 
-## Example
+## EXAMPLES
 
 for `etcd` remote config service:
 

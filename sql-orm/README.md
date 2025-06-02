@@ -29,7 +29,7 @@ Flags:
   -t, --tables strings           comma-separated list of tables to inspect (all if empty)
 ```
 
-## Example
+## EXAMPLES
 
 for `ent` ORM:
 
