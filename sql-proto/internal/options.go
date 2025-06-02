@@ -8,19 +8,32 @@ type Options struct {
 	Driver string `json:"driver"` // Driver name, e.g., "mysql", "postgres"
 	Source string `json:"source"` // Data source name (DSN), e.g., "mysql://user:pass@tcp(localhost:3306)/dbname"
 
-	Tables         []string `json:"tables"`
-	ExcludedTables []string `json:"excluded_tables"` // Tables to exclude from inspection
+	IncludedTables []string `json:"included_tables"` // IncludedTables to inspect (all if empty)
+	ExcludedTables []string `json:"excluded_tables"` // ExcludedTables to exclude from inspection
 
 	OutputPath string `json:"output_path"` // Path to save the generated code
+
+	SourceModule string `json:"sourceModule"` // Source module name, for REST service generate, e.g., "admin"
+	Module       string `json:"module"`       // Module name for the generated code, e.g., "admin"
+	Version      string `json:"version"`      // Version of the module, e.g., "v1"
+	Service      string `json:"service"`      // generate service code, "rest" for REST service, "grpc" for gRPC service
 }
 
 type (
 	// ConvertOptions are the options passed on to every SchemaConverter.
 	ConvertOptions struct {
-		tables         []string
+		includedTables []string
 		excludedTables []string
-		protoPath      string
-		driver         *mux.ConvertDriver
+
+		protoPath string
+
+		sourceModuleName string // for REST service, the source module name
+		moduleName       string
+		moduleVersion    string
+
+		serviceType string
+
+		driver *mux.ConvertDriver
 	}
 
 	// ConvertOption allows for managing import configuration using functional options.
@@ -34,14 +47,38 @@ func WithProtoPath(path string) ConvertOption {
 	}
 }
 
-// WithTables limits the schema import to a set of given tables (by all tables are imported)
-func WithTables(tables []string) ConvertOption {
+func WithSourceModuleName(name string) ConvertOption {
 	return func(i *ConvertOptions) {
-		i.tables = tables
+		i.sourceModuleName = name
 	}
 }
 
-// WithExcludedTables supplies the set of tables to exclude.
+func WithModuleName(name string) ConvertOption {
+	return func(i *ConvertOptions) {
+		i.moduleName = name
+	}
+}
+
+func WithModuleVersion(ver string) ConvertOption {
+	return func(i *ConvertOptions) {
+		i.moduleVersion = ver
+	}
+}
+
+func WithServiceType(serviceType string) ConvertOption {
+	return func(i *ConvertOptions) {
+		i.serviceType = serviceType
+	}
+}
+
+// WithIncludedTables limits the schema import to a set of given includedTables (by all includedTables are imported)
+func WithIncludedTables(tables []string) ConvertOption {
+	return func(i *ConvertOptions) {
+		i.includedTables = tables
+	}
+}
+
+// WithExcludedTables supplies the set of includedTables to exclude.
 func WithExcludedTables(tables []string) ConvertOption {
 	return func(i *ConvertOptions) {
 		i.excludedTables = tables

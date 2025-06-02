@@ -35,13 +35,13 @@ func (f ProtoField) EntSetNillableFunc() string {
 }
 
 type GrpcProtoTemplateData struct {
-	Name    string
-	Comment string
-	Version string
+	Name    string // Proto文件名
+	Comment string // Proto文件注释
+	Version string // Proto版本号
 
-	Module string
+	Module string // 模块名
 
-	Fields []ProtoField
+	Fields []ProtoField // 字段列表
 }
 
 func (d GrpcProtoTemplateData) PascalName() string {

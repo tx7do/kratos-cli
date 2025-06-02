@@ -70,12 +70,13 @@ func NewMySQL(i *ConvertOptions) (*MySQL, error) {
 
 func (m *MySQL) SchemaTables(ctx context.Context) ([]*TableData, error) {
 	inspectOptions := &schema.InspectOptions{
-		Tables: m.tables,
+		Tables: m.includedTables,
 	}
 	s, err := m.driver.InspectSchema(ctx, m.driver.SchemaName, inspectOptions)
 	if err != nil {
 		return nil, err
 	}
+
 	tables := s.Tables
 	if m.excludedTables != nil {
 		tables = nil
@@ -83,13 +84,14 @@ func (m *MySQL) SchemaTables(ctx context.Context) ([]*TableData, error) {
 		for _, t := range m.excludedTables {
 			excludedTableNames[t] = true
 		}
-		// filter out tables that are in excludedTables:
+		// filter out includedTables that are in excludedTables:
 		for _, t := range s.Tables {
 			if !excludedTableNames[t.Name] {
 				tables = append(tables, t)
 			}
 		}
 	}
+
 	return schemaTables(MySQLFieldType, tables)
 }
 

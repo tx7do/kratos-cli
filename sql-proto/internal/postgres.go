@@ -80,7 +80,7 @@ func NewPostgreSQL(i *ConvertOptions) (SchemaConverter, error) {
 
 func (p *Postgres) SchemaTables(ctx context.Context) ([]*TableData, error) {
 	inspectOptions := &schema.InspectOptions{
-		Tables: p.tables,
+		Tables: p.includedTables,
 	}
 	s, err := p.driver.InspectSchema(ctx, p.driver.SchemaName, inspectOptions)
 	if err != nil {
@@ -93,7 +93,7 @@ func (p *Postgres) SchemaTables(ctx context.Context) ([]*TableData, error) {
 		for _, t := range p.excludedTables {
 			excludedTableNames[t] = true
 		}
-		// filter out tables that are in excludedTables:
+		// filter out includedTables that are in excludedTables:
 		for _, t := range s.Tables {
 			if !excludedTableNames[t.Name] {
 				tables = append(tables, t)

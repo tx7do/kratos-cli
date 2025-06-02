@@ -10,7 +10,7 @@ import (
 )
 
 // Importer imports the schema from the database specified by the DSN and writes it to the schemaPath.
-func Importer(ctx context.Context, dsn, schemaPath *string, tables, excludeTables []string) error {
+func Importer(ctx context.Context, dsn, schemaPath *string, includeTables, excludeTables []string) error {
 	if schemaPath == nil {
 		return errors.New("entimport: schema path is nil")
 	}
@@ -27,7 +27,7 @@ func Importer(ctx context.Context, dsn, schemaPath *string, tables, excludeTable
 	defer drv.Close()
 
 	i, err := NewImport(
-		WithTables(tables),
+		WithTables(includeTables),
 		WithExcludedTables(excludeTables),
 		WithDriver(drv),
 	)

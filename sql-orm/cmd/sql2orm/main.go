@@ -30,10 +30,10 @@ func init() {
 "mysql://user:pass@tcp(localhost:3306)/dbname"
 "postgres://user:pass@host:port/dbname"`)
 
-	rootCmd.PersistentFlags().StringVarP(&opts.SchemaPath, "schema-path", "s", "./ent/schema/", "output path for schema")
-	rootCmd.PersistentFlags().StringVarP(&opts.DaoPath, "dao-path", "d", "./daos/", "output path for DAO code (for gorm)")
-	rootCmd.PersistentFlags().StringSliceVarP(&opts.Tables, "tables", "t", nil, "comma-separated list of tables to inspect (all if empty)")
-	rootCmd.PersistentFlags().StringSliceVarP(&opts.ExcludedTables, "exclude-tables", "e", nil, "comma-separated list of tables to exclude")
+	rootCmd.PersistentFlags().StringVarP(&opts.SchemaPath, "schema", "s", "./ent/schema/", "output path for schema files (for ent)")
+	rootCmd.PersistentFlags().StringVarP(&opts.DaoPath, "dao", "d", "./daos/", "output path for DAO code (for gorm)")
+	rootCmd.PersistentFlags().StringSliceVarP(&opts.IncludedTables, "includes", "i", nil, "comma-separated list of tables to inspect (all if empty)")
+	rootCmd.PersistentFlags().StringSliceVarP(&opts.ExcludedTables, "excludes", "e", nil, "comma-separated list of tables to exclude")
 }
 
 func parseDSN(url string) (string, string, error) {
@@ -77,7 +77,7 @@ func command(cmd *cobra.Command, _ []string) {
 		opts.ORM,
 		&opts.Driver, &opts.Source,
 		&opts.SchemaPath, &opts.DaoPath,
-		opts.Tables, opts.ExcludedTables,
+		opts.IncludedTables, opts.ExcludedTables,
 	)
 }
 

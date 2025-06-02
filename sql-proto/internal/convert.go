@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -15,6 +16,8 @@ import (
 
 	"github.com/tx7do/kratos-cli/sql-proto/internal/render"
 )
+
+const defaultModuleVersion = "v1"
 
 func NewConvert(opts ...ConvertOption) (SchemaConverter, error) {
 	var (
@@ -141,35 +144,98 @@ func convertTable(fnc fieldTypeFunc, table *schema.Table) (*TableData, error) {
 	return &tableData, nil
 }
 
-func WriteProto(tables []*TableData, opts ...ConvertOption) error {
+func WriteProto(
+	tables []*TableData,
+	opts ...ConvertOption,
+) error {
 	o := &ConvertOptions{}
 	for _, apply := range opts {
 		apply(o)
 	}
 
 	data := render.GrpcProtoTemplateData{
-		Version: "v1",
+		Version: defaultModuleVersion,
+		Module:  "proto",
+	}
+
+	if o.moduleName != "" {
+		data.Module = o.moduleName
+	}
+	if o.moduleVersion != "" {
+		data.Version = o.moduleVersion
 	}
 
 	for i := 0; i < len(tables); i++ {
 		table := tables[i]
 
-		data.Module = inflection.Singular(table.Name)
-		data.Name = inflection.Singular(table.Name)
-		data.Comment = render.RemoveTableCommentSuffix(table.Comment)
+		switch strings.TrimSpace(strings.ToLower(o.serviceType)) {
+		case "rest":
+			writeRestServiceProto(table, o)
 
-		for n := 0; n < len(table.Fields); n++ {
-			field := table.Fields[n]
-			data.Fields = append(data.Fields, render.ProtoField{
-				Number:  i + 1,
-				Name:    field.Name,
-				Comment: field.Comment,
-				Type:    field.Type,
-			})
+		default:
+			fallthrough
+		case "grpc":
+			writeGrpcServiceProto(table, o)
 		}
-
-		render.WriteGrpcServiceProto(o.protoPath, data)
 	}
 
 	return nil
+}
+
+func writeGrpcServiceProto(
+	table *TableData,
+	opts *ConvertOptions,
+) {
+	data := render.GrpcProtoTemplateData{
+		Version: defaultModuleVersion,
+		Module:  "proto",
+	}
+
+	if opts.moduleName != "" {
+		data.Module = opts.moduleName
+	}
+	if opts.moduleVersion != "" {
+		data.Version = opts.moduleVersion
+	}
+
+	data.Name = inflection.Singular(table.Name)
+	data.Comment = render.RemoveTableCommentSuffix(table.Comment)
+
+	for n := 0; n < len(table.Fields); n++ {
+		field := table.Fields[n]
+		data.Fields = append(data.Fields, render.ProtoField{
+			Number:  n + 1,
+			Name:    field.Name,
+			Comment: field.Comment,
+			Type:    field.Type,
+		})
+	}
+
+	render.WriteGrpcServiceProto(opts.protoPath, data)
+}
+
+func writeRestServiceProto(
+	table *TableData,
+	opts *ConvertOptions,
+) {
+	data := render.RestProtoTemplateData{
+		Version:      defaultModuleVersion,
+		SourceModule: "proto",
+		TargetModule: "proto",
+	}
+
+	if opts.moduleName != "" {
+		data.TargetModule = opts.moduleName
+	}
+	if opts.sourceModuleName != "" {
+		data.SourceModule = opts.sourceModuleName
+	}
+	if opts.moduleVersion != "" {
+		data.Version = opts.moduleVersion
+	}
+
+	data.Name = inflection.Singular(table.Name)
+	data.Comment = render.RemoveTableCommentSuffix(table.Comment)
+
+	render.WriteRestServiceProto(opts.protoPath, data)
 }

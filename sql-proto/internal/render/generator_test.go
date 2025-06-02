@@ -75,7 +75,7 @@ func TestWriteInitWireCode(t *testing.T) {
 		Package: "server",
 		Postfix: "Server",
 		ServiceNames: []string{
-			"REST",
+			"Service",
 			"GRPC",
 		},
 	}

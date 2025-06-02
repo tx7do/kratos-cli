@@ -15,21 +15,38 @@ Usage:
   sql2proto [flags]
 
 Flags:
-  -v, --drv string               Database driver name to use (mysql, postgres, sqlite...) (default "mysql")
-  -n, --dsn string               Data source name (connection information), for example:
-                                 "mysql://user:pass@tcp(localhost:3306)/dbname"
-                                 "postgres://user:pass@host:port/dbname"
-  -e, --exclude-tables strings   comma-separated list of tables to exclude
-  -h, --help                     help for sql2proto
-  -s, --proto-path string        output path for protobuf schema files (default "./api/protos/")
-  -t, --tables strings           comma-separated list of tables to inspect (all if empty)
+  -n, --dsn string          Data source name (connection information), for example:
+                            "mysql://user:pass@tcp(localhost:3306)/dbname"
+                            "postgres://user:pass@host:port/dbname"
+  -e, --excludes strings    comma-separated list of tables to exclude
+  -h, --help                help for sql2proto
+  -i, --includes strings    comma-separated list of tables to inspect (all if empty)
+  -m, --module string       module name for the generated code, e.g., 'admin' (default "admin")
+  -o, --output string       output path for protobuf schema files (default "./api/protos/")
+  -s, --src-module string   Source module name, for REST service generate, e.g., "admin" (default "user")
+  -t, --type string         generate RPC service type, "rest" for REST service, "grpc" for gRPC service (default "grpc")
+  -v, --version string      Version of the module, e.g., 'v1' (default "v1")
 ```
 
 ## Example
 
+generate gRPC service from PostgreSQL database schema:
+
 ```shell
 sql2proto \
-  --drv "postgres" \
-  --dsn "postgres://postgres:pass@localhost:5432/test?sslmode=disable" \
-  --proto-path "./api/protos"
+  -n "postgres://postgres:pass@localhost:5432/test?sslmode=disable" \
+  -o "./api/protos" \
+  -t "grpc" \
+  -m "user"
+```
+
+generate REST service from MySQL database schema:
+
+```shell
+sql2proto \
+  -n "mysql://root:pass@localhost:3306/test" \
+  -o "./api/protos" \
+  -t "rest" \
+  -m "admin" \
+  -s "user"
 ```

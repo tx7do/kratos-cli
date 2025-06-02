@@ -8,7 +8,7 @@ import (
 	"github.com/tx7do/kratos-cli/sql-proto/internal/render/templates"
 )
 
-// WriteGrpcServiceProto GRPC service proto file
+// WriteGrpcServiceProto write gRPC service proto file
 func WriteGrpcServiceProto(outputPath string, data GrpcProtoTemplateData) {
 	outputPath = outputPath + "/" + strings.ToLower(data.Module) + "/service/" + strings.ToLower(data.Version)
 	outputPath = filepath.Clean(outputPath)
@@ -21,7 +21,7 @@ func WriteGrpcServiceProto(outputPath string, data GrpcProtoTemplateData) {
 	_ = renderTemplate[GrpcProtoTemplateData](outputPath, data, "grpc_proto", string(templates.GrpcProtoTemplateData))
 }
 
-// WriteRestServiceProto REST service proto file
+// WriteRestServiceProto write REST service proto file
 func WriteRestServiceProto(outputPath string, data RestProtoTemplateData) {
 	outputPath = outputPath + "/" + strings.ToLower(data.TargetModule) + "/service/" + strings.ToLower(data.Version)
 	outputPath = filepath.Clean(outputPath)
