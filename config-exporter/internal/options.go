@@ -20,6 +20,8 @@ type Options struct {
 	ProjectName string // 项目名
 	ProjectRoot string // 项目根目录
 
+	MergeSingle bool // 是否合并单个配置文件
+
 	Group       string // for nacos
 	Env         string // for nacos
 	NamespaceId string // for nacos

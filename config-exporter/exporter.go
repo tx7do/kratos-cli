@@ -18,6 +18,7 @@ func NewExporter(
 	group string,
 	env string,
 	namespaceId string,
+	mergeSingle bool,
 ) internal.Exporter {
 	opts := &internal.Options{
 		Service:     internal.ImporterType(typeName),
@@ -27,6 +28,7 @@ func NewExporter(
 		Group:       group,
 		Env:         env,
 		NamespaceId: namespaceId,
+		MergeSingle: mergeSingle,
 	}
 
 	switch opts.Service {
@@ -62,8 +64,18 @@ func Export(
 	group string,
 	env string,
 	namespaceId string,
+	mergeSingle bool,
 ) error {
-	exporter := NewExporter(typeName, endpoint, prefix, projectRootPath, group, env, namespaceId)
+	exporter := NewExporter(
+		typeName,
+		endpoint,
+		prefix,
+		projectRootPath,
+		group,
+		env,
+		namespaceId,
+		mergeSingle,
+	)
 	if exporter == nil {
 		return errors.New("exporter is nil")
 	}

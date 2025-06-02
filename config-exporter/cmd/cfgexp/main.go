@@ -27,6 +27,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&(opts.Group), "group", "g", "DEFAULT_GROUP", "group name, this name is used to key prefix in remote config service")
 	rootCmd.PersistentFlags().StringVarP(&(opts.Env), "env", "e", "dev", "environment name, like dev, test, prod, etc.")
 	rootCmd.PersistentFlags().StringVarP(&(opts.NamespaceId), "ns", "n", "public", "namespace ID, used for Nacos")
+	rootCmd.PersistentFlags().BoolVarP(&(opts.MergeSingle), "merge", "m", false, "merge single file into one file, default is false, which means each key will be exported to a separate file")
 }
 
 // countFlags 统计显式设置的标志数量
@@ -46,7 +47,16 @@ func command(cmd *cobra.Command, _ []string) {
 		return
 	}
 
-	_ = cfgexp.Export(string(opts.Service), opts.Endpoint, opts.ProjectName, opts.ProjectRoot, opts.Group, opts.Env, opts.NamespaceId)
+	_ = cfgexp.Export(
+		string(opts.Service),
+		opts.Endpoint,
+		opts.ProjectName,
+		opts.ProjectRoot,
+		opts.Group,
+		opts.Env,
+		opts.NamespaceId,
+		opts.MergeSingle,
+	)
 }
 
 func main() {
