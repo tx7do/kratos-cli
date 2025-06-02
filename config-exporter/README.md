@@ -1,5 +1,7 @@
 # Local Config Files → Remote Config System Exporter
 
+This tool exports local configuration files to remote configuration systems like Consul or Etcd, making it easier to manage configurations in distributed systems.
+
 Support Remote Config Systems Exporter for Kratos CLI:
 
 - Consul

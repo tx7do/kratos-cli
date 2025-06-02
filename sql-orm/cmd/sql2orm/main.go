@@ -16,8 +16,8 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "sql2orm",
-	Short: "SQL to ORM code Importer",
-	Long:  "SQL to ORM code Importer is a tool to generate ORM code from SQL database schemas.",
+	Short: "SQL to ORM code generator",
+	Long:  "sql2orm is a tool to generate ORM code from SQL database schemas.",
 	Run:   command,
 }
 

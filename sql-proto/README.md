@@ -1,5 +1,7 @@
 # SQL → Protobuf
 
+This tool imports the SQL database schema into Protobuf code for use in Kratos microservices.
+
 ## HOW TO INSTALL
 
 ```shell

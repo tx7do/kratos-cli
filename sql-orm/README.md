@@ -1,6 +1,6 @@
 # SQL → ORM Schema Importer
 
-Copy from <https://github.com/zeevmoney/entimport>
+This tool imports SQL database schemas and generates ORM code for use in Kratos microservices, supporting both `ent` and `gorm` ORMs.
 
 ## HOW TO INSTALL
 
@@ -11,7 +11,7 @@ go install github.com/tx7do/kratos-cli/sql-orm/cmd/sql2orm@latest
 ## HOW TO USE
 
 ```shell
-SQL to ORM code Importer is a tool to generate ORM code from SQL database schemas.
+sql2orm is a tool to generate ORM code from SQL database schemas.
 
 Usage:
   sql2orm [flags]
@@ -50,3 +50,9 @@ sql2orm \
   --schema-path "./daos/models" \
   --dao-path "./daos/"
 ```
+
+## ACKNOWLEDGEMENT
+
+- [ent](https://entgo.io) generator code is based on Copy from <https://github.com/zeevmoney/entimport>.
+- [gorm](https://gorm.io) generator code is based on [GORM GEN](https://gorm.io/gen/index.html)
+- sql parser is <https://github.com/blastrain/vitess-sqlparser>
