@@ -60,8 +60,8 @@ func WriteGormDataPackageCode(outputPath string, data DataTemplateData) {
 	_ = renderTemplate[DataTemplateData](outputPath, data, "gorm_data", string(templates.GormDataTemplateData))
 }
 
-// WriteGrpcServicePackageCode writes the GRPC service package code to the specified output path.
-func WriteGrpcServicePackageCode(outputPath string, data ServiceTemplateData) {
+// WriteServicePackageCode writes the GRPC service package code to the specified output path.
+func WriteServicePackageCode(outputPath string, data ServiceTemplateData) {
 	outputPath = outputPath + "/service/"
 	outputPath = filepath.Clean(outputPath)
 
@@ -71,6 +71,28 @@ func WriteGrpcServicePackageCode(outputPath string, data ServiceTemplateData) {
 	outputPath = filepath.Clean(outputPath)
 
 	_ = renderTemplate[ServiceTemplateData](outputPath, data, "service", string(templates.ServiceTemplateData))
+}
+
+// WriteServerPackageCode writes the server package code to the specified output path.
+func WriteServerPackageCode(outputPath string, data ServerTemplateData) {
+	data.Service = strings.ToLower(data.Service)
+
+	outputPath = outputPath + "/server/"
+	outputPath = filepath.Clean(outputPath)
+
+	_ = os.MkdirAll(outputPath, os.ModePerm)
+
+	switch data.Type {
+	case "grpc":
+		outputPath = outputPath + "/" + "grpc" + GoFilePostfix
+		outputPath = filepath.Clean(outputPath)
+		_ = renderTemplate[ServerTemplateData](outputPath, data, "grpc_server_"+data.Project, string(templates.GrpcTemplateServerData))
+
+	case "rest":
+		outputPath = outputPath + "/" + "rest" + GoFilePostfix
+		outputPath = filepath.Clean(outputPath)
+		_ = renderTemplate[ServerTemplateData](outputPath, data, "rest_server_"+data.Project, string(templates.RestTemplateServerData))
+	}
 }
 
 // WriteInitWireCode writes the initialization wire code to the specified output path.
@@ -106,26 +128,4 @@ func WriteMainCode(outputPath string, data MainTemplateData) {
 	data.Service = snakeToPascal(data.Service)
 
 	_ = renderTemplate[MainTemplateData](goFileName, data, "main_"+data.Project, string(templates.MainTemplateData))
-}
-
-// WriteServerPackageCode writes the server package code to the specified output path.
-func WriteServerPackageCode(outputPath string, data ServerTemplateData) {
-	data.Service = strings.ToLower(data.Service)
-
-	outputPath = outputPath + "/server/"
-	outputPath = filepath.Clean(outputPath)
-
-	_ = os.MkdirAll(outputPath, os.ModePerm)
-
-	switch data.Type {
-	case "grpc":
-		outputPath = outputPath + "/" + "grpc" + GoFilePostfix
-		outputPath = filepath.Clean(outputPath)
-		_ = renderTemplate[ServerTemplateData](outputPath, data, "grpc_server_"+data.Project, string(templates.GrpcTemplateServerData))
-
-	case "rest":
-		outputPath = outputPath + "/" + "rest" + GoFilePostfix
-		outputPath = filepath.Clean(outputPath)
-		_ = renderTemplate[ServerTemplateData](outputPath, data, "rest_server_"+data.Project, string(templates.RestTemplateServerData))
-	}
 }

@@ -14,6 +14,8 @@ type ProtoField struct {
 	Comment string // 字段注释
 }
 
+type ProtoFieldArray []ProtoField
+
 func (f ProtoField) CamelName() string {
 	return snakeToCamel(f.Name)
 }
@@ -41,7 +43,7 @@ type GrpcProtoTemplateData struct {
 
 	Module string // 模块名
 
-	Fields []ProtoField // 字段列表
+	Fields ProtoFieldArray // 字段列表
 }
 
 func (d GrpcProtoTemplateData) PascalName() string {
@@ -95,7 +97,7 @@ type DataTemplateData struct {
 	Module  string
 	Version string
 
-	Fields []ProtoField
+	Fields ProtoFieldArray
 
 	UseTimestamp bool
 }
@@ -123,8 +125,8 @@ type ServiceTemplateData struct {
 
 	Version string
 
-	SourceApi string
-	TargetApi string
+	SourceModuleName string
+	TargetModuleName string
 
 	UseRepo bool // 是否使用数据仓库，否则使用GRPC客户端。
 	IsGrpc  bool // 是否是GRPC服务。
@@ -139,15 +141,15 @@ func (d ServiceTemplateData) PascalName() string {
 }
 
 func (d ServiceTemplateData) SourceApiPackage() string {
-	return strings.ToLower(d.SourceApi) + strings.ToUpper(d.Version)
+	return strings.ToLower(d.SourceModuleName) + strings.ToUpper(d.Version)
 }
 
 func (d ServiceTemplateData) TargetApiPackage() string {
-	return strings.ToLower(d.TargetApi) + strings.ToUpper(d.Version)
+	return strings.ToLower(d.TargetModuleName) + strings.ToUpper(d.Version)
 }
 
 func (d ServiceTemplateData) IsSameApi() bool {
-	return strings.ToLower(d.SourceApi) == strings.ToLower(d.TargetApi)
+	return strings.ToLower(d.SourceModuleName) == strings.ToLower(d.TargetModuleName)
 }
 
 func (d ServiceTemplateData) ServiceInterface() string {

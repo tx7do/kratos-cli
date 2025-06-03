@@ -29,7 +29,7 @@ func TestWriteGrpcServiceProto(t *testing.T) {
 		Comment: "用户",
 		Version: "v1",
 
-		Fields: []ProtoField{
+		Fields: ProtoFieldArray{
 			{Name: "id", Type: "int64", Number: 1, Comment: "用户ID"},
 			{Name: "last_login_time", Type: "int64", Number: 2, Comment: "最后登录时间"},
 		},
@@ -103,21 +103,21 @@ func TestWriteMainCode(t *testing.T) {
 	WriteMainCode("./app/user/service/cmd/server", serviceInit)
 }
 
-func TestWriteRestServicePackageCode(t *testing.T) {
+func TestWriteServicePackageCode(t *testing.T) {
 	dataUser := ServiceTemplateData{
 		Project: "kratos-admin",
 
 		Service: "admin",
 		Name:    "user",
 
-		SourceApi: "user",
-		TargetApi: "admin",
-		Version:   "v1",
+		SourceModuleName: "user",
+		TargetModuleName: "admin",
+		Version:          "v1",
 
 		UseRepo: false,
 		IsGrpc:  false,
 	}
-	WriteGrpcServicePackageCode("./app/user/service/internal/", dataUser)
+	WriteServicePackageCode("./app/user/service/internal/", dataUser)
 
 	dataTenant := ServiceTemplateData{
 		Project: "kratos-admin",
@@ -125,14 +125,14 @@ func TestWriteRestServicePackageCode(t *testing.T) {
 		Service: "user",
 		Name:    "tenant",
 
-		SourceApi: "user",
-		TargetApi: "user",
-		Version:   "v1",
+		SourceModuleName: "user",
+		TargetModuleName: "user",
+		Version:          "v1",
 
 		UseRepo: true,
 		IsGrpc:  true,
 	}
-	WriteGrpcServicePackageCode("./app/user/service/internal/", dataTenant)
+	WriteServicePackageCode("./app/user/service/internal/", dataTenant)
 }
 
 func TestWriteEntDataPackageCode(t *testing.T) {
@@ -145,7 +145,7 @@ func TestWriteEntDataPackageCode(t *testing.T) {
 		Module:  "user",
 		Version: "v1",
 
-		Fields: []ProtoField{
+		Fields: ProtoFieldArray{
 			{Name: "id", Type: "int64", Number: 1, Comment: "用户ID"},
 			{Name: "last_login_time", Type: "int64", Number: 2, Comment: "最后登录时间"},
 		},
