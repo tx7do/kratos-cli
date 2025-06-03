@@ -111,8 +111,16 @@ func WriteServerPackageCode(
 
 func WriteInitWireCode(
 	outputPath string,
+
+	projectName string,
+	postfix string,
+	services []string,
 ) {
-	data := render.InitWireTemplateData{}
+	data := render.InitWireTemplateData{
+		Package:      projectName,
+		Postfix:      postfix,
+		ServiceNames: services,
+	}
 	render.WriteInitWireCode(outputPath, data)
 }
 
