@@ -17,15 +17,15 @@ func Convert(
 	moduleName, sourceModuleName, moduleVersion *string,
 	serviceType *string,
 	includeTables, excludeTables []string,
-) error {
+) ([]*internal.TableData, error) {
 	if outputPath == nil {
-		return errors.New("sqlproto: proto file output path is nil")
+		return nil, errors.New("sqlproto: proto file output path is nil")
 	}
 	if dsn == nil {
-		return errors.New("sqlproto: dsn is nil")
+		return nil, errors.New("sqlproto: dsn is nil")
 	}
 	if moduleName == nil {
-		return errors.New("sqlproto: proto module is nil")
+		return nil, errors.New("sqlproto: proto module is nil")
 	}
 
 	_ = os.MkdirAll(*outputPath, os.ModePerm)
@@ -33,6 +33,7 @@ func Convert(
 	convertDriver, err := mux.Default.OpenConvert(*dsn)
 	if err != nil {
 		log.Fatalf("sqlproto: failed to create import driver - %v", err)
+		return nil, err
 	}
 	defer convertDriver.Close()
 
@@ -43,11 +44,13 @@ func Convert(
 	)
 	if err != nil {
 		log.Fatalf("sqlproto: create importer failed: %v", err)
+		return nil, err
 	}
 
 	tableDatas, err := i.SchemaTables(ctx)
 	if err != nil {
 		log.Fatalf("sqlproto: schema import failed - %v", err)
+		return nil, err
 	}
 
 	var opts []internal.ConvertOption
@@ -70,7 +73,7 @@ func Convert(
 		log.Fatalf("sqlproto: schema writing failed - %v", err)
 	}
 
-	return nil
+	return tableDatas, nil
 }
 
 // filterTables filters the provided tables based on the include and exclude lists.

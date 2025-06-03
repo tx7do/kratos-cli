@@ -60,7 +60,7 @@ func command(cmd *cobra.Command, _ []string) {
 
 	ctx := context.Background()
 
-	_ = sqlproto.Convert(
+	_, _ = sqlproto.Convert(
 		ctx,
 		&opts.Source, &opts.OutputPath,
 		&opts.Module,

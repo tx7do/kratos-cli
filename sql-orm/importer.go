@@ -16,11 +16,11 @@ func Importer(
 	schemaPath, daoPath *string,
 	includeTables, excludeTables []string,
 ) error {
-	switch strings.ToLower(strings.TrimSpace(orm)) {
-	case "ent":
+	switch OrmType(strings.ToLower(strings.TrimSpace(orm))) {
+	case OrmTypeEnt:
 		return entimport.Importer(ctx, dsn, schemaPath, includeTables, excludeTables)
 
-	case "gorm":
+	case OrmTypeGorm:
 		return gorm.Importer(ctx, drv, dsn, schemaPath, daoPath, includeTables, excludeTables)
 
 	default:
