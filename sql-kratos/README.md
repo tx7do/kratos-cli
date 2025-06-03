@@ -58,4 +58,16 @@ sql2kratos \
 generate code for REST service:
 
 ```shell
+sql2kratos \
+  -p "kratos-admin" \
+  -n "postgres://postgres:pass@localhost:5432/test?sslmode=disable" \
+  -r "ent" \
+  -o "." \
+  -s "user" \
+  -m "admin" \
+  -c "admin" \
+  -g "rest" \
+  -x=false \
+  -z=false \
+  -l=false
 ```

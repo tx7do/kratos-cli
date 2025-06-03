@@ -3,8 +3,9 @@ package sqlkratos
 import (
 	"context"
 	"fmt"
-	"github.com/jinzhu/inflection"
 	"log"
+
+	"github.com/jinzhu/inflection"
 
 	sqlorm "github.com/tx7do/kratos-cli/sql-orm"
 	sqlproto "github.com/tx7do/kratos-cli/sql-proto"
@@ -44,7 +45,8 @@ func Generate(ctx context.Context, opts internal.GeneratorOptions) error {
 	}
 
 	// 生成ORM代码
-	if opts.GenerateServer {
+	log.Println("orm", opts.GenerateORM)
+	if opts.GenerateORM {
 		dataPackagePath := fmt.Sprintf("%s/app/%s/service/internal/", opts.OutputPath, opts.ModuleName)
 		if err = generateOrmCode(ctx, opts, dataPackagePath); err != nil {
 			return err

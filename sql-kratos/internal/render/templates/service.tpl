@@ -38,17 +38,17 @@ func New{{.ClassName}}(
 	}
 }
 
-func (s *{{.ClassName}}) List(ctx context.Context, req *pagination.PagingRequest) (*{{.SourceModuleName}}.List{{.PascalName}}Response, error) {
+func (s *{{.ClassName}}) List(ctx context.Context, req *pagination.PagingRequest) (*{{.SourceApiPackage}}.List{{.PascalName}}Response, error) {
 	return s.{{.DataSourceVar}}.List(ctx, req)
 }
 
-func (s *{{.ClassName}}) Get(ctx context.Context, req *{{.SourceModuleName}}.Get{{.PascalName}}Request) (*{{.SourceModuleName}}.{{.PascalName}}, error) {
+func (s *{{.ClassName}}) Get(ctx context.Context, req *{{.SourceApiPackage}}.Get{{.PascalName}}Request) (*{{.SourceApiPackage}}.{{.PascalName}}, error) {
 	return s.{{.DataSourceVar}}.Get(ctx, req)
 }
 
-func (s *{{.ClassName}}) Create(ctx context.Context, req *{{.SourceModuleName}}.Create{{.PascalName}}Request) (*emptypb.Empty, error) {
+func (s *{{.ClassName}}) Create(ctx context.Context, req *{{.SourceApiPackage}}.Create{{.PascalName}}Request) (*emptypb.Empty, error) {
 	if req == nil || req.Data == nil {
-		return nil, {{.SourceModuleName}}.ErrorBadRequest("invalid parameter")
+		return nil, {{.SourceApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
 
 {{if not .IsGrpc}}
@@ -71,9 +71,9 @@ func (s *{{.ClassName}}) Create(ctx context.Context, req *{{.SourceModuleName}}.
 {{end -}}
 }
 
-func (s *{{.ClassName}}) Update(ctx context.Context, req *{{.SourceModuleName}}.Update{{.PascalName}}Request) (*emptypb.Empty, error) {
+func (s *{{.ClassName}}) Update(ctx context.Context, req *{{.SourceApiPackage}}.Update{{.PascalName}}Request) (*emptypb.Empty, error) {
 	if req == nil || req.Data == nil {
-		return nil, {{.SourceModuleName}}.ErrorBadRequest("invalid parameter")
+		return nil, {{.SourceApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
 
 {{if not .IsGrpc}}
@@ -96,9 +96,9 @@ func (s *{{.ClassName}}) Update(ctx context.Context, req *{{.SourceModuleName}}.
 {{end -}}
 }
 
-func (s *{{.ClassName}}) Delete(ctx context.Context, req *{{.SourceModuleName}}.Delete{{.PascalName}}Request) (*emptypb.Empty, error) {
+func (s *{{.ClassName}}) Delete(ctx context.Context, req *{{.SourceApiPackage}}.Delete{{.PascalName}}Request) (*emptypb.Empty, error) {
     if req == nil {
-        return nil, {{.SourceModuleName}}.ErrorBadRequest("invalid parameter")
+        return nil, {{.SourceApiPackage}}.ErrorBadRequest("invalid parameter")
     }
 
 {{if not .UseRepo}}
