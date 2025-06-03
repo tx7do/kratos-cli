@@ -92,13 +92,9 @@ func TestWriteWireCode(t *testing.T) {
 
 func TestWriteMainCode(t *testing.T) {
 	serviceInit := MainTemplateData{
-		Project:     "kratos-admin",
-		Service:     "user",
-		EnableREST:  true,
-		EnableGRPC:  true,
-		EnableAsynq: false,
-		EnableSSE:   false,
-		EnableKafka: false,
+		Project: "kratos-admin",
+		Service: "user",
+		Servers: []string{"REST", "GRPC"},
 	}
 	WriteMainCode("./app/user/service/cmd/server", serviceInit)
 }

@@ -47,8 +47,23 @@ func WriteDataPackageCode(
 	serviceName string,
 	name string,
 	moduleName, moduleVersion string,
-	protoFields ProtoFieldArray,
+	protoFields []ProtoField,
 ) {
+	var copyProtoFields render.ProtoFieldArray
+	for _, field := range protoFields {
+		if field.Type == "" {
+			continue
+		}
+
+		copyProtoField := render.ProtoField{
+			Number:  field.Number,
+			Name:    field.Name,
+			Type:    field.Type,
+			Comment: field.Comment,
+		}
+		copyProtoFields = append(copyProtoFields, copyProtoField)
+	}
+
 	data := render.DataTemplateData{
 		Project: projectName,
 
@@ -58,7 +73,7 @@ func WriteDataPackageCode(
 		Module:  moduleName,
 		Version: moduleVersion,
 
-		Fields: render.ProtoFieldArray(protoFields),
+		Fields: copyProtoFields,
 	}
 	switch strings.TrimSpace(strings.ToLower(orm)) {
 	case "ent":
@@ -143,23 +158,12 @@ func WriteMainCode(
 	projectName string,
 	serviceName string,
 
-	enableREST bool,
-	enableGRPC bool,
-	enableAsynq bool,
-	enableSSE bool,
-	enableKafka bool,
-	enableMQTT bool,
+	servers []string,
 ) {
 	data := render.MainTemplateData{
 		Project: projectName,
 		Service: serviceName,
-
-		EnableREST:  enableREST,
-		EnableGRPC:  enableGRPC,
-		EnableAsynq: enableAsynq,
-		EnableSSE:   enableSSE,
-		EnableKafka: enableKafka,
-		EnableMQTT:  enableMQTT,
+		Servers: servers,
 	}
 	render.WriteMainCode(outputPath, data)
 }
