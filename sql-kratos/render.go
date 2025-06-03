@@ -99,12 +99,12 @@ func WriteServerPackageCode(
 func WriteInitWireCode(
 	outputPath string,
 
-	projectName string,
+	packageName string,
 	postfix string,
 	services []string,
 ) error {
 	data := render.InitWireTemplateData{
-		Package:      projectName,
+		Package:      packageName,
 		Postfix:      postfix,
 		ServiceNames: services,
 	}

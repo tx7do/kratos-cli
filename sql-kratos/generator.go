@@ -3,6 +3,7 @@ package sqlkratos
 import (
 	"context"
 	"fmt"
+	"log"
 
 	sqlorm "github.com/tx7do/kratos-cli/sql-orm"
 	sqlproto "github.com/tx7do/kratos-cli/sql-proto"
@@ -41,11 +42,10 @@ func Generate(ctx context.Context, opts internal.GeneratorOptions) error {
 		}
 	}
 
-	serviceRootPath := opts.OutputPath + "/service"
-
 	// 生成ORM代码
 	if opts.GenerateServer {
-		if err = generateOrmCode(ctx, opts, serviceRootPath); err != nil {
+		dataPackagePath := fmt.Sprintf("%s/app/%s/service/internal/", opts.OutputPath, opts.ModuleName)
+		if err = generateOrmCode(ctx, opts, dataPackagePath); err != nil {
 			return err
 		}
 	}
@@ -151,6 +151,8 @@ func generateOrmCode(
 ) error {
 	var err error
 
+	log.Println("Generating ORM code...")
+
 	var schemaPath string
 	var daoPath string
 	switch opts.OrmType {
@@ -174,6 +176,8 @@ func generateOrmCode(
 		return err
 	}
 
+	log.Println("ORM code generation completed.")
+
 	return nil
 }
 
@@ -195,7 +199,7 @@ func generateServerPackageCode(
 		}
 	}
 
-	return WriteInitWireCode(outputPath, projectName, "Server", servers)
+	return WriteInitWireCode(outputPath, "server", "Server", servers)
 }
 
 func generateServicePackageCode(
@@ -225,7 +229,7 @@ func generateServicePackageCode(
 		}
 	}
 
-	return WriteInitWireCode(outputPath, projectName, "Service", services)
+	return WriteInitWireCode(outputPath, "service", "Service", services)
 }
 
 func generateDataPackageCode(
@@ -274,7 +278,7 @@ func generateDataPackageCode(
 		}
 	}
 
-	return WriteInitWireCode(outputPath, projectName, "Repo", services)
+	return WriteInitWireCode(outputPath, "data", "Repo", services)
 }
 
 func generateMainPackageCode(

@@ -90,9 +90,10 @@ func WriteInitWireCode(outputPath string, data InitWireTemplateData) error {
 		return err
 	}
 
-	goFileName := outputPath + "/" + "init" + GoFilePostfix
+	outputPath = outputPath + "/" + "init" + GoFilePostfix
+	outputPath = filepath.Clean(outputPath)
 
-	return renderTemplate[InitWireTemplateData](goFileName, data, "init_"+data.Package, string(templates.InitTemplateData))
+	return renderTemplate[InitWireTemplateData](outputPath, data, "init_"+data.Package, string(templates.InitTemplateData))
 }
 
 // WriteWireCode writes the wire code to the specified output path.
@@ -101,12 +102,12 @@ func WriteWireCode(outputPath string, data WireTemplateData) error {
 		return err
 	}
 
-	goFileName := outputPath + "/" + "wire" + GoFilePostfix
-	goFileName = filepath.Clean(goFileName)
+	outputPath = outputPath + "/" + "wire" + GoFilePostfix
+	outputPath = filepath.Clean(outputPath)
 
 	data.Service = strings.ToLower(data.Service)
 
-	return renderTemplate[WireTemplateData](goFileName, data, "wire_"+data.Project, string(templates.WireTemplateData))
+	return renderTemplate[WireTemplateData](outputPath, data, "wire_"+data.Project, string(templates.WireTemplateData))
 }
 
 // WriteMainCode writes the main code to the specified output path.
@@ -115,10 +116,10 @@ func WriteMainCode(outputPath string, data MainTemplateData) error {
 		return err
 	}
 
-	goFileName := outputPath + "/" + "main" + GoFilePostfix
-	goFileName = filepath.Clean(goFileName)
+	outputPath = outputPath + "/" + "main" + GoFilePostfix
+	outputPath = filepath.Clean(outputPath)
 
 	data.Service = snakeToPascal(data.Service)
 
-	return renderTemplate[MainTemplateData](goFileName, data, "main_"+data.Project, string(templates.MainTemplateData))
+	return renderTemplate[MainTemplateData](outputPath, data, "main_"+data.Project, string(templates.MainTemplateData))
 }
