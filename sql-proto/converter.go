@@ -19,6 +19,7 @@ func Convert(
 	moduleName, sourceModuleName, moduleVersion *string,
 	serviceType *string,
 	includeTables, excludeTables []string,
+	exportProto bool,
 ) (TableDataArray, error) {
 	if outputPath == nil {
 		return nil, errors.New("sqlproto: proto file output path is nil")
@@ -55,24 +56,15 @@ func Convert(
 		return nil, err
 	}
 
-	var opts []internal.ConvertOption
-	if serviceType != nil {
-		opts = append(opts, internal.WithServiceType(*serviceType))
-	}
-	if outputPath != nil {
-		opts = append(opts, internal.WithProtoPath(*outputPath))
-	}
-	if moduleName != nil {
-		opts = append(opts, internal.WithModuleName(*moduleName))
-	}
-	if sourceModuleName != nil {
-		opts = append(opts, internal.WithSourceModuleName(*sourceModuleName))
-	}
-	if moduleVersion != nil {
-		opts = append(opts, internal.WithModuleVersion(*moduleVersion))
-	}
-	if err = internal.WriteProto(tableDatas, opts...); err != nil {
-		log.Fatalf("sqlproto: schema writing failed - %v", err)
+	if exportProto {
+		if err = WriteServicesProto(
+			*outputPath,
+			*serviceType,
+			*moduleName, *sourceModuleName, *moduleVersion,
+			tableDatas,
+		); err != nil {
+			log.Fatalf("sqlproto: schema writing failed - %v", err)
+		}
 	}
 
 	return tableDatas, nil
