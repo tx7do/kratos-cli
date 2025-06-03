@@ -10,6 +10,8 @@ import (
 	"github.com/tx7do/kratos-cli/sql-proto/internal/mux"
 )
 
+type TableDataArray []*internal.TableData
+
 // Convert converts the database schema into a protocol buffer definition.
 func Convert(
 	ctx context.Context,
@@ -17,7 +19,7 @@ func Convert(
 	moduleName, sourceModuleName, moduleVersion *string,
 	serviceType *string,
 	includeTables, excludeTables []string,
-) ([]*internal.TableData, error) {
+) (TableDataArray, error) {
 	if outputPath == nil {
 		return nil, errors.New("sqlproto: proto file output path is nil")
 	}
@@ -74,34 +76,4 @@ func Convert(
 	}
 
 	return tableDatas, nil
-}
-
-// filterTables filters the provided tables based on the include and exclude lists.
-func filterTables(tables []*internal.TableData, includeTables, excludeTables []string) []*internal.TableData {
-	if len(excludeTables) == 0 && len(includeTables) == 0 {
-		return tables
-	}
-
-	tableSet := make(map[string]*internal.TableData)
-	for _, table := range tables {
-		tableSet[table.Name] = table
-	}
-
-	filtered := make([]*internal.TableData, 0, len(includeTables))
-	for _, tableName := range includeTables {
-		if _, exists := tableSet[tableName]; exists {
-			excluded := false
-			for _, excludedTable := range excludeTables {
-				if tableName == excludedTable {
-					excluded = true
-					break
-				}
-			}
-			if !excluded {
-				filtered = append(filtered, tableSet[tableName])
-			}
-		}
-	}
-
-	return filtered
 }

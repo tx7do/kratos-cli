@@ -8,8 +8,18 @@ import (
 func TestConverter(t *testing.T) {
 	ctx := context.Background()
 
-	srv := "postgres"
 	dsn := "postgres://postgres:*Abcd123456@localhost:5432/example?sslmode=disable"
+	moduleName := "admin"
+	sourceModuleName := "user"
+	moduleVersion := "v1"
+	serviceType := "grpc"
 	outputPath := "./api/protos"
-	_ = Convert(ctx, &srv, &dsn, &outputPath, nil, nil)
+	_, _ = Convert(
+		ctx,
+		&dsn,
+		&outputPath,
+		&moduleName, &sourceModuleName, &moduleVersion,
+		&serviceType,
+		nil, nil,
+	)
 }
