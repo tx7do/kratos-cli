@@ -183,8 +183,8 @@ github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf
 github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
 github.com/tx7do/kratos-cli/sql-orm v0.0.2 h1:sefEiPDpM2+hNEZYw/UU1PbAKQhBsZMkGBSyTclpLIk=
 github.com/tx7do/kratos-cli/sql-orm v0.0.2/go.mod h1:6nhx6YMGURzVamnWyK8oLR5/Cr75MQcllb/U2/EOBsE=
-github.com/tx7do/kratos-cli/sql-proto v0.0.10 h1:FNKupiT8cw/aGGfnN7N0OlNCQmEI8ClqMYjOZEo55Kg=
-github.com/tx7do/kratos-cli/sql-proto v0.0.10/go.mod h1:l2B68sc5CVq+qaJzZFZsoSDKd8XBsFQwEJ8U1lqk7IE=
+github.com/tx7do/kratos-cli/sql-proto v0.0.12 h1:AF+U+74v5PR1dFxVJPl62XvMfbUxKAPY3p+Xp+DAcE4=
+github.com/tx7do/kratos-cli/sql-proto v0.0.12/go.mod h1:AbEJlm7yJ7e0azJPuXK7rVAVMKj6oQWVT6PSuwdE9mM=
 github.com/xdg-go/pbkdf2 v1.0.0/go.mod h1:jrpuAogTd400dnrH08LKmI/xc1MbPOebTwRqcT5RDeI=
 github.com/xdg-go/scram v1.1.1/go.mod h1:RaEWvsqvNKKvBPvcKeFjrG2cJqOkHTiyTpzz23ni57g=
 github.com/xdg-go/stringprep v1.0.3/go.mod h1:W3f5j4i+9rC0kuIEJL0ky1VpHXQU3ocBgklLGvcBnW8=

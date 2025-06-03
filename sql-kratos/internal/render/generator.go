@@ -65,6 +65,8 @@ func WriteServerPackageCode(outputPath string, data ServerTemplateData) error {
 		return err
 	}
 
+	data.Service = snakeToPascal(data.Service)
+
 	switch data.Type {
 	case "grpc":
 		outputPath = outputPath + "/" + "grpc" + GoFilePostfix
@@ -92,6 +94,10 @@ func WriteInitWireCode(outputPath string, data InitWireTemplateData) error {
 
 	outputPath = outputPath + "/" + "init" + GoFilePostfix
 	outputPath = filepath.Clean(outputPath)
+
+	for i, name := range data.ServiceNames {
+		data.ServiceNames[i] = snakeToPascal(name)
+	}
 
 	return renderTemplate[InitWireTemplateData](outputPath, data, "init_"+data.Package, string(templates.InitTemplateData))
 }

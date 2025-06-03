@@ -3,6 +3,7 @@ package sqlkratos
 import (
 	"context"
 	"fmt"
+	"github.com/jinzhu/inflection"
 	"log"
 
 	sqlorm "github.com/tx7do/kratos-cli/sql-orm"
@@ -28,7 +29,7 @@ func Generate(ctx context.Context, opts internal.GeneratorOptions) error {
 			continue
 		}
 
-		name := table.Name
+		name := inflection.Singular(table.Name)
 
 		services = append(services, name)
 		servicePackageMap[name] = opts.ModuleName
@@ -127,8 +128,8 @@ func generateProtobufCode(ctx context.Context, opts internal.GeneratorOptions) (
 		if tables, err = sqlproto.Convert(
 			ctx,
 			&opts.Source,
-			&opts.OutputPath,
 			&protoPath,
+			&opts.ModuleName,
 			&opts.SourceModuleName,
 			&opts.ModuleVersion,
 			&server,
@@ -216,7 +217,7 @@ func generateServicePackageCode(
 			continue
 		}
 
-		name := table.Name
+		name := inflection.Singular(table.Name)
 
 		if err := WriteServicePackageCode(
 			outputPath,
@@ -250,7 +251,7 @@ func generateDataPackageCode(
 			continue
 		}
 
-		name := table.Name
+		name := inflection.Singular(table.Name)
 
 		dataFields = make([]DataField, 0)
 		for _, field := range table.Fields {

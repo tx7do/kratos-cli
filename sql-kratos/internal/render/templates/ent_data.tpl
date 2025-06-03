@@ -13,7 +13,6 @@ import (
 	entgoUpdate "github.com/tx7do/go-utils/entgo/update"
 	"github.com/tx7do/go-utils/fieldmaskutil"
 	"github.com/tx7do/go-utils/timeutil"
-	"github.com/tx7do/go-utils/trans"
 	pagination "github.com/tx7do/kratos-bootstrap/api/gen/go/pagination/v1"
 
 	"{{.Project}}/app/{{.Service}}/service/internal/data/ent"

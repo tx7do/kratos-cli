@@ -17,7 +17,7 @@ require (
 	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.10.0
 	github.com/tx7do/kratos-cli/sql-orm v0.0.2
-	github.com/tx7do/kratos-cli/sql-proto v0.0.10
+	github.com/tx7do/kratos-cli/sql-proto v0.0.12
 	golang.org/x/text v0.25.0
 )
 

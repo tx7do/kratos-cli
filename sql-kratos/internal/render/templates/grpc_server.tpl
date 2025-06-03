@@ -14,8 +14,8 @@ import (
 {{- end}}
 )
 
-// NewGRPCServer new a gRPC server.
-func NewGRPCServer(
+// NewGrpcServer new a gRPC server.
+func NewGrpcServer(
 	cfg *conf.Bootstrap, logger log.Logger,
 {{range $key, $value := .Services}}
     {{lower $key}}Service *service.{{pascal $key}}Service,
