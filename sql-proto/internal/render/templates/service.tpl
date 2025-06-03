@@ -12,8 +12,8 @@ import (
 
 	"{{.Project}}/app/{{.Service}}/service/internal/data"
 
-	{{.TargetModuleName}} "{{.Project}}/api/gen/go/{{.TargetApi}}/service/v1"
-{{if not .IsSameApi}}	{{.SourceModuleName}} "{{.Project}}/api/gen/go/{{.SourceApi}}/service/v1"{{end}}
+	{{.TargetApiPackage}} "{{.Project}}/api/gen/go/{{lower .TargetModuleName}}/service/v1"
+{{if not .IsSameApi}}	{{.SourceApiPackage}} "{{.Project}}/api/gen/go/{{lower .SourceModuleName}}/service/v1"{{end}}
 
 {{if not .IsGrpc}}
 	"{{.Project}}/pkg/middleware/auth"
