@@ -186,7 +186,7 @@ func generateServerPackageCode(
 ) error {
 
 	for _, server := range servers {
-		if err := sqlproto.WriteServerPackageCode(
+		if err := WriteServerPackageCode(
 			outputPath,
 			projectName, server, serviceName,
 			servicePackageMap,
@@ -195,7 +195,7 @@ func generateServerPackageCode(
 		}
 	}
 
-	return sqlproto.WriteInitWireCode(outputPath, projectName, "Server", servers)
+	return WriteInitWireCode(outputPath, projectName, "Server", servers)
 }
 
 func generateServicePackageCode(
@@ -214,7 +214,7 @@ func generateServicePackageCode(
 
 		name := table.Name
 
-		if err := sqlproto.WriteServicePackageCode(
+		if err := WriteServicePackageCode(
 			outputPath,
 			projectName, serviceName,
 			name,
@@ -225,7 +225,7 @@ func generateServicePackageCode(
 		}
 	}
 
-	return sqlproto.WriteInitWireCode(outputPath, projectName, "Service", services)
+	return WriteInitWireCode(outputPath, projectName, "Service", services)
 }
 
 func generateDataPackageCode(
@@ -240,7 +240,7 @@ func generateDataPackageCode(
 		return nil
 	}
 
-	var protoFields []sqlproto.ProtoField
+	var dataFields []DataField
 	for _, table := range tables {
 		if len(table.Fields) == 0 {
 			continue
@@ -248,34 +248,33 @@ func generateDataPackageCode(
 
 		name := table.Name
 
-		protoFields = make([]sqlproto.ProtoField, 0)
-		for i, field := range table.Fields {
+		dataFields = make([]DataField, 0)
+		for _, field := range table.Fields {
 			if field.Type == "" {
 				continue
 			}
 
-			protoField := sqlproto.ProtoField{
-				Number: i + 1,
-				Name:   field.Name,
-				Type:   field.Type,
+			dataField := DataField{
+				Name: field.Name,
+				Type: field.Type,
 				//Null:    field.Null,
 				Comment: field.Comment,
 			}
-			protoFields = append(protoFields, protoField)
+			dataFields = append(dataFields, dataField)
 		}
 
-		if err := sqlproto.WriteDataPackageCode(
+		if err := WriteDataPackageCode(
 			outputPath,
 			orm,
 			projectName, serviceName, name,
 			moduleName, moduleVersion,
-			protoFields,
+			dataFields,
 		); err != nil {
 			return err
 		}
 	}
 
-	return sqlproto.WriteInitWireCode(outputPath, projectName, "Repo", services)
+	return WriteInitWireCode(outputPath, projectName, "Repo", services)
 }
 
 func generateMainPackageCode(
@@ -285,7 +284,7 @@ func generateMainPackageCode(
 
 	servers []string,
 ) error {
-	if err := sqlproto.WriteMainCode(
+	if err := WriteMainCode(
 		outputPath,
 		projectName, serviceName,
 		servers,
@@ -293,7 +292,7 @@ func generateMainPackageCode(
 		return err
 	}
 
-	return sqlproto.WriteWireCode(
+	return WriteWireCode(
 		outputPath,
 		projectName, serviceName,
 	)

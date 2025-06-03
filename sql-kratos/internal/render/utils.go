@@ -94,6 +94,16 @@ func camelToSnake(camel string) string {
 	return strings.ToLower(snake)
 }
 
+func makeEntSetNillableFunc(fieldName string) string {
+	inputVar := "req.Data." + snakeToPascal(fieldName)
+	return "SetNillable" + snakeToPascalPlus(fieldName) + "(" + inputVar + ")"
+}
+
+func makeEntSetNillableFuncWithTransfer(fieldName string, transFunc string) string {
+	inputVar := "req.Data." + snakeToPascal(fieldName)
+	return "SetNillable" + snakeToPascalPlus(fieldName) + "(" + transFunc + "(" + inputVar + "))"
+}
+
 func RemoveTableCommentSuffix(input string) string {
 	re := regexp.MustCompile(`(表|table)$`)
 	return re.ReplaceAllString(input, "")

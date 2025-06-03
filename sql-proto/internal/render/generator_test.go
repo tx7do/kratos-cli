@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/jinzhu/inflection"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestPlural(t *testing.T) {
@@ -35,7 +36,8 @@ func TestWriteGrpcServiceProto(t *testing.T) {
 		},
 	}
 
-	WriteGrpcServiceProto("./api/protos", data)
+	err := WriteGrpcServiceProto("./api/protos", data)
+	assert.Nil(t, err)
 }
 
 func TestWriteRestServiceProto(t *testing.T) {
@@ -47,129 +49,6 @@ func TestWriteRestServiceProto(t *testing.T) {
 		Comment:      "用户",
 	}
 
-	WriteRestServiceProto("./api/protos", data)
-}
-
-func TestWriteInitWireCode(t *testing.T) {
-	serviceInit := InitWireTemplateData{
-		Package: "service",
-		Postfix: "Service",
-		ServiceNames: []string{
-			"User",
-			"Tenant",
-		},
-	}
-	WriteInitWireCode("./app/user/internal/", serviceInit)
-
-	dataInit := InitWireTemplateData{
-		Package: "data",
-		Postfix: "Repo",
-		ServiceNames: []string{
-			"User",
-			"Tenant",
-		},
-	}
-	WriteInitWireCode("./app/user/internal/", dataInit)
-
-	serverInit := InitWireTemplateData{
-		Package: "server",
-		Postfix: "Server",
-		ServiceNames: []string{
-			"Service",
-			"GRPC",
-		},
-	}
-	WriteInitWireCode("./app/user/service/internal/", serverInit)
-}
-
-func TestWriteWireCode(t *testing.T) {
-	serviceInit := WireTemplateData{
-		Project: "kratos-admin",
-		Service: "user",
-	}
-	WriteWireCode("./app/user/service/cmd/server", serviceInit)
-}
-
-func TestWriteMainCode(t *testing.T) {
-	serviceInit := MainTemplateData{
-		Project: "kratos-admin",
-		Service: "user",
-		Servers: []string{"REST", "GRPC"},
-	}
-	WriteMainCode("./app/user/service/cmd/server", serviceInit)
-}
-
-func TestWriteServicePackageCode(t *testing.T) {
-	dataUser := ServiceTemplateData{
-		Project: "kratos-admin",
-
-		Service: "admin",
-		Name:    "user",
-
-		SourceModuleName: "user",
-		TargetModuleName: "admin",
-		Version:          "v1",
-
-		UseRepo: false,
-		IsGrpc:  false,
-	}
-	WriteServicePackageCode("./app/user/service/internal/", dataUser)
-
-	dataTenant := ServiceTemplateData{
-		Project: "kratos-admin",
-
-		Service: "user",
-		Name:    "tenant",
-
-		SourceModuleName: "user",
-		TargetModuleName: "user",
-		Version:          "v1",
-
-		UseRepo: true,
-		IsGrpc:  true,
-	}
-	WriteServicePackageCode("./app/user/service/internal/", dataTenant)
-}
-
-func TestWriteEntDataPackageCode(t *testing.T) {
-	data := DataTemplateData{
-		Project: "kratos-admin",
-
-		Service: "user",
-		Name:    "user",
-
-		Module:  "user",
-		Version: "v1",
-
-		Fields: ProtoFieldArray{
-			{Name: "id", Type: "int64", Number: 1, Comment: "用户ID"},
-			{Name: "last_login_time", Type: "int64", Number: 2, Comment: "最后登录时间"},
-		},
-	}
-
-	WriteEntDataPackageCode("./app/user/service/internal/", data)
-}
-
-func TestWriteServerCode(t *testing.T) {
-	dataGrpc := ServerTemplateData{
-		Project: "kratos-admin",
-		Type:    "grpc",
-		Service: "user",
-		Services: map[string]string{
-			"User":   "user",
-			"Tenant": "user",
-		},
-	}
-	WriteServerPackageCode("./app/user/service/internal/", dataGrpc)
-
-	dataRest := ServerTemplateData{
-		Project: "kratos-admin",
-		Type:    "rest",
-		Service: "admin",
-		Services: map[string]string{
-			"User":   "user",
-			"Tenant": "user",
-		},
-	}
-	WriteServerPackageCode("./app/user/service/internal/", dataRest)
+	err := WriteRestServiceProto("./api/protos", data)
+	assert.Nil(t, err)
 }
