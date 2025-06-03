@@ -7,7 +7,7 @@ import (
 )
 
 type ProtoField render.ProtoField
-type ProtoFieldArray render.ProtoFieldArray
+type ProtoFieldArray []render.ProtoField
 
 func WriteServiceProto(
 	outputPath string,
