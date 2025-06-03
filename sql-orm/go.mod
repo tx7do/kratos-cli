@@ -4,6 +4,8 @@ go 1.23.0
 
 toolchain go1.24.3
 
+replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20240318140521-94a12d6c2237
+
 require (
 	ariga.io/atlas v0.34.0
 	entgo.io/contrib v0.6.0
@@ -75,7 +77,7 @@ require (
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.25.0 // indirect
 	golang.org/x/tools v0.33.0 // indirect
-	google.golang.org/genproto v0.0.0-20221118155620-16455021b5e6 // indirect
+	google.golang.org/grpc v1.62.1 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/datatypes v1.2.5 // indirect
