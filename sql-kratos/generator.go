@@ -45,7 +45,6 @@ func Generate(ctx context.Context, opts internal.GeneratorOptions) error {
 	}
 
 	// 生成ORM代码
-	log.Println("orm", opts.GenerateORM)
 	if opts.GenerateORM {
 		dataPackagePath := fmt.Sprintf("%s/app/%s/service/internal/", opts.OutputPath, opts.ModuleName)
 		if err = generateOrmCode(ctx, opts, dataPackagePath); err != nil {
