@@ -68,6 +68,7 @@ func command(cmd *cobra.Command, _ []string) {
 		&opts.Version,
 		&opts.Service,
 		opts.IncludedTables, opts.ExcludedTables,
+		true,
 	)
 }
 
