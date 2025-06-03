@@ -4,8 +4,7 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
-	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/entimport"
-	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/mux"
+
 	"go/ast"
 	"go/parser"
 	"go/printer"
@@ -17,8 +16,13 @@ import (
 
 	"entgo.io/ent/dialect"
 	"github.com/go-openapi/inflect"
+
 	_ "github.com/go-sql-driver/mysql"
+
 	"github.com/stretchr/testify/require"
+
+	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/entimport"
+	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/mux"
 )
 
 func TestMySQL(t *testing.T) {

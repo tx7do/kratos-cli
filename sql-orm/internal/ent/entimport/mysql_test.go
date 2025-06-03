@@ -3,17 +3,20 @@ package entimport_test
 import (
 	"bytes"
 	"context"
-	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/entimport"
+	"testing"
+
 	"go/parser"
 	"go/printer"
 	"go/token"
-	"testing"
 
 	"ariga.io/atlas/sql/schema"
 	"entgo.io/ent/dialect"
 	"github.com/go-openapi/inflect"
 	_ "github.com/go-sql-driver/mysql"
+
 	"github.com/stretchr/testify/require"
+
+	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/entimport"
 )
 
 func TestMySQL(t *testing.T) {
