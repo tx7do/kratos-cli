@@ -44,6 +44,7 @@ func Convert(
 		internal.WithIncludedTables(includeTables),
 		internal.WithExcludedTables(excludeTables),
 		internal.WithDriver(convertDriver),
+		internal.WithSchemaPath(*dsn),
 	)
 	if err != nil {
 		log.Fatalf("sqlproto: create importer failed: %v", err)

@@ -25,7 +25,8 @@ type (
 		includedTables []string
 		excludedTables []string
 
-		protoPath string
+		protoPath  string
+		schemaPath string
 
 		sourceModuleName string // for REST service, the source module name
 		moduleName       string
@@ -44,6 +45,12 @@ type (
 func WithProtoPath(path string) ConvertOption {
 	return func(i *ConvertOptions) {
 		i.protoPath = path
+	}
+}
+
+func WithSchemaPath(path string) ConvertOption {
+	return func(i *ConvertOptions) {
+		i.schemaPath = path
 	}
 }
 

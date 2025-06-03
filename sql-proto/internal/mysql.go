@@ -107,5 +107,5 @@ func MySQLFieldType(sqlType string) (f string) {
 		return protoType
 	}
 
-	return "string"
+	return ""
 }
