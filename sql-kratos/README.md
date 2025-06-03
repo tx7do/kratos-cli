@@ -1,6 +1,6 @@
 # SQL → Kratos Microservice
 
-This tool imports the SQL database schema into Kratos microservice code.
+This tool imports the SQL database schemas and generates Kratos microservice code.
 
 ## HOW TO INSTALL
 

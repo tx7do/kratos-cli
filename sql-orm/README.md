@@ -1,6 +1,6 @@
 # SQL → ORM Schema Importer
 
-This tool imports SQL database schemas and generates ORM code for use in Kratos microservices, supporting both `ent` and `gorm` ORMs.
+This tool imports the SQL database schemas and generates ORM code for use in Kratos microservices, supporting both `ent` and `gorm` ORMs.
 
 ## HOW TO INSTALL
 

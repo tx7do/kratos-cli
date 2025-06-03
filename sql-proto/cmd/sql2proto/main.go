@@ -15,7 +15,7 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "sql2proto",
 	Short: "SQL to Protobuf code generator",
-	Long:  "sql2proto is a tool to import SQL database schema and generate Protobuf code.",
+	Long:  "sql2proto imports the SQL database schemas and generates Protobuf code for use in Kratos microservices.",
 	Run:   command,
 }
 

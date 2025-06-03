@@ -17,7 +17,7 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "sql2orm",
 	Short: "SQL to ORM code generator",
-	Long:  "sql2orm is a tool to generate ORM code from SQL database schemas.",
+	Long:  "sql2orm imports the SQL database schemas and generates ORM code for use in Kratos microservices, supporting both `ent` and `gorm` ORMs.",
 	Run:   command,
 }
 
