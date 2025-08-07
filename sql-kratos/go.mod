@@ -4,8 +4,6 @@ go 1.24
 
 toolchain go1.24.4
 
-replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20250603155806-513f23925822
-
 require (
 	github.com/jinzhu/inflection v1.0.0
 	github.com/spf13/cobra v1.9.1
