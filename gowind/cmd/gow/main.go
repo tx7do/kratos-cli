@@ -10,9 +10,9 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "gowind",
-	Short: "gowind: GoWind microservices toolkit",
-	Long:  `gowind: GoWind microservices toolkit.`,
+	Use:   "gow",
+	Short: "gow CLI",
+	Long:  "gow is the CLI for GoWind framework.",
 }
 
 func init() {

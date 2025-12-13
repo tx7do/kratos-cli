@@ -5,13 +5,13 @@
 ### Install GoWind CLI
 
 ```shell
-go install github.com/tx7do/kratos-cli/gowind@latest
+go install github.com/tx7do/kratos-cli/gowind/cmd/gow@latest
 ```
 
 ### Create a New Project
 
 ```shell
-gowind new myproject
+gow new myproject
 cd myproject
 go mod tidy
 ```
@@ -19,7 +19,7 @@ go mod tidy
 or you can use `-m` to specify the module name:
 
 ```shell
-gowind new myproject -m github.com/yourusername/myproject
+gow new myproject -m github.com/yourusername/myproject
 cd myproject
 go mod tidy
 ```
@@ -29,11 +29,11 @@ go mod tidy
 You can directly execute the microservice in the current path without parameters, For example you are currently in 'app/admin/service':
 
 ```shell
-gowind run
+gow run
 ```
 
 or run a specified microservice, for example `admin` service:
 
 ```shell
-gowind run admin
+gow run admin
 ```
