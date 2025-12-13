@@ -5,7 +5,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -47,6 +46,8 @@ func Run(cmd *cobra.Command, args []string) {
 			return
 		}
 
+		//fmt.Printf("[%s] hasCmd: %v, hasConfigs: %v\n", wd, hasCmd, hasConfigs)
+
 		if hasCmd && hasConfigs {
 			// 当前目录即为服务目录
 			if err = runService(wd); err != nil {
@@ -55,7 +56,7 @@ func Run(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: service name is required\033[m\n")
+		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: this is not a valid service folder\033[m\n")
 		return
 	}
 
@@ -87,11 +88,26 @@ func runService(serviceWorkPath string) error {
 	g.Stdout = os.Stdout
 	g.Stderr = os.Stderr
 
-	arg1 := fmt.Sprintf("%s/cmd/server", serviceWorkPath)
-	arg2 := fmt.Sprintf("-conf %s/configs", serviceWorkPath)
+	// 构建并规范化路径
+	appPath := filepath.Join(serviceWorkPath, "cmd", "server")
+	appPathAbs, err := filepath.Abs(appPath)
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
+		return err
+	}
+	appPathAbs = filepath.Clean(appPathAbs)
 
-	runArgs := append([]string{"run", arg1, arg2})
-	if err := g.Run(runArgs...); err != nil {
+	configPath := filepath.Join(serviceWorkPath, "configs")
+	configPathAbs, err := filepath.Abs(configPath)
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
+		return err
+	}
+	configPathAbs = filepath.Clean(configPathAbs)
+
+	runArgs := []string{"run", appPathAbs, "-conf", configPathAbs}
+
+	if err = g.Run(runArgs...); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
 		return err
 	}
@@ -110,7 +126,7 @@ func HasCmdAndConfigs(dir string) (bool, bool, error) {
 		}
 		d = wd
 	} else {
-		d = strconv.Itoa(int(dir[0]))
+		d = dir
 	}
 
 	hasMain := false
