@@ -1,6 +1,9 @@
 ﻿package pkg
 
 import (
+	"bytes"
+	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -75,4 +78,73 @@ func writeAtomic(path string, data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func isFileExtIncluded(path string, includeExts []string) bool {
+	ext := filepath.Ext(path)
+	for _, e := range includeExts {
+		if ext == "."+e {
+			return true
+		}
+	}
+	return false
+}
+
+// ReplaceTemplateInCurrentDir 遍历当前目录及子目录，替换指定的模板字符串。
+// 返回被修改的文件数量和错误（如果有）。
+func ReplaceTemplateInCurrentDir(rootDir, source, target string) (int, error) {
+	var includeFileExt = []string{"go", "mod", "yaml"}
+
+	var updated int
+	err := filepath.WalkDir(rootDir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		//fmt.Printf("scanning: %s\n", path)
+
+		// 跳过 .git 和 vendor 目录
+		if d.IsDir() {
+			switch d.Name() {
+			case ".git", "vendor", "script":
+				return filepath.SkipDir
+			default:
+				return nil
+			}
+		}
+
+		if !isFileExtIncluded(path, includeFileExt) {
+			//fmt.Printf("skipped (ext): %s\n", path)
+			return nil
+		}
+
+		info, err := d.Info()
+		if err != nil {
+			fmt.Printf("failed to get file info: %s, error: %v\n", path, err)
+			return err
+		}
+
+		data, err := os.ReadFile(path)
+		if err != nil {
+			fmt.Printf("failed to read file: %s, error: %v\n", path, err)
+			return err
+		}
+
+		if !bytes.Contains(data, []byte(source)) {
+			fmt.Printf("skipped: %s\n", path)
+			return nil
+		}
+
+		newData := bytes.ReplaceAll(data, []byte(source), []byte(target))
+		if err = os.WriteFile(path, newData, info.Mode().Perm()); err != nil {
+			fmt.Printf("failed to write file: %s, error: %v\n", path, err)
+			return err
+		}
+
+		updated++
+		fmt.Printf("updated: %s\n", path)
+		return nil
+	})
+
+	return updated, err
 }

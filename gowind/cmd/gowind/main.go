@@ -6,16 +6,18 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/tx7do/kratos-cli/gowind/internal/project"
+	"github.com/tx7do/kratos-cli/gowind/internal/run"
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "gowind",
-	Short: "gowind: Go microservices toolkit",
-	Long:  `gowind: Go microservices toolkit.`,
+	Short: "gowind: GoWind microservices toolkit",
+	Long:  `gowind: GoWind microservices toolkit.`,
 }
 
 func init() {
 	rootCmd.AddCommand(project.CmdNew)
+	rootCmd.AddCommand(run.CmdRun)
 }
 
 func main() {

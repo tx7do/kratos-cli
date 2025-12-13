@@ -23,18 +23,26 @@ var CmdNew = &cobra.Command{
 }
 
 var (
-	repoURL string
-	branch  string
-	timeout string
-	nomod   bool
+	repoURL    string
+	branch     string
+	timeout    string
+	moduleName string
+	nomod      bool
+)
+
+const (
+	GithubRepoURL = "https://github.com/tx7do/go-wind-admin-template.git"
+	GiteeRepoURL  = "https://gitee.com/tx7do/go-wind-admin-template.git"
 )
 
 func init() {
-	repoURL = "https://github.com/tx7do/go-wind-admin-template.git"
+	repoURL = GithubRepoURL
 	timeout = "60s"
+
 	CmdNew.Flags().StringVarP(&repoURL, "repo-url", "r", repoURL, "layout repo")
 	CmdNew.Flags().StringVarP(&branch, "branch", "b", branch, "repo branch")
 	CmdNew.Flags().StringVarP(&timeout, "timeout", "t", timeout, "time out")
+	CmdNew.Flags().StringVarP(&moduleName, "module", "m", moduleName, "set go module name, if not set, use project name")
 	CmdNew.Flags().BoolVarP(&nomod, "nomod", "", nomod, "retain go mod")
 }
 
@@ -87,7 +95,13 @@ func run(_ *cobra.Command, args []string) {
 
 	fmt.Printf("🚀 Creating service %s, layout repo is %s, please wait a moment.\n\n", projectName, repoURL)
 
-	p := &Project{Name: projectName}
+	p := &Project{
+		Name:   projectName,
+		Module: projectName,
+	}
+	if moduleName != "" {
+		p.Module = moduleName
+	}
 
 	done := make(chan error, 1)
 	go func() {

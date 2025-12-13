@@ -3,15 +3,19 @@
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/tx7do/kratos-cli/gowind/internal/pkg"
 )
 
+const (
+	TemplateModuleName = "github.com/tx7do/go-wind-admin-template"
+)
+
 type Project struct {
-	Name string
-	Path string
+	Name   string
+	Path   string
+	Module string
 }
 
 // New a project from remote repo.
@@ -23,14 +27,21 @@ func (p *Project) New(ctx context.Context, dir string, layout string, branch str
 		return err
 	}
 
-	e := os.Rename(
-		filepath.Join(to, "cmd", "server"),
-		filepath.Join(to, "cmd", p.Name),
-	)
-	if e != nil {
-		return e
+	//e := os.Rename(
+	//	filepath.Join(to, "cmd", "server"),
+	//	filepath.Join(to, "cmd", p.Name),
+	//)
+	//if e != nil {
+	//	return e
+	//}
+
+	//pkg.Tree(to, dir)
+
+	updateCount, err := pkg.ReplaceTemplateInCurrentDir(dir, TemplateModuleName, p.Module)
+	if err != nil {
+		return err
 	}
-	pkg.Tree(to, dir)
+	fmt.Printf("Updated %d files.\n", updateCount)
 
 	return nil
 }
@@ -51,15 +62,21 @@ func (p *Project) Add(ctx context.Context, dir string, layout string, branch str
 		return err
 	}
 
-	e := os.Rename(
-		filepath.Join(to, "cmd", "server"),
-		filepath.Join(to, "cmd", p.Name),
-	)
-	if e != nil {
-		return e
-	}
+	//e := os.Rename(
+	//	filepath.Join(to, "cmd", "server"),
+	//	filepath.Join(to, "cmd", p.Name),
+	//)
+	//if e != nil {
+	//	return e
+	//}
 
-	pkg.Tree(to, dir)
+	//pkg.Tree(to, dir)
+
+	updateCount, err := pkg.ReplaceTemplateInCurrentDir(dir, TemplateModuleName, p.Module)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Updated %d files.\n", updateCount)
 
 	return nil
 }
