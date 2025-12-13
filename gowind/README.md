@@ -26,9 +26,13 @@ go mod tidy
 
 ### Run the microservice Application
 
+You can directly execute the microservice in the current path without parameters, For example you are currently in 'app/admin/service':
+
 ```shell
 gowind run
 ```
+
+or run a specified microservice, for example `admin` service:
 
 ```shell
 gowind run admin
