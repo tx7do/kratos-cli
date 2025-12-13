@@ -14,12 +14,14 @@ import (
 	"github.com/tx7do/kratos-cli/gowind/internal/pkg"
 )
 
-// CmdNew represents the new command.
-var CmdNew = &cobra.Command{
-	Use:   "new",
-	Short: "Create a project template",
-	Long:  "Create a project using the repository template. Example: gowind new helloworld",
-	Run:   run,
+// CmdProject represents the project command.
+var CmdProject = &cobra.Command{
+	Use:     "project [name]",
+	Aliases: []string{"proj"},
+	Short:   "create a new project scaffold",
+	Long:    "Create a project using the repository template. Example: gow new project helloworld",
+	Args:    cobra.ExactArgs(1),
+	Run:     run,
 }
 
 var (
@@ -39,11 +41,11 @@ func init() {
 	repoURL = GithubRepoURL
 	timeout = "60s"
 
-	CmdNew.Flags().StringVarP(&repoURL, "repo-url", "r", repoURL, "layout repo")
-	CmdNew.Flags().StringVarP(&branch, "branch", "b", branch, "repo branch")
-	CmdNew.Flags().StringVarP(&timeout, "timeout", "t", timeout, "time out")
-	CmdNew.Flags().StringVarP(&moduleName, "module", "m", moduleName, "set go module name, if not set, use project name")
-	CmdNew.Flags().BoolVarP(&nomod, "nomod", "", nomod, "retain go mod")
+	CmdProject.Flags().StringVarP(&repoURL, "repo-url", "r", repoURL, "layout repo")
+	CmdProject.Flags().StringVarP(&branch, "branch", "b", branch, "repo branch")
+	CmdProject.Flags().StringVarP(&timeout, "timeout", "t", timeout, "time out")
+	CmdProject.Flags().StringVarP(&moduleName, "module", "m", moduleName, "set go module name, if not set, use project name")
+	CmdProject.Flags().BoolVarP(&nomod, "nomod", "", nomod, "retain go mod")
 }
 
 func run(_ *cobra.Command, args []string) {

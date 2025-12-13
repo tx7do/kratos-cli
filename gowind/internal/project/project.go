@@ -27,16 +27,6 @@ func (p *Project) New(ctx context.Context, dir string, layout string, branch str
 		return err
 	}
 
-	//e := os.Rename(
-	//	filepath.Join(to, "cmd", "server"),
-	//	filepath.Join(to, "cmd", p.Name),
-	//)
-	//if e != nil {
-	//	return e
-	//}
-
-	//pkg.Tree(to, dir)
-
 	updateCount, err := pkg.ReplaceTemplateInCurrentDir(dir, TemplateModuleName, p.Module)
 	if err != nil {
 		return err
@@ -61,16 +51,6 @@ func (p *Project) Add(ctx context.Context, dir string, layout string, branch str
 	if err != nil {
 		return err
 	}
-
-	//e := os.Rename(
-	//	filepath.Join(to, "cmd", "server"),
-	//	filepath.Join(to, "cmd", p.Name),
-	//)
-	//if e != nil {
-	//	return e
-	//}
-
-	//pkg.Tree(to, dir)
 
 	updateCount, err := pkg.ReplaceTemplateInCurrentDir(dir, TemplateModuleName, p.Module)
 	if err != nil {
