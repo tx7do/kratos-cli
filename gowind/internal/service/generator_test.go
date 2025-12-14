@@ -21,7 +21,7 @@ func TestGenerate(t *testing.T) {
 		ServiceName:   "user",
 
 		Servers:   []string{"rest", "grpc"},
-		DbClients: []string{"ent"},
+		DbClients: []string{"ent", "redis"},
 
 		OutputPath: "./test",
 	})

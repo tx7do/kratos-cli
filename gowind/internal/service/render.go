@@ -20,6 +20,22 @@ func WriteServerPackageCode(
 	return render.WriteServerPackageCode(outputPath, data)
 }
 
+func WriteDataPackageCode(
+	outputPath string,
+	projectModule string,
+	projectName string,
+	serviceName string,
+	dbClients []string,
+) error {
+	data := render.DataTemplateData{
+		Module:    projectModule,
+		Project:   projectName,
+		Service:   serviceName,
+		DBClients: dbClients,
+	}
+	return render.WriteDataPackageCode(outputPath, data)
+}
+
 func WriteInitWireCode(
 	outputPath string,
 	packageName string,

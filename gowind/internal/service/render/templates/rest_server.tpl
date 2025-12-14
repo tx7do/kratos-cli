@@ -13,6 +13,9 @@ import (
 
 	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
 	"github.com/tx7do/kratos-bootstrap/rpc"
+
+    "{{.Module}}/app/{{lower $.Service}}/service/cmd/server/assets"
+    "{{.Module}}/app/{{lower $.Service}}/service/internal/service"
 )
 
 // NewWhiteListMatcher 创建jwt白名单

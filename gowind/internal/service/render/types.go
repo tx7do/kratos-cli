@@ -241,3 +241,37 @@ func (d ServerTemplateData) Modules() []string {
 	}
 	return modules
 }
+
+type DataTemplateData struct {
+	Module    string
+	Project   string
+	Service   string
+	DBClients []string
+}
+
+func (d DataTemplateData) HasGorm() bool {
+	for _, dbc := range d.DBClients {
+		if strings.ToLower(dbc) == "gorm" {
+			return true
+		}
+	}
+	return false
+}
+
+func (d DataTemplateData) HasEnt() bool {
+	for _, dbc := range d.DBClients {
+		if strings.ToLower(dbc) == "ent" || strings.ToLower(dbc) == "entgo" {
+			return true
+		}
+	}
+	return false
+}
+
+func (d DataTemplateData) HasRedis() bool {
+	for _, dbc := range d.DBClients {
+		if strings.ToLower(dbc) == "redis" {
+			return true
+		}
+	}
+	return false
+}

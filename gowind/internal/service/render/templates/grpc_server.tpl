@@ -7,6 +7,8 @@ import (
 
 	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
 	"github.com/tx7do/kratos-bootstrap/rpc"
+
+	"{{.Module}}/app/{{lower $.Service}}/service/internal/service"
 )
 
 // NewGRPCServer new a gRPC server.

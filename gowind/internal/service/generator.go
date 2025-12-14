@@ -48,7 +48,9 @@ func Generate(ctx context.Context, opts GeneratorOptions) error {
 		if err = generateDataPackageCode(
 			dataPackagePath,
 			opts.ProjectModule,
+			opts.ProjectName,
 			opts.ServiceName,
+			opts.DbClients,
 			[]string{},
 		); err != nil {
 			return err
@@ -139,11 +141,17 @@ func generateServicePackageCode(
 
 func generateDataPackageCode(
 	outputPath string,
+	projectModule string,
 	projectName string,
 	serviceName string,
+	dbClients []string,
 	repos []string,
 ) error {
-	return WriteInitWireCode(outputPath, "data", "Repo", repos)
+	if err := WriteDataPackageCode(outputPath, projectModule, projectName, serviceName, dbClients); err != nil {
+		return err
+	}
+
+	return WriteInitWireCode(outputPath, "data", "Client", dbClients)
 }
 
 func generateMainPackageCode(
