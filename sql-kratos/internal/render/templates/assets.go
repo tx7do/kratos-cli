@@ -2,26 +2,26 @@ package templates
 
 import _ "embed"
 
-//go:embed ent_data.tpl
-var EntDataTemplateData []byte
+//go:embed ent_repo.tpl
+var EntRepoTemplate []byte
 
-//go:embed gorm_data.tpl
-var GormDataTemplateData []byte
+//go:embed gorm_repo.tpl
+var GormRepoTemplate []byte
 
 //go:embed service.tpl
-var ServiceTemplateData []byte
+var ServiceTemplate []byte
 
 //go:embed main.tpl
-var MainTemplateData []byte
+var MainTemplate []byte
 
 //go:embed wire.tpl
-var WireTemplateData []byte
+var WireTemplate []byte
 
 //go:embed init.tpl
-var InitTemplateData []byte
+var InitTemplate []byte
 
 //go:embed grpc_server.tpl
-var GrpcTemplateServerData []byte
+var GrpcServerTemplate []byte
 
 //go:embed rest_server.tpl
-var RestTemplateServerData []byte
+var RestServerTemplate []byte

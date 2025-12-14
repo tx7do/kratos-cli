@@ -2,20 +2,21 @@
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/jinzhu/copier"
 
 	"github.com/tx7do/go-utils/copierutil"
-	entgo "github.com/tx7do/go-utils/entgo/query"
-	entgoUpdate "github.com/tx7do/go-utils/entgo/update"
-	"github.com/tx7do/go-utils/fieldmaskutil"
-	"github.com/tx7do/go-utils/timeutil"
-	pagination "github.com/tx7do/kratos-bootstrap/api/gen/go/pagination/v1"
+	"github.com/tx7do/go-utils/crypto"
+	"github.com/tx7do/go-utils/mapper"
+
+	pagination "github.com/tx7do/go-crud/api/gen/go/pagination/v1"
+	entCurd "github.com/tx7do/go-crud/entgo"
 
 	"{{.Project}}/app/{{.Service}}/service/internal/data/ent"
+	"{{.Project}}/app/{{.Service}}/service/internal/data/ent/predicate"
 	"{{.Project}}/app/{{.Service}}/service/internal/data/ent/{{.LowerName}}"
 
 	{{.ApiPackage}} "{{.Project}}/api/gen/go/{{.Module}}/service/v1"
@@ -24,13 +25,23 @@ import (
 type {{.ClassName}} struct {
 	data         *Data
 	log          *log.Helper
-	copierOption copier.Option
+
+	mapper     *mapper.CopierMapper[{{.ApiPackage}}.{{.PascalName}}, ent.{{.PascalName}}]
+	repository *entCurd.Repository[
+		ent.{{.PascalName}}Query, ent.{{.PascalName}}Select,
+		ent.{{.PascalName}}Create, ent.{{.PascalName}}CreateBulk,
+		ent.{{.PascalName}}Update, ent.{{.PascalName}}UpdateOne,
+		ent.{{.PascalName}}Delete,
+		predicate.{{.PascalName}},
+		{{.ApiPackage}}.{{.PascalName}}, ent.{{.PascalName}},
+	]
 }
 
 func New{{.ClassName}}(data *Data, logger log.Logger) *{{.ClassName}} {
 	repo := &{{.ClassName}}{
 		log:  log.NewHelper(log.With(logger, "module", "{{.LowerName}}/repo/{{.Service}}-service")),
 		data: data,
+		mapper: mapper.NewCopierMapper[{{.ApiPackage}}.{{.PascalName}}, ent.{{.PascalName}}](),
 	}
 
 	repo.init()
@@ -39,34 +50,17 @@ func New{{.ClassName}}(data *Data, logger log.Logger) *{{.ClassName}} {
 }
 
 func (r *{{.ClassName}}) init() {
-	r.copierOption = copier.Option{
-		Converters: []copier.TypeConverter{},
-	}
+	r.repository = entCurd.NewRepository[
+		ent.{{.PascalName}}Query, ent.{{.PascalName}}Select,
+		ent.{{.PascalName}}Create, ent.{{.PascalName}}CreateBulk,
+		ent.{{.PascalName}}Update, ent.{{.PascalName}}UpdateOne,
+		ent.{{.PascalName}}Delete,
+		predicate.{{.PascalName}},
+		userV1.{{.PascalName}}, ent.{{.PascalName}},
+	](r.mapper)
 
-	r.copierOption.Converters = append(r.copierOption.Converters, copierutil.NewTimeStringConverterPair()...)
-	r.copierOption.Converters = append(r.copierOption.Converters, copierutil.NewTimeTimestamppbConverterPair()...)
-}
-
-func (r *{{.ClassName}}) toProto(in *ent.{{.PascalName}}) *{{.ApiPackage}}.{{.PascalName}} {
-	if in == nil {
-		return nil
-	}
-
-	var out {{.ApiPackage}}.{{.PascalName}}
-	_ = copier.CopyWithOption(&out, in, r.copierOption)
-
-	return &out
-}
-
-func (r *{{.ClassName}}) toEnt(in *{{.ApiPackage}}.{{.PascalName}}) *ent.{{.PascalName}} {
-	if in == nil {
-		return nil
-	}
-
-	var out ent.{{.PascalName}}
-	_ = copier.CopyWithOption(&out, in, r.copierOption)
-
-	return &out
+	r.mapper.AppendConverters(copierutil.NewTimeStringConverterPair())
+	r.mapper.AppendConverters(copierutil.NewTimeTimestamppbConverterPair())
 }
 
 func (r *{{.ClassName}}) Count(ctx context.Context, whereCond []func(s *sql.Selector)) (int, error) {
@@ -91,42 +85,18 @@ func (r *{{.ClassName}}) List(ctx context.Context, req *pagination.PagingRequest
 
 	builder := r.data.db.Client().{{.PascalName}}.Query()
 
-	err, whereSelectors, querySelectors := entgo.BuildQuerySelector(
-		req.GetQuery(), req.GetOrQuery(),
-		req.GetPage(), req.GetPageSize(), req.GetNoPaging(),
-		req.GetOrderBy(), {{.LowerName}}.FieldCreateTime,
-		req.GetFieldMask().GetPaths(),
-	)
-	if err != nil {
-		r.log.Errorf("parse list param error [%s]", err.Error())
-		return nil, {{.ApiPackage}}.ErrorBadRequest("invalid query parameter")
-	}
+    ret, err := r.repository.ListWithPaging(ctx, builder, builder.Clone(), req)
+    if err != nil {
+        return nil, err
+    }
+    if ret == nil {
+        return &{{.ApiPackage}}.List{{.PascalName}}Response{Total: 0, Items: nil}, nil
+    }
 
-	if querySelectors != nil {
-		builder.Modify(querySelectors...)
-	}
-
-	results, err := builder.All(ctx)
-	if err != nil {
-		r.log.Errorf("query list failed: %s", err.Error())
-		return nil, {{.ApiPackage}}.ErrorInternalServerError("query list failed")
-	}
-
-	items := make([]*{{.ApiPackage}}.{{.PascalName}}, 0, len(results))
-	for _, res := range results {
-		item := r.toProto(res)
-		items = append(items, item)
-	}
-
-	count, err := r.Count(ctx, whereSelectors)
-	if err != nil {
-		return nil, err
-	}
-
-	return &{{.ApiPackage}}.List{{.PascalName}}Response{
-		Total: uint32(count),
-		Items: items,
-	}, err
+    return &{{.ApiPackage}}.List{{.PascalName}}Response{
+        Total: ret.Total,
+        Items: ret.Items,
+    }, nil
 }
 
 func (r *{{.ClassName}}) IsExist(ctx context.Context, id uint32) (bool, error) {
@@ -145,18 +115,21 @@ func (r *{{.ClassName}}) Get(ctx context.Context, req *{{.ApiPackage}}.Get{{.Pas
 		return nil, {{.ApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
 
-	ret, err := r.data.db.Client().{{.PascalName}}.Get(ctx, req.GetId())
+    var whereCond []func(s *sql.Selector)
+    switch req.QueryBy.(type) {
+    case *{{.ApiPackage}}.GetUserRequest_Id:
+        whereCond = append(whereCond, {{.LowerName}}.IDEQ(req.GetId()))
+    default:
+        whereCond = append(whereCond, {{.LowerName}}.IDEQ(req.GetId()))
+    }
+
+    builder := r.data.db.Client().{{.PascalName}}.Query()
+	dto, err := r.repository.Get(ctx, builder, req.GetViewMask(), whereCond...)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, {{.ApiPackage}}.Error{{.PascalName}}NotFound("{{.LowerName}} not found")
-		}
-
-		r.log.Errorf("query one data failed: %s", err.Error())
-
-		return nil, {{.ApiPackage}}.ErrorInternalServerError("query data failed")
+		return nil, err
 	}
 
-	return r.toProto(ret), nil
+	return dto, err
 }
 
 func (r *{{.ClassName}}) Create(ctx context.Context, req *{{.ApiPackage}}.Create{{.PascalName}}Request) error {
@@ -208,42 +181,15 @@ func (r *{{.ClassName}}) Update(ctx context.Context, req *{{.ApiPackage}}.Update
 		}
 	}
 
-	if req.UpdateMask != nil {
-		req.UpdateMask.Normalize()
-		if !req.UpdateMask.IsValid(req.Data) {
-			r.log.Errorf("invalid field mask [%v]", req.UpdateMask)
-			return {{.ApiPackage}}.ErrorBadRequest("invalid field mask")
-		}
-		fieldmaskutil.Filter(req.GetData(), req.UpdateMask.GetPaths())
-	}
-
 	builder := r.data.db.Client().{{.PascalName}}.UpdateOneID(req.Data.GetId())
+	result, err := r.repository.UpdateOne(ctx, builder, req.Data, req.GetUpdateMask(),
+		func(dto *{{.ApiPackage}}.{{.PascalName}}) {
+			builder.
+				SetUpdatedAt(time.Now())
+		},
+	)
 
-	builder{{range .Fields}}.{{newline}}		{{.EntSetNillableFunc}}
-{{- end}}
-
-    builder.SetNillableUpdateBy(req.Data.UpdateBy)
-
-	if req.Data.UpdateTime == nil {
-		builder.SetUpdateTime(time.Now())
-	} else {
-		builder.SetNillableUpdateTime(timeutil.StringTimeToTime(req.Data.UpdateTime))
-	}
-
-	if req.UpdateMask != nil {
-		nilPaths := fieldmaskutil.NilValuePaths(req.Data, req.GetUpdateMask().GetPaths())
-		nilUpdater := entgoUpdate.BuildSetNullUpdater(nilPaths)
-		if nilUpdater != nil {
-			builder.Modify(nilUpdater)
-		}
-	}
-
-	if err := builder.Exec(ctx); err != nil {
-		r.log.Errorf("update one data failed: %s", err.Error())
-		return {{.ApiPackage}}.ErrorInternalServerError("update data failed")
-	}
-
-	return nil
+	return result, err
 }
 
 func (r *{{.ClassName}}) Delete(ctx context.Context, req *{{.ApiPackage}}.Delete{{.PascalName}}Request) error {
@@ -251,15 +197,10 @@ func (r *{{.ClassName}}) Delete(ctx context.Context, req *{{.ApiPackage}}.Delete
 		return {{.ApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
 
-	if err := r.data.db.Client().{{.PascalName}}.DeleteOneID(req.GetId()).Exec(ctx); err != nil {
-		if ent.IsNotFound(err) {
-			return {{.ApiPackage}}.ErrorNotFound("{{.LowerName}} not found")
-		}
-
-		r.log.Errorf("delete one data failed: %s", err.Error())
-
-		return {{.ApiPackage}}.ErrorInternalServerError("delete failed")
-	}
+	builder := r.data.db.Client().{{.PascalName}}.Delete()
+	_, err := r.repository.Delete(ctx, builder, func(s *sql.Selector) {
+		s.Where(sql.EQ({{.LowerName}}.FieldID, req.GetId()))
+	})
 
 	return nil
 }

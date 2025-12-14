@@ -21,7 +21,7 @@ func WriteEntDataPackageCode(outputPath string, data DataTemplateData) error {
 	outputPath = outputPath + "/" + strings.ToLower(data.Name) + GoFilePostfix
 	outputPath = filepath.Clean(outputPath)
 
-	return renderTemplate[DataTemplateData](outputPath, data, "ent_data", string(templates.EntDataTemplateData))
+	return renderTemplate[DataTemplateData](outputPath, data, "ent_data", string(templates.EntRepoTemplate))
 }
 
 // WriteGormDataPackageCode writes the GORM data package code to the specified output path.
@@ -36,7 +36,7 @@ func WriteGormDataPackageCode(outputPath string, data DataTemplateData) error {
 	outputPath = outputPath + "/" + strings.ToLower(data.Name) + GoFilePostfix
 	outputPath = filepath.Clean(outputPath)
 
-	return renderTemplate[DataTemplateData](outputPath, data, "gorm_data", string(templates.GormDataTemplateData))
+	return renderTemplate[DataTemplateData](outputPath, data, "gorm_data", string(templates.GormRepoTemplate))
 }
 
 // WriteServicePackageCode writes the GRPC service package code to the specified output path.
@@ -51,7 +51,7 @@ func WriteServicePackageCode(outputPath string, data ServiceTemplateData) error 
 	outputPath = outputPath + "/" + strings.ToLower(data.Name) + GoFilePostfix
 	outputPath = filepath.Clean(outputPath)
 
-	return renderTemplate[ServiceTemplateData](outputPath, data, "service", string(templates.ServiceTemplateData))
+	return renderTemplate[ServiceTemplateData](outputPath, data, "service", string(templates.ServiceTemplate))
 }
 
 // WriteServerPackageCode writes the server package code to the specified output path.
@@ -71,12 +71,12 @@ func WriteServerPackageCode(outputPath string, data ServerTemplateData) error {
 	case "grpc":
 		outputPath = outputPath + "/" + "grpc" + GoFilePostfix
 		outputPath = filepath.Clean(outputPath)
-		return renderTemplate[ServerTemplateData](outputPath, data, "grpc_server_"+data.Project, string(templates.GrpcTemplateServerData))
+		return renderTemplate[ServerTemplateData](outputPath, data, "grpc_server_"+data.Project, string(templates.GrpcServerTemplate))
 
 	case "rest":
 		outputPath = outputPath + "/" + "rest" + GoFilePostfix
 		outputPath = filepath.Clean(outputPath)
-		return renderTemplate[ServerTemplateData](outputPath, data, "rest_server_"+data.Project, string(templates.RestTemplateServerData))
+		return renderTemplate[ServerTemplateData](outputPath, data, "rest_server_"+data.Project, string(templates.RestServerTemplate))
 
 	default:
 		return errors.New("unsupported server type: " + data.Type)
@@ -99,7 +99,7 @@ func WriteInitWireCode(outputPath string, data InitWireTemplateData) error {
 		data.ServiceNames[i] = snakeToPascal(name)
 	}
 
-	return renderTemplate[InitWireTemplateData](outputPath, data, "init_"+data.Package, string(templates.InitTemplateData))
+	return renderTemplate[InitWireTemplateData](outputPath, data, "init_"+data.Package, string(templates.InitTemplate))
 }
 
 // WriteWireCode writes the wire code to the specified output path.
@@ -113,7 +113,7 @@ func WriteWireCode(outputPath string, data WireTemplateData) error {
 
 	data.Service = strings.ToLower(data.Service)
 
-	return renderTemplate[WireTemplateData](outputPath, data, "wire_"+data.Project, string(templates.WireTemplateData))
+	return renderTemplate[WireTemplateData](outputPath, data, "wire_"+data.Project, string(templates.WireTemplate))
 }
 
 // WriteMainCode writes the main code to the specified output path.
@@ -127,5 +127,5 @@ func WriteMainCode(outputPath string, data MainTemplateData) error {
 
 	data.Service = snakeToPascal(data.Service)
 
-	return renderTemplate[MainTemplateData](outputPath, data, "main_"+data.Project, string(templates.MainTemplateData))
+	return renderTemplate[MainTemplateData](outputPath, data, "main_"+data.Project, string(templates.MainTemplate))
 }

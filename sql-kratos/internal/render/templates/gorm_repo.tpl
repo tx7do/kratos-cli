@@ -1,1 +1,140 @@
-﻿
+﻿package data
+
+import (
+	"context"
+	"errors"
+
+	"github.com/go-kratos/kratos/v2/log"
+	"gorm.io/gorm"
+
+	"github.com/tx7do/go-utils/copierutil"
+	"github.com/tx7do/go-utils/crypto"
+	"github.com/tx7do/go-utils/mapper"
+
+	pagination "github.com/tx7do/go-crud/api/gen/go/pagination/v1"
+	gormCurd "github.com/tx7do/go-crud/gorm"
+
+	"{{.Project}}/app/{{.Service}}/service/internal/data/gorm/models"
+
+	{{.ApiPackage}} "{{.Project}}/api/gen/go/{{.Module}}/service/v1"
+)
+
+type {{.ClassName}} struct {
+	data *Data
+	log  *log.Helper
+
+	mapper     *mapper.CopierMapper[{{.ApiPackage}}.{{.PascalName}}, models.{{.PascalName}}]
+	repository *gormCurd.Repository[{{.ApiPackage}}.{{.PascalName}}, models.{{.PascalName}}]
+}
+
+func New{{.ClassName}}(data *Data, logger log.Logger) *{{.ClassName}} {
+	l := log.NewHelper(log.With(logger, "module", "user/repo/user-service"))
+	repo := &{{.ClassName}}{
+		data:   data,
+		log:    l,
+		mapper: mapper.NewCopierMapper[{{.ApiPackage}}.{{.PascalName}}, models.{{.PascalName}}](),
+	}
+
+	repo.init()
+
+	return repo
+}
+
+func (r *{{.ClassName}}) init() {
+    r.repository = gormCurd.NewRepository[{{.ApiPackage}}.{{.PascalName}}, models.{{.PascalName}}](
+        repo.mapper,
+    )
+
+	r.mapper.AppendConverters(copierutil.NewTimeStringConverterPair())
+	r.mapper.AppendConverters(copierutil.NewTimeTimestamppbConverterPair())
+}
+
+func (r *{{.ClassName}}) List(ctx context.Context, req *pagination.PagingRequest) (*{{.ApiPackage}}.List{{.PascalName}}Response, error) {
+	if req == nil {
+		return nil, errors.New("request is nil")
+	}
+
+	ret, err := r.repository.ListWithPaging(ctx, r.data.db, req)
+	if err != nil {
+		return nil, err
+	}
+	if ret == nil {
+		return &{{.ApiPackage}}.List{{.PascalName}}Response{Total: 0, Items: nil}, nil
+	}
+
+	return &{{.ApiPackage}}.List{{.PascalName}}Response{
+		Total: ret.Total,
+		Items: ret.Items,
+	}, nil
+}
+
+func (r *{{.ClassName}}) Get(ctx context.Context, req *{{.ApiPackage}}.Get{{.PascalName}}Request) (*{{.ApiPackage}}.{{.PascalName}}, error) {
+	if req == nil {
+		return nil, errors.New("request is nil")
+	}
+
+	var whereCond *gorm.DB
+	switch req.QueryBy.(type) {
+	case *{{.ApiPackage}}.Get{{.PascalName}}Request_Id:
+		whereCond = r.data.db.Where("id = ?", req.GetId())
+	default:
+		whereCond = r.data.db.Where("id = ?", req.GetId())
+	}
+
+	dto, err := r.repository.Get(ctx, whereCond, req.GetViewMask())
+	if err != nil {
+		return nil, err
+	}
+
+	return dto, err
+}
+
+func (r *{{.ClassName}}) Create(ctx context.Context, req *{{.ApiPackage}}.Create{{.PascalName}}Request) (*{{.ApiPackage}}.{{.PascalName}}, error) {
+	if req == nil || req.Data == nil {
+		return nil, errors.New("request is nil")
+	}
+
+	result, err := r.repository.Create(ctx, r.data.db, req.Data, nil)
+
+	return result, err
+}
+
+func (r *{{.ClassName}}) Update(ctx context.Context, req *{{.ApiPackage}}.Update{{.PascalName}}Request) (*{{.ApiPackage}}.{{.PascalName}}, error) {
+	if req == nil || req.Data == nil {
+		return nil, errors.New("request is nil")
+	}
+
+	result, err := r.repository.Update(ctx,
+		r.data.db.Where("id = ?", req.Data.GetId()),
+		req.Data,
+		req.GetUpdateMask(),
+	)
+
+	return result, err
+}
+
+func (r *{{.ClassName}}) Upsert(ctx context.Context, req *{{.ApiPackage}}.Update{{.PascalName}}Request) (*{{.ApiPackage}}.{{.PascalName}}, error) {
+	if req == nil || req.Data == nil {
+		return nil, errors.New("request is nil")
+	}
+
+	var err error
+
+	result, err := r.repository.Upsert(ctx, r.data.db, req.Data, req.GetUpdateMask())
+
+	return result, err
+}
+
+func (r *{{.ClassName}}) Delete(ctx context.Context, req *{{.ApiPackage}}.Delete{{.PascalName}}Request) (bool, error) {
+	if req == nil {
+		return false, errors.New("request is nil")
+	}
+
+	result, err := r.repository.Delete(
+		ctx,
+		r.data.db.Where("id = ?", req.GetId()),
+		true,
+	)
+
+	return result > 0, err
+}
