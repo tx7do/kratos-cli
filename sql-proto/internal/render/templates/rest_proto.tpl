@@ -26,7 +26,7 @@ service {{.PascalName}}Service {
   }
 
   // 创建
-  rpc Create ({{.SourcePackage}}.Create{{.PascalName}}Request) returns (google.protobuf.Empty) {
+  rpc Create ({{.SourcePackage}}.Create{{.PascalName}}Request) returns ({{.SourcePackage}}.{{.PascalName}}) {
     option (google.api.http) = {
         post: "{{.Path}}"
         body: "*"
@@ -36,7 +36,7 @@ service {{.PascalName}}Service {
   // 更新
   rpc Update ({{.SourcePackage}}.Update{{.PascalName}}Request) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-        put: "{{.Path}}/{data.id}"
+        put: "{{.Path}}/{id}"
         body: "*"
     };
   }

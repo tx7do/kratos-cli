@@ -132,7 +132,7 @@ func (r *{{.ClassName}}) Get(ctx context.Context, req *{{.ApiPackage}}.Get{{.Pas
 	return dto, err
 }
 
-func (r *{{.ClassName}}) Create(ctx context.Context, req *{{.ApiPackage}}.Create{{.PascalName}}Request) error {
+func (r *{{.ClassName}}) Create(ctx context.Context, req *{{.ApiPackage}}.Create{{.PascalName}}Request) (*{{.ApiPackage}}.{{.PascalName}}, error) {
 	if req == nil || req.Data == nil {
 		return {{.ApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
@@ -154,15 +154,15 @@ func (r *{{.ClassName}}) Create(ctx context.Context, req *{{.ApiPackage}}.Create
 		builder.SetID(req.Data.GetId())
 	}
 
-	if err := builder.Exec(ctx); err != nil {
+	if ret, err := builder.Save(ctx); err != nil {
 		r.log.Errorf("insert one data failed: %s", err.Error())
-		return {{.ApiPackage}}.ErrorInternalServerError("insert data failed")
+		return nil, {{.ApiPackage}}.ErrorInternalServerError("insert data failed")
+	} else {
+		return r.mapper.ToDTO(ret), nil
 	}
-
-	return nil
 }
 
-func (r *{{.ClassName}}) Update(ctx context.Context, req *{{.ApiPackage}}.Update{{.PascalName}}Request) error {
+func (r *{{.ClassName}}) Update(ctx context.Context, req *{{.ApiPackage}}.Update{{.PascalName}}Request) (*{{.ApiPackage}}.{{.PascalName}}, error) {
 	if req == nil || req.Data == nil {
 		return {{.ApiPackage}}.ErrorBadRequest("invalid parameter")
 	}

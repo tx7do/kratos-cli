@@ -5,8 +5,8 @@ package {{.Package}};
 import "gnostic/openapi/v3/annotations.proto";
 
 import "google/protobuf/empty.proto";
-import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
 
 import "pagination/v1/pagination.proto";
 
@@ -19,7 +19,7 @@ service {{.PascalName}}Service {
   rpc Get (Get{{.PascalName}}Request) returns ({{.PascalName}}) {}
 
   // 创建
-  rpc Create (Create{{.PascalName}}Request) returns (google.protobuf.Empty) {}
+  rpc Create (Create{{.PascalName}}Request) returns ({{.PascalName}}) {}
 
   // 更新
   rpc Update (Update{{.PascalName}}Request) returns (google.protobuf.Empty) {}
@@ -42,11 +42,23 @@ message {{.PascalName}} {
 
 message List{{.PascalName}}Response {
   repeated {{.PascalName}} items = 1;
-  uint32 total = 2;
+  uint64 total = 2;
 }
 
 message Get{{.PascalName}}Request {
-  uint32 id = 1;
+  oneof query_by {
+    uint32 id = 1 [
+      (gnostic.openapi.v3.property) = {description: "ID", read_only: true},
+      json_name = "id"
+    ]; // ID
+  }
+
+  optional google.protobuf.FieldMask view_mask = 100 [
+    json_name = "viewMask",
+    (gnostic.openapi.v3.property) = {
+      description: "视图字段过滤器，用于控制返回的字段"
+    }
+  ]; // 视图字段过滤器，用于控制返回的字段
 }
 
 message Create{{.PascalName}}Request {
@@ -54,9 +66,11 @@ message Create{{.PascalName}}Request {
 }
 
 message Update{{.PascalName}}Request {
-  {{.PascalName}} data = 1;
+  uint32 id = 1;
 
-  google.protobuf.FieldMask update_mask = 2 [
+  {{.PascalName}} data = 2;
+
+  google.protobuf.FieldMask update_mask = 100 [
     (gnostic.openapi.v3.property) = {
       description: "要更新的字段列表",
       example: {yaml : "id,realname,username"}
@@ -64,7 +78,7 @@ message Update{{.PascalName}}Request {
     json_name = "updateMask"
   ]; // 要更新的字段列表
 
-  optional bool allow_missing = 3 [
+  optional bool allow_missing = 101 [
     (gnostic.openapi.v3.property) = {description: "如果设置为true的时候，资源不存在则会新增(插入)，并且在这种情况下`updateMask`字段将会被忽略。"},
     json_name = "allowMissing"
   ]; // 如果设置为true的时候，资源不存在则会新增(插入)，并且在这种情况下`updateMask`字段将会被忽略。

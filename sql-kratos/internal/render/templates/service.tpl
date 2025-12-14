@@ -46,7 +46,7 @@ func (s *{{.ClassName}}) Get(ctx context.Context, req *{{.SourceApiPackage}}.Get
 	return s.{{.DataSourceVar}}.Get(ctx, req)
 }
 
-func (s *{{.ClassName}}) Create(ctx context.Context, req *{{.SourceApiPackage}}.Create{{.PascalName}}Request) (*emptypb.Empty, error) {
+func (s *{{.ClassName}}) Create(ctx context.Context, req *{{.SourceApiPackage}}.Create{{.PascalName}}Request) (*{{.SourceApiPackage}}.{{.PascalName}}, error) {
 	if req == nil || req.Data == nil {
 		return nil, {{.SourceApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
@@ -62,10 +62,11 @@ func (s *{{.ClassName}}) Create(ctx context.Context, req *{{.SourceApiPackage}}.
 {{end}}
 
 {{if not .UseRepo}}
-	if err := s.{{.DataSourceVar}}.Create(ctx, req); err != nil {
+	if result, err := s.{{.DataSourceVar}}.Create(ctx, req); err != nil {
 		return nil, err
+	} else {
+	    return result, nil
 	}
-	return &emptypb.Empty{}, nil
 {{else}}
     return s.{{.DataSourceVar}}.Create(ctx, req)
 {{end -}}
@@ -87,12 +88,15 @@ func (s *{{.ClassName}}) Update(ctx context.Context, req *{{.SourceApiPackage}}.
 {{end -}}
 
 {{if not .UseRepo}}
-	if err := s.{{.DataSourceVar}}.Update(ctx, req); err != nil {
+	if _, err := s.{{.DataSourceVar}}.Update(ctx, req); err != nil {
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil
 {{else}}
-    return s.{{.DataSourceVar}}.Update(ctx, req)
+	if _, err := s.{{.DataSourceVar}}.Update(ctx, req); err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
 {{end -}}
 }
 
