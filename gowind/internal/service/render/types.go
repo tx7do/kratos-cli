@@ -222,6 +222,7 @@ type ProtoItem struct {
 }
 
 type ServerTemplateData struct {
+	Module   string
 	Project  string
 	Service  string
 	Type     string

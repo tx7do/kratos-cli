@@ -13,7 +13,7 @@ import (
 func WriteServerPackageCode(outputPath string, data ServerTemplateData) error {
 	data.Service = strings.ToLower(data.Service)
 
-	outputPath = outputPath + "/server/"
+	outputPath = filepath.Join(outputPath, "/server/")
 	outputPath = filepath.Clean(outputPath)
 
 	if err := os.MkdirAll(outputPath, os.ModePerm); err != nil {
@@ -24,12 +24,12 @@ func WriteServerPackageCode(outputPath string, data ServerTemplateData) error {
 
 	switch data.Type {
 	case "grpc":
-		outputPath = outputPath + "/" + "grpc" + GoFilePostfix
+		outputPath = filepath.Join(outputPath, "/", "grpc"+GoFilePostfix)
 		outputPath = filepath.Clean(outputPath)
 		return renderTemplate[ServerTemplateData](outputPath, data, "grpc_server_"+data.Project, string(templates.GrpcTemplateServerData))
 
 	case "rest":
-		outputPath = outputPath + "/" + "rest" + GoFilePostfix
+		outputPath = filepath.Join(outputPath, "/", "rest"+GoFilePostfix)
 		outputPath = filepath.Clean(outputPath)
 		return renderTemplate[ServerTemplateData](outputPath, data, "rest_server_"+data.Project, string(templates.RestTemplateServerData))
 
@@ -40,14 +40,14 @@ func WriteServerPackageCode(outputPath string, data ServerTemplateData) error {
 
 // WriteInitWireCode writes the initialization wire code to the specified output path.
 func WriteInitWireCode(outputPath string, data InitWireTemplateData) error {
-	outputPath = outputPath + "/" + data.Package + "/"
+	outputPath = filepath.Join(outputPath, "/", data.Package, "/")
 	outputPath = filepath.Clean(outputPath)
 
 	if err := os.MkdirAll(outputPath, os.ModePerm); err != nil {
 		return err
 	}
 
-	outputPath = outputPath + "/" + "init" + GoFilePostfix
+	outputPath = filepath.Join(outputPath, "/", "init"+GoFilePostfix)
 	outputPath = filepath.Clean(outputPath)
 
 	for i, name := range data.ServiceNames {
@@ -63,7 +63,7 @@ func WriteWireCode(outputPath string, data WireTemplateData) error {
 		return err
 	}
 
-	outputPath = outputPath + "/" + "wire" + GoFilePostfix
+	outputPath = filepath.Join(outputPath, "/", "wire"+GoFilePostfix)
 	outputPath = filepath.Clean(outputPath)
 
 	data.Service = strings.ToLower(data.Service)
@@ -77,7 +77,7 @@ func WriteMainCode(outputPath string, data MainTemplateData) error {
 		return err
 	}
 
-	outputPath = outputPath + "/" + "main" + GoFilePostfix
+	outputPath = filepath.Join(outputPath, "/", "main"+GoFilePostfix)
 	outputPath = filepath.Clean(outputPath)
 
 	data.Service = snakeToPascal(data.Service)

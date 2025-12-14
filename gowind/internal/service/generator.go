@@ -21,6 +21,7 @@ func Generate(ctx context.Context, opts GeneratorOptions) error {
 		if err = generateServerPackageCode(
 			serverPackagePath,
 			opts.ProjectModule,
+			opts.ProjectName,
 			opts.ServiceName,
 			opts.Servers,
 		); err != nil {
@@ -83,11 +84,33 @@ func Generate(ctx context.Context, opts GeneratorOptions) error {
 		}
 	}
 
+	// 追加服务名称常量定义
+	{
+		servicePackagePath := filepath.Join(opts.OutputPath, "/pkg/service")
+		if err = appendServiceName(
+			servicePackagePath,
+			opts.ProjectName,
+			opts.ServiceName,
+			opts.HasBFFService(),
+		); err != nil {
+			return err
+		}
+	}
+
+	// 生成assets包代码
+	if opts.HasBFFService() {
+		assetsPath := filepath.Join(opts.OutputPath, "/app/", opts.ServiceName, "/service/cmd/server/assets")
+		if err = writeAssets(assetsPath); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
 func generateServerPackageCode(
 	outputPath string,
+	projectModule string,
 	projectName string,
 	serviceName string,
 	servers []string,
@@ -96,7 +119,7 @@ func generateServerPackageCode(
 	for _, server := range servers {
 		if err := WriteServerPackageCode(
 			outputPath,
-			projectName, server, serviceName,
+			projectModule, projectName, server, serviceName,
 		); err != nil {
 			return err
 		}
@@ -153,9 +176,7 @@ func writeMakefile(outputPath string) error {
 	makefilePath := path.Join(outputPath, "Makefile")
 	makefilePath = filepath.Clean(makefilePath)
 
-	const makefileContent string = `
-include ../../../app.mk
-`
+	const makefileContent string = `include ../../../app.mk`
 	if !pkg.IsFileExists(makefilePath) {
 		if err := os.WriteFile(makefilePath, []byte(makefileContent), 0644); err != nil {
 			return fmt.Errorf("write Makefile: %w", err)
@@ -167,8 +188,7 @@ include ../../../app.mk
 
 // writeConfigs 生成默认的配置文件到指定目录。
 func writeConfigs(outputPath string) error {
-	const dataYaml string = `
-data:
+	const dataYaml string = `data:
   database:
     driver: "postgres"
     source: "host=postgres port=5432 user=postgres password=<you_password> dbname=gwa sslmode=disable"
@@ -190,16 +210,14 @@ data:
     write_timeout: 0.6s
 `
 
-	const serverYaml string = `
-server:
+	const serverYaml string = `server:
   grpc:
     addr: ":8899"
     timeout: 10s
     middleware:
 `
 
-	const loggerYaml string = `
-logger:
+	const loggerYaml string = `logger:
   type: std # Options: std, file, fluent, zap, logrus, aliyun, tencent
 
   fluent:
@@ -232,8 +250,7 @@ logger:
     access_secret: "<access_secret>"
 `
 
-	const clientYaml string = `
-client:
+	const clientYaml string = `client:
   grpc:
     timeout: 10s
     middleware:
@@ -285,8 +302,7 @@ client:
 
 // appendServiceName 向 pkg/service/name.go 文件追加服务名称常量定义。
 func appendServiceName(outputPath string, projectName, serviceName string, isBff bool) error {
-	pkgDir := filepath.Join(outputPath, "pkg", "service")
-	if err := os.MkdirAll(pkgDir, os.ModePerm); err != nil {
+	if err := os.MkdirAll(outputPath, os.ModePerm); err != nil {
 		return fmt.Errorf("create pkg/service dir: %w", err)
 	}
 
@@ -302,7 +318,7 @@ func appendServiceName(outputPath string, projectName, serviceName string, isBff
 	// 行格式，带缩进
 	fieldLine := fmt.Sprintf("    %s = %q", constName, constValue)
 
-	serviceNamePath := filepath.Join(pkgDir, "name.go")
+	serviceNamePath := filepath.Join(outputPath, "name.go")
 
 	// 文件不存在：创建包含 const 块的初始文件
 	if !pkg.IsFileExists(serviceNamePath) {
@@ -342,8 +358,31 @@ func appendServiceName(outputPath string, projectName, serviceName string, isBff
 	// 未找到 const 块，直接在文件末尾追加一个新的 const 块
 	appendContent := fmt.Sprintf("\nconst (\n%s\n)\n", fieldLine)
 	newText := text + appendContent
-	if err := os.WriteFile(serviceNamePath, []byte(newText), 0644); err != nil {
+	if err = os.WriteFile(serviceNamePath, []byte(newText), 0644); err != nil {
 		return fmt.Errorf("append service name file: %w", err)
+	}
+
+	return nil
+}
+
+// writeAssets 生成 assets 包代码到指定目录。
+func writeAssets(outputPath string) error {
+	if err := os.MkdirAll(outputPath, os.ModePerm); err != nil {
+		return fmt.Errorf("create assets dir: %w", err)
+	}
+
+	assetsPath := filepath.Join(outputPath, "assets.go")
+
+	content := `
+package assets
+
+import _ "embed"
+
+//go:embed openapi.yaml
+var OpenApiData []byte
+`
+	if err := os.WriteFile(assetsPath, []byte(content), 0644); err != nil {
+		return fmt.Errorf("write assets.go file: %w", err)
 	}
 
 	return nil

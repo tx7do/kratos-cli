@@ -9,17 +9,21 @@ import (
 
 func TestGenerate(t *testing.T) {
 	_ = Generate(context.Background(), GeneratorOptions{
-		GenerateMain:    true,
-		GenerateServer:  true,
-		GenerateService: true,
-		GenerateData:    true,
+		GenerateMain:     true,
+		GenerateServer:   true,
+		GenerateService:  true,
+		GenerateData:     true,
+		GenerateMakefile: true,
+		GenerateConfigs:  true,
 
-		ProjectModule: "test.com/gowind",
+		ProjectModule: "github.com/gowind-example",
+		ProjectName:   "gowind-example",
 		ServiceName:   "user",
 
-		Servers: []string{"rest", "grpc"},
+		Servers:   []string{"rest", "grpc"},
+		DbClients: []string{"ent"},
 
-		OutputPath: ".",
+		OutputPath: "./test",
 	})
 }
 
@@ -44,6 +48,6 @@ func TestWriteMakefile(t *testing.T) {
 }
 
 func TestWriteConfigs(t *testing.T) {
-	err := writeConfigs("./")
+	err := writeConfigs("./configs")
 	assert.Nil(t, err)
 }

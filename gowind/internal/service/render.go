@@ -6,11 +6,13 @@ import (
 
 func WriteServerPackageCode(
 	outputPath string,
+	projectModule string,
 	projectName string,
 	serviceType string,
 	serviceName string,
 ) error {
 	data := render.ServerTemplateData{
+		Module:  projectModule,
 		Project: projectName,
 		Type:    serviceType,
 		Service: serviceName,
@@ -20,7 +22,6 @@ func WriteServerPackageCode(
 
 func WriteInitWireCode(
 	outputPath string,
-
 	packageName string,
 	postfix string,
 	services []string,
