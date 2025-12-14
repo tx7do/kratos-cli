@@ -51,3 +51,13 @@ func TestWriteConfigs(t *testing.T) {
 	err := writeConfigs("./configs")
 	assert.Nil(t, err)
 }
+
+func TestExtractProjectName(t *testing.T) {
+	projectModule := "github.com/gowind-example"
+	projectName := extractProjectName(projectModule)
+	assert.Equal(t, "gowind-example", projectName)
+
+	projectModule = "gowind-example"
+	projectName = extractProjectName(projectModule)
+	assert.Equal(t, "gowind-example", projectName)
+}

@@ -11,8 +11,8 @@ import (
 	"{{.Module}}/app/{{lower $.Service}}/service/internal/service"
 )
 
-// NewGRPCServer new a gRPC server.
-func NewGRPCServer(
+// NewGrpcServer new a gRPC server.
+func NewGrpcServer(
 	cfg *conf.Bootstrap, logger log.Logger,
 ) *grpc.Server {
 	srv := rpc.CreateGrpcServer(cfg, logging.Server(logger))

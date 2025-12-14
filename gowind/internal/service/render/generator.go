@@ -124,11 +124,28 @@ func WriteInitWireCode(outputPath string, data InitWireTemplateData) error {
 	outputPath = filepath.Join(outputPath, "/", "init"+GoFilePostfix)
 	outputPath = filepath.Clean(outputPath)
 
-	for i, name := range data.ServiceNames {
-		data.ServiceNames[i] = snakeToPascal(name)
+	var functionData InitWireFunctionTemplateData
+	functionData.Package = data.Package
+	for _, name := range data.ServiceNames {
+		functionData.Functions = append(functionData.Functions, "New"+snakeToPascal(name)+data.Postfix)
 	}
 
-	return renderTemplate[InitWireTemplateData](outputPath, data, "init_"+data.Package, string(templates.InitTemplate))
+	return renderTemplate[InitWireFunctionTemplateData](outputPath, functionData, "init_"+data.Package, string(templates.InitTemplate))
+}
+
+// WriteInitWireFunctionCode writes the initialization wire code to the specified output path.
+func WriteInitWireFunctionCode(outputPath string, data InitWireFunctionTemplateData) error {
+	outputPath = filepath.Join(outputPath, "/", data.Package, "/")
+	outputPath = filepath.Clean(outputPath)
+
+	if err := os.MkdirAll(outputPath, os.ModePerm); err != nil {
+		return err
+	}
+
+	outputPath = filepath.Join(outputPath, "/", "init"+GoFilePostfix)
+	outputPath = filepath.Clean(outputPath)
+
+	return renderTemplate[InitWireFunctionTemplateData](outputPath, data, "init_"+data.Package, string(templates.InitTemplate))
 }
 
 // WriteWireCode writes the wire code to the specified output path.

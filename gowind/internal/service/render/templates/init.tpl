@@ -9,5 +9,5 @@ import (
 
 // ProviderSet is {{.Package}} providers.
 var ProviderSet = wire.NewSet(
-{{range .ServiceNames}}	New{{.}}{{$.Postfix}},
+{{range .Functions}}	{{.}},
 {{end}})

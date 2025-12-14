@@ -151,7 +151,19 @@ func generateDataPackageCode(
 		return err
 	}
 
-	return WriteInitWireCode(outputPath, "data", "Client", dbClients)
+	var functions []string
+	functions = append(functions, "NewData")
+	
+	for _, repo := range repos {
+		functions = append(functions, fmt.Sprintf("New%sRepo", stringcase.UpperCamelCase(repo)))
+	}
+	for _, dbClient := range dbClients {
+		functions = append(functions, fmt.Sprintf("New%sClient", stringcase.UpperCamelCase(dbClient)))
+	}
+
+	//fmt.Printf("functions: %v\n", functions)
+
+	return WriteInitWireFunctionCode(outputPath, "data", functions)
 }
 
 func generateMainPackageCode(
@@ -199,9 +211,9 @@ func writeConfigs(outputPath string) error {
 	const dataYaml string = `data:
   database:
     driver: "postgres"
-    source: "host=postgres port=5432 user=postgres password=<you_password> dbname=gwa sslmode=disable"
+    source: "host=postgres port=5432 user=postgres password=<your_password> dbname=<your_database> sslmode=disable"
 #    driver: "mysql"
-#    source: "root:<you_password>@tcp(localhost:3306)/gwa?parseTime=true&charset=utf8mb4&loc=Asia%2FShanghai"
+#    source: "root:<you_password>@tcp(localhost:3306)/<your_database>?parseTime=true&charset=utf8mb4&loc=Asia%2FShanghai"
     migrate: true
     debug: false
     enable_trace: false
@@ -212,7 +224,7 @@ func writeConfigs(outputPath string) error {
 
   redis:
     addr: "redis:6379"
-    password: "<you_password>"
+    password: "<your_password>"
     dial_timeout: 10s
     read_timeout: 0.4s
     write_timeout: 0.6s
@@ -220,9 +232,15 @@ func writeConfigs(outputPath string) error {
 
 	const serverYaml string = `server:
   grpc:
-    addr: ":8899"
-    timeout: 10s
+    addr: "0.0.0.0:0"
+    timeout: 120s
     middleware:
+      enable_logging: true
+      enable_recovery: true
+      enable_tracing: true
+      enable_validate: true
+      enable_circuit_breaker: true
+      enable_metadata: true
 `
 
 	const loggerYaml string = `logger:
@@ -270,7 +288,7 @@ func writeConfigs(outputPath string) error {
       enable_metadata: true
       auth:
         method: "HS256"
-        key: "some_api_key"
+        key: "<some_api_key>"
 `
 
 	if err := os.MkdirAll(outputPath, os.ModePerm); err != nil {

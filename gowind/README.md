@@ -32,6 +32,25 @@ gow add service user
 go mod tidy
 ```
 
+You can also specify the server type and orm type when adding a new microservice:
+
+```shell
+# add microservice with grpc
+gow add service order -s grpc
+
+# add microservice with rest
+gow add service admin -s rest
+
+# add microservice with rest and grpc servers
+gow add service admin -s rest -s grpc
+
+# add microservice with gorm orm and grpc server
+gow add svc payment -d gorm -s grpc
+
+# add microservice with rest, grpc servers and gorm, redis daos
+gow add service admin -s rest -s grpc -d gorm -d redis
+```
+
 ### Run The Microservice Application
 
 You can directly execute the microservice in the current path without parameters, For example you are currently in 'app/admin/service':

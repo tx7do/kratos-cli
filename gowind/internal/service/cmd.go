@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/spf13/cobra"
@@ -21,7 +22,38 @@ var CmdService = &cobra.Command{
 	Run:     run,
 }
 
-var serviceName string
+var (
+	serviceName string
+	Servers     []string
+	DbClients   []string
+)
+
+func init() {
+	Servers = []string{"grpc"}
+	DbClients = []string{"ent"}
+
+	CmdService.Flags().StringArrayVarP(&Servers, "servers", "s", []string{"grpc"}, "Specify which server types to generate (grpc, rest, asynq, sse...)")
+	CmdService.Flags().StringArrayVarP(&DbClients, "db-clients", "d", []string{"ent"}, "Specify which database clients to generate (gorm, ent, redis, clickhouse...)")
+}
+
+func extractProjectName(module string) string {
+	module = strings.TrimSpace(module)
+	if module == "" {
+		return ""
+	}
+
+	if strings.Contains(module, "/") {
+		parts := strings.Split(module, "/")
+		for i := len(parts) - 1; i >= 0; i-- {
+			seg := strings.TrimSpace(parts[i])
+			if seg != "" {
+				return seg
+			}
+		}
+	}
+
+	return module
+}
 
 func run(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
@@ -51,11 +83,19 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	_ = Generate(context.Background(), GeneratorOptions{
-		GenerateMain:   true,
-		GenerateServer: true,
+		GenerateMain:     true,
+		GenerateServer:   true,
+		GenerateService:  true,
+		GenerateData:     true,
+		GenerateMakefile: true,
+		GenerateConfigs:  true,
 
+		ProjectName:   extractProjectName(inspector.ModPath),
 		ProjectModule: inspector.ModPath,
 		ServiceName:   serviceName,
+
+		Servers:   Servers,
+		DbClients: DbClients,
 
 		OutputPath: inspector.Root,
 	})

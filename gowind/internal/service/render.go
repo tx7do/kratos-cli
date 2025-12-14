@@ -50,6 +50,18 @@ func WriteInitWireCode(
 	return render.WriteInitWireCode(outputPath, data)
 }
 
+func WriteInitWireFunctionCode(
+	outputPath string,
+	packageName string,
+	functions []string,
+) error {
+	data := render.InitWireFunctionTemplateData{
+		Package:   packageName,
+		Functions: functions,
+	}
+	return render.WriteInitWireFunctionCode(outputPath, data)
+}
+
 func WriteWireCode(
 	outputPath string,
 	projectName string,

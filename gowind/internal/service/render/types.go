@@ -11,6 +11,11 @@ type InitWireTemplateData struct {
 	ServiceNames []string
 }
 
+type InitWireFunctionTemplateData struct {
+	Package   string
+	Functions []string
+}
+
 type WireTemplateData struct {
 	Project string
 	Service string

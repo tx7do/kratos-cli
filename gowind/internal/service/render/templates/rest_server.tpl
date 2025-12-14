@@ -39,8 +39,8 @@ func newRestMiddleware(
 	return ms
 }
 
-// NewRESTServer new an HTTP server.
-func NewRESTServer(
+// NewRestServer new an REST server.
+func NewRestServer(
 	cfg *conf.Bootstrap, logger log.Logger,
 ) *http.Server {
 	if cfg == nil || cfg.Server == nil || cfg.Server.Rest == nil {
