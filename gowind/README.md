@@ -24,7 +24,15 @@ cd myproject
 go mod tidy
 ```
 
-### Run the microservice Application
+### Add a New Microservice
+
+```shell
+gow add service admin
+gow add service user
+go mod tidy
+```
+
+### Run The Microservice Application
 
 You can directly execute the microservice in the current path without parameters, For example you are currently in 'app/admin/service':
 

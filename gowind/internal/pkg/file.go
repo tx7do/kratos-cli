@@ -148,3 +148,21 @@ func ReplaceTemplateInCurrentDir(rootDir, source, target string) (int, error) {
 
 	return updated, err
 }
+
+func IsDirExists(dir string) bool {
+	if _, err := os.Stat(dir); !os.IsNotExist(err) {
+		return true
+	}
+	return false
+}
+
+func IsFileExists(filePath string) bool {
+	fi, err := os.Stat(filePath)
+	if err == nil {
+		return !fi.IsDir()
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
+}

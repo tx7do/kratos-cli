@@ -36,7 +36,7 @@ func isDirExists(baseDir, projectName string) bool {
 func processProjectParams(projectName string, workingDir string) (projectNameResult, workingDirResult string) {
 	_projectDir := projectName
 	_workingDir := workingDir
-	// Process ProjectName with system variable
+	// Process ProjectModule with system variable
 	if strings.HasPrefix(projectName, "~") {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
