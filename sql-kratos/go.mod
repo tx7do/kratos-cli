@@ -8,11 +8,11 @@ require (
 	github.com/jinzhu/inflection v1.0.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
-	github.com/stretchr/testify v1.11.1
+	github.com/tx7do/go-utils v1.1.34
+	github.com/tx7do/go-utils/code_generator v0.0.1
 	github.com/tx7do/kratos-cli/generators v0.0.3
 	github.com/tx7do/kratos-cli/sql-orm v0.0.4
 	github.com/tx7do/kratos-cli/sql-proto v0.0.14
-	golang.org/x/text v0.32.0
 )
 
 require (
@@ -29,7 +29,6 @@ require (
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/bufbuild/protocompile v0.14.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-faster/city v1.0.1 // indirect
 	github.com/go-faster/errors v0.7.1 // indirect
 	github.com/go-openapi/inflect v0.21.5 // indirect
@@ -57,11 +56,8 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/paulmach/orb v0.12.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.22 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
-	github.com/tx7do/go-utils v1.1.34 // indirect
-	github.com/tx7do/go-utils/code_generator v0.0.1 // indirect
 	github.com/zclconf/go-cty v1.17.0 // indirect
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
 	go.opentelemetry.io/otel v1.39.0 // indirect
@@ -72,6 +68,7 @@ require (
 	golang.org/x/mod v0.31.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.39.0 // indirect
+	golang.org/x/text v0.32.0 // indirect
 	golang.org/x/tools v0.40.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250728155136-f173205681a0 // indirect
 	google.golang.org/grpc v1.74.2 // indirect
