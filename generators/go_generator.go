@@ -1,4 +1,4 @@
-﻿package generators
+package generators
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 
 	"github.com/tx7do/go-utils/code_generator"
 	"github.com/tx7do/go-utils/stringcase"
-	"github.com/tx7do/kratos-cli/generatos/templates/golang"
+	"github.com/tx7do/kratos-cli/generators/templates/golang"
 )
 
 // GoGenerator 使用 TemplateEngine 渲染并将结果写入磁盘
