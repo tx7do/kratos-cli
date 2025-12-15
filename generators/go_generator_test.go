@@ -11,8 +11,8 @@ func TestGoGenerator_Template_Main(t *testing.T) {
 	g := NewGoGenerator()
 
 	opts := code_generator.Options{
-		OutDir:      "./output",
-		ProjectName: "MyProject",
+		OutDir: "./output",
+		Module: "github.com/example/myproject",
 		Vars: map[string]interface{}{
 			"Service":                  "user",
 			"ServerImports":            []string{"github.com/example/myproject/server"},

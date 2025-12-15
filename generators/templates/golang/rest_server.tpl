@@ -78,7 +78,7 @@ func NewRestServer(
 	if cfg.GetServer().GetRest().GetEnableSwagger() {
 		swaggerUI.RegisterSwaggerUIServerWithOption(
 			srv,
-			swaggerUI.WithTitle("{{pascal .Service}} Service"),
+			swaggerUI.WithTitle("{{pascal .Project}} {{.Service}} Service"),
 			swaggerUI.WithMemoryData(assets.OpenApiData, "yaml"),
 		)
 	}

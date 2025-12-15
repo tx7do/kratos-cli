@@ -9,7 +9,7 @@ import (
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 
 {{renderImports .ServerImports}}
-	"{{.Project}}/pkg/service"
+	"{{.Module}}/pkg/service"
 )
 
 var version string
