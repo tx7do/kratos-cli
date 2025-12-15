@@ -18,7 +18,7 @@ func TestGoGenerator_GenerateCreatesFile(t *testing.T) {
 		t.Fatalf("failed to create engine: %v", err)
 	}
 
-	g := NewGoGenerator(engine)
+	g := NewGoGeneratorWithEngine(engine)
 	opts := Options{
 		Module:      "github.com/example/mod",
 		ProjectName: "demo",
@@ -28,7 +28,7 @@ func TestGoGenerator_GenerateCreatesFile(t *testing.T) {
 		},
 	}
 
-	if err := g.Generate(opts, "pkg/main.tpl"); err != nil {
+	if err = g.Generate(opts, "pkg/main.tpl"); err != nil {
 		t.Fatalf("Generate failed: %v", err)
 	}
 
@@ -53,13 +53,13 @@ func TestGoGenerator_RemovesSuffixAndCreatesNestedDirs(t *testing.T) {
 		t.Fatalf("failed to create engine: %v", err)
 	}
 
-	g := NewGoGenerator(engine)
+	g := NewGoGeneratorWithEngine(engine)
 	opts := Options{
 		ProjectName: "nested",
 		OutDir:      tmp,
 	}
 
-	if err := g.Generate(opts, "a/b/c/file.tmpl"); err != nil {
+	if err = g.Generate(opts, "a/b/c/file.tmpl"); err != nil {
 		t.Fatalf("Generate failed: %v", err)
 	}
 
@@ -74,7 +74,7 @@ func TestGoGenerator_RemovesSuffixAndCreatesNestedDirs(t *testing.T) {
 }
 
 func TestGoGenerator_NoEngineReturnsError(t *testing.T) {
-	g := NewGoGenerator(nil)
+	g := NewGoGeneratorWithEngine(nil)
 	opts := Options{OutDir: t.TempDir()}
 
 	err := g.Generate(opts, "doesnotmatter.tpl")
@@ -98,14 +98,14 @@ func TestGoGenerator_OverwriteExistingFile(t *testing.T) {
 
 	// create existing file with different content
 	outPath := filepath.Join(tmp, "dup")
-	if err := os.MkdirAll(filepath.Dir(outPath), 0o755); err != nil {
+	if err = os.MkdirAll(filepath.Dir(outPath), 0o755); err != nil {
 		t.Fatalf("mkdir failed: %v", err)
 	}
-	if err := os.WriteFile(outPath, []byte("old"), 0o644); err != nil {
+	if err = os.WriteFile(outPath, []byte("old"), 0o644); err != nil {
 		t.Fatalf("write initial file failed: %v", err)
 	}
 
-	g := NewGoGenerator(engine)
+	g := NewGoGeneratorWithEngine(engine)
 	opts := Options{
 		OutDir: tmp,
 		Vars: map[string]interface{}{
@@ -113,7 +113,7 @@ func TestGoGenerator_OverwriteExistingFile(t *testing.T) {
 		},
 	}
 
-	if err := g.Generate(opts, "dup.tpl"); err != nil {
+	if err = g.Generate(opts, "dup.tpl"); err != nil {
 		t.Fatalf("Generate failed: %v", err)
 	}
 

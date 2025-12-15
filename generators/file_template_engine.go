@@ -33,6 +33,7 @@ func NewFileTemplateEngine(root string) (*FileTemplateEngine, error) {
 	return e, nil
 }
 
+// loadAll 加载 root 目录下的所有模板文件
 func (e *FileTemplateEngine) loadAll() error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -110,4 +111,17 @@ func (e *FileTemplateEngine) ListTemplates() []string {
 		out = append(out, k)
 	}
 	return out
+}
+
+func (e *FileTemplateEngine) InstallFuncMap(funcs template.FuncMap) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
+	for name, tmpl := range e.templates {
+		t := tmpl.Funcs(funcs)
+		parsed, err := t.Parse(tmpl.Tree.Root.String())
+		if err == nil {
+			e.templates[name] = parsed
+		}
+	}
 }

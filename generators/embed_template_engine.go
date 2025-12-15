@@ -14,6 +14,10 @@ type EmbeddedTemplateEngine struct {
 	templates map[string]*template.Template
 }
 
+func NewEmbeddedTemplateEngine(srcs map[string][]byte) (*EmbeddedTemplateEngine, error) {
+	return NewEmbeddedTemplateEngineFromMap(srcs, nil)
+}
+
 // NewEmbeddedTemplateEngineFromMap 使用预先准备好的模板字节映射创建引擎，
 // 可选传入 FuncMap，会在解析模板前调用 template.New(name).Funcs(funcs)。
 // 键应为相对路径样式（使用 '/' 分隔），例如 `main.tpl` 或 `sub/main.tpl`。
@@ -21,6 +25,7 @@ func NewEmbeddedTemplateEngineFromMap(srcs map[string][]byte, funcs template.Fun
 	e := &EmbeddedTemplateEngine{
 		templates: make(map[string]*template.Template),
 	}
+
 	for name, b := range srcs {
 		if len(b) == 0 {
 			continue
@@ -35,7 +40,21 @@ func NewEmbeddedTemplateEngineFromMap(srcs map[string][]byte, funcs template.Fun
 		}
 		e.templates[name] = tmpl
 	}
+
 	return e, nil
+}
+
+func (e *EmbeddedTemplateEngine) InstallFuncMap(funcs template.FuncMap) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
+	for name, tmpl := range e.templates {
+		t := tmpl.Funcs(funcs)
+		parsed, err := t.Parse(tmpl.Tree.Root.String())
+		if err == nil {
+			e.templates[name] = parsed
+		}
+	}
 }
 
 // Render 渲染指定模板名（例如 "main.tpl" 或 "service.tpl"），返回渲染后的字节。
