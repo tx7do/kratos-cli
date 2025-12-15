@@ -4,6 +4,10 @@ go 1.24.6
 
 replace github.com/tx7do/kratos-cli/generators => ../generators
 
+replace github.com/tx7do/kratos-cli/sql-orm => ../sql-orm
+
+replace github.com/tx7do/kratos-cli/sql-proto => ../sql-proto
+
 require (
 	github.com/jinzhu/inflection v1.0.0
 	github.com/spf13/cobra v1.10.2
