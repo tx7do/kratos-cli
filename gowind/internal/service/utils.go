@@ -1,200 +1,433 @@
 ﻿package service
 
 import (
-	"fmt"
 	"strings"
 )
 
-func serverImportPath(servers []string) string {
-	var str string
+func serverImportPath(servers []string) []string {
+	var paths []string
+	seen := make(map[string]bool)
 
 	for _, server := range servers {
 		switch strings.TrimSpace(strings.ToLower(server)) {
 		case "grpc":
-			str += fmt.Sprintf("\t\"github.com/go-kratos/kratos/v2/transport/grpc\"\n")
+			if p := "github.com/go-kratos/kratos/v2/transport/grpc"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "rest":
-			str += fmt.Sprintf("\t\"github.com/go-kratos/kratos/v2/transport/http\"\n")
-
+			if p := "github.com/go-kratos/kratos/v2/transport/http"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "activemq":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/activemq\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/activemq"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "asynq":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/asynq\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/asynq"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "fasthttp":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/fasthttp\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/fasthttp"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "gin":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/gin\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/gin"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "gozero":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/gozero\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/gozero"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "graphql":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/graphql\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/graphql"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "hertz":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/hertz\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/hertz"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "iris":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/iris\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/iris"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "kafka":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/kafka\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/kafka"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "machinery":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/machinery\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/machinery"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "mqtt":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/mqtt\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/mqtt"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "nats":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/nats\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/nats"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "nsq":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/nsq\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/nsq"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "pulsar":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/pulsar\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/pulsar"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "rabbitmq":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/rabbitmq\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/rabbitmq"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "redis":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/redis\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/redis"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "rocketmq":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/rocketmq\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/rocketmq"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "signalr":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/signalr\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/signalr"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "socketio":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/socketio\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/socketio"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "sse":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/sse\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/sse"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "tcp":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/tcp\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/tcp"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "thrift":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/thrift\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/thrift"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "trpc":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/trpc\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/trpc"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		case "websocket":
-			str += fmt.Sprintf("\t\"github.com/tx7do/kratos-transport/transport/websocket\"\n")
+			if p := "github.com/tx7do/kratos-transport/transport/websocket"; !seen[p] {
+				paths = append(paths, p)
+				seen[p] = true
+			}
 		}
 	}
 
-	return str
+	return paths
 }
 
 // serverFormalParameters 形参
-func serverFormalParameters(servers []string) string {
-	var str string
+func serverFormalParameters(servers []string) []string {
+	var params []string
+	seen := make(map[string]bool)
 
 	for _, server := range servers {
 		switch strings.TrimSpace(strings.ToLower(server)) {
 		case "grpc":
-			str += fmt.Sprintf("\tgs *grpc.Server,\n")
+			if p := "gs *grpc.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "rest":
-			str += fmt.Sprintf("\ths *http.Server,\n")
-
+			if p := "hs *http.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "activemq":
-			str += fmt.Sprintf("\tts *activemq.Server,\n")
+			if p := "ts *activemq.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "asynq":
-			str += fmt.Sprintf("\tas *asynq.Server,\n")
+			if p := "as *asynq.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "fasthttp":
-			str += fmt.Sprintf("\tfs *fasthttp.Server,\n")
+			if p := "fs *fasthttp.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "gin":
-			str += fmt.Sprintf("\tis *gin.Server,\n")
+			if p := "is *gin.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "gozero":
-			str += fmt.Sprintf("\tos *gozero.Server,\n")
+			if p := "os *gozero.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "graphql":
-			str += fmt.Sprintf("\tqs *graphql.Server,\n")
+			if p := "qs *graphql.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "hertz":
-			str += fmt.Sprintf("\tzs *hertz.Server,\n")
+			if p := "zs *hertz.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "iris":
-			str += fmt.Sprintf("\trs *iris.Server,\n")
+			if p := "rs *iris.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "kafka":
-			str += fmt.Sprintf("\tks *kafka.Server,\n")
+			if p := "ks *kafka.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "machinery":
-			str += fmt.Sprintf("\tys *machinery.Server,\n")
+			if p := "ys *machinery.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "mqtt":
-			str += fmt.Sprintf("\tms *mqtt.Server,\n")
+			if p := "ms *mqtt.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "nats":
-			str += fmt.Sprintf("\tnats *nats.Server,\n")
+			if p := "nats *nats.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "nsq":
-			str += fmt.Sprintf("\tnsqs *nsq.Server,\n")
+			if p := "nsqs *nsq.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "pulsar":
-			str += fmt.Sprintf("\tpulsars *pulsar.Server,\n")
+			if p := "pulsars *pulsar.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "rabbitmq":
-			str += fmt.Sprintf("\trabbitmqs *rabbitmq.Server,\n")
+			if p := "rabbitmqs *rabbitmq.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "redis":
-			str += fmt.Sprintf("\trediss *redis.Server,\n")
+			if p := "rediss *redis.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "rocketmq":
-			str += fmt.Sprintf("\trocketmqs *rocketmq.Server,\n")
+			if p := "rocketmqs *rocketmq.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "signalr":
-			str += fmt.Sprintf("\tsignalrs *signalr.Server,\n")
+			if p := "signalrs *signalr.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "socketio":
-			str += fmt.Sprintf("\tsocketios *socketio.Server,\n")
+			if p := "socketios *socketio.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "sse":
-			str += fmt.Sprintf("\tss *sse.Server,\n")
+			if p := "ss *sse.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "tcp":
-			str += fmt.Sprintf("\ttcps *tcp.Server,\n")
+			if p := "tcps *tcp.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "thrift":
-			str += fmt.Sprintf("\tthrifts *thrift.Server,\n")
+			if p := "thrifts *thrift.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "trpc":
-			str += fmt.Sprintf("\ttrpcs *trpc.Server,\n")
+			if p := "trpcs *trpc.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		case "websocket":
-			str += fmt.Sprintf("\tws *websocket.Server,\n")
+			if p := "ws *websocket.Server"; !seen[p] {
+				params = append(params, p)
+				seen[p] = true
+			}
 		}
 	}
 
-	return str
+	return params
 }
 
 // serverTransferParameters 传参
-func serverTransferParameters(servers []string) string {
-	var str string
+func serverTransferParameters(servers []string) []string {
+	var out []string
+	seen := make(map[string]bool)
 
 	for _, server := range servers {
 		switch strings.TrimSpace(strings.ToLower(server)) {
 		case "grpc":
-			str += fmt.Sprintf("\tgs,\n")
+			if v := "gs"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "rest":
-			str += fmt.Sprintf("\ths,\n")
-
+			if v := "hs"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "activemq":
-			str += fmt.Sprintf("\tts,\n")
+			if v := "ts"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "asynq":
-			str += fmt.Sprintf("\tas,\n")
+			if v := "as"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "fasthttp":
-			str += fmt.Sprintf("\tfs,\n")
+			if v := "fs"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "gin":
-			str += fmt.Sprintf("\tis,\n")
+			if v := "is"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "gozero":
-			str += fmt.Sprintf("\tos,\n")
+			if v := "os"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "graphql":
-			str += fmt.Sprintf("\tqs,\n")
+			if v := "qs"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "hertz":
-			str += fmt.Sprintf("\tzs,\n")
+			if v := "zs"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "iris":
-			str += fmt.Sprintf("\trs,\n")
+			if v := "rs"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "kafka":
-			str += fmt.Sprintf("\tks,\n")
+			if v := "ks"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "machinery":
-			str += fmt.Sprintf("\tys,\n")
+			if v := "ys"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "mqtt":
-			str += fmt.Sprintf("\tms,\n")
+			if v := "ms"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "nats":
-			str += fmt.Sprintf("\tnats,\n")
+			if v := "nats"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "nsq":
-			str += fmt.Sprintf("\tnsqs,\n")
+			if v := "nsqs"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "pulsar":
-			str += fmt.Sprintf("\tpulsars,\n")
+			if v := "pulsars"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "rabbitmq":
-			str += fmt.Sprintf("\trabbitmqs,\n")
+			if v := "rabbitmqs"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "redis":
-			str += fmt.Sprintf("\trediss,\n")
+			if v := "rediss"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "rocketmq":
-			str += fmt.Sprintf("\trocketmqs,\n")
+			if v := "rocketmqs"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "signalr":
-			str += fmt.Sprintf("\tsignalrs,\n")
+			if v := "signalrs"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "socketio":
-			str += fmt.Sprintf("\tsocketios,\n")
+			if v := "socketios"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "sse":
-			str += fmt.Sprintf("\tss,\n")
+			if v := "ss"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "tcp":
-			str += fmt.Sprintf("\ttcps,\n")
+			if v := "tcps"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "thrift":
-			str += fmt.Sprintf("\tthrifts,\n")
+			if v := "thrifts"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "trpc":
-			str += fmt.Sprintf("\ttrpcs,\n")
+			if v := "trpcs"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		case "websocket":
-			str += fmt.Sprintf("\tws,\n")
+			if v := "ws"; !seen[v] {
+				out = append(out, v)
+				seen[v] = true
+			}
 		}
 	}
 
-	return str
+	return out
 }

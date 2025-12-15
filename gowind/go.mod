@@ -4,15 +4,17 @@ go 1.24.0
 
 toolchain go1.24.3
 
+replace github.com/tx7do/kratos-cli/generators => ../generators
+
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/fatih/color v1.18.0
-	github.com/jinzhu/inflection v1.0.0
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.11.1
 	github.com/tx7do/go-utils v1.1.34
+	github.com/tx7do/go-utils/code_generator v0.0.1
+	github.com/tx7do/kratos-cli/generators v0.0.3
 	golang.org/x/mod v0.31.0
-	golang.org/x/text v0.32.0
 )
 
 require (
@@ -27,5 +29,6 @@ require (
 	github.com/spf13/pflag v1.0.10 // indirect
 	golang.org/x/sys v0.39.0 // indirect
 	golang.org/x/term v0.38.0 // indirect
+	golang.org/x/text v0.32.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

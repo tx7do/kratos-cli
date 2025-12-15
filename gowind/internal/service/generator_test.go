@@ -8,7 +8,7 @@ import (
 )
 
 func TestGenerate(t *testing.T) {
-	_ = Generate(context.Background(), GeneratorOptions{
+	err := Generate(context.Background(), GeneratorOptions{
 		GenerateMain:     true,
 		GenerateServer:   true,
 		GenerateService:  true,
@@ -25,6 +25,7 @@ func TestGenerate(t *testing.T) {
 
 		OutputPath: "./test",
 	})
+	assert.Nil(t, err)
 }
 
 func TestAppendServiceName(t *testing.T) {

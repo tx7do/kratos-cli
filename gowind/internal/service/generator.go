@@ -8,20 +8,22 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/tx7do/go-utils/code_generator"
 	"github.com/tx7do/go-utils/stringcase"
+
+	"github.com/tx7do/kratos-cli/generators"
 	"github.com/tx7do/kratos-cli/gowind/internal/pkg"
 )
 
-func Generate(ctx context.Context, opts GeneratorOptions) error {
+func Generate(_ context.Context, opts GeneratorOptions) error {
 	var err error
 
 	// 生成server层代码
 	if opts.GenerateServer {
-		serverPackagePath := filepath.Join(opts.OutputPath, "/app/", opts.ServiceName, "/service/internal/")
+		serverPackagePath := filepath.Join(opts.OutputPath, "/app/", opts.ServiceName, "/service/internal/server")
 		if err = generateServerPackageCode(
 			serverPackagePath,
 			opts.ProjectModule,
-			opts.ProjectName,
 			opts.ServiceName,
 			opts.Servers,
 		); err != nil {
@@ -31,7 +33,7 @@ func Generate(ctx context.Context, opts GeneratorOptions) error {
 
 	// 生成service层代码
 	if opts.GenerateService {
-		servicePackagePath := filepath.Join(opts.OutputPath, "/app/", opts.ServiceName, "/service/internal/")
+		servicePackagePath := filepath.Join(opts.OutputPath, "/app/", opts.ServiceName, "/service/internal/service")
 		if err = generateServicePackageCode(
 			servicePackagePath,
 			opts.ProjectModule,
@@ -44,7 +46,7 @@ func Generate(ctx context.Context, opts GeneratorOptions) error {
 
 	// 生成data层代码
 	if opts.GenerateData {
-		dataPackagePath := filepath.Join(opts.OutputPath, "/app/", opts.ServiceName, "/service/internal/")
+		dataPackagePath := filepath.Join(opts.OutputPath, "/app/", opts.ServiceName, "/service/internal/data")
 		if err = generateDataPackageCode(
 			dataPackagePath,
 			opts.ProjectModule,
@@ -113,21 +115,38 @@ func Generate(ctx context.Context, opts GeneratorOptions) error {
 func generateServerPackageCode(
 	outputPath string,
 	projectModule string,
-	projectName string,
 	serviceName string,
 	servers []string,
 ) error {
-
+	g := generators.NewGoGenerator()
 	for _, server := range servers {
-		if err := WriteServerPackageCode(
-			outputPath,
-			projectModule, projectName, server, serviceName,
-		); err != nil {
-			return err
+		switch strings.ToLower(server) {
+		case "grpc":
+			o := code_generator.Options{
+				OutDir: outputPath,
+				Module: projectModule,
+				Vars: map[string]interface{}{
+					"Service": serviceName,
+				},
+			}
+			if _, err := g.GenerateGrpcServer(context.Background(), o); err != nil {
+				return err
+			}
+		case "rest":
+			o := code_generator.Options{
+				OutDir: outputPath,
+				Module: projectModule,
+				Vars: map[string]interface{}{
+					"Service": serviceName,
+				},
+			}
+			if _, err := g.GenerateRestServer(context.Background(), o); err != nil {
+				return err
+			}
 		}
 	}
 
-	return WriteInitWireCode(outputPath, "server", "Server", servers)
+	return writeInitWireCode(outputPath, "server", "Server", servers)
 }
 
 func generateServicePackageCode(
@@ -136,7 +155,7 @@ func generateServicePackageCode(
 	serviceName string,
 	services []string,
 ) error {
-	return WriteInitWireCode(outputPath, "service", "Service", services)
+	return writeInitWireCode(outputPath, "service", "Service", services)
 }
 
 func generateDataPackageCode(
@@ -147,41 +166,69 @@ func generateDataPackageCode(
 	dbClients []string,
 	repos []string,
 ) error {
-	if err := WriteDataPackageCode(outputPath, projectModule, projectName, serviceName, dbClients); err != nil {
+	g := generators.NewGoGenerator()
+
+	o := code_generator.Options{
+		OutDir: outputPath,
+		Module: projectModule,
+		Vars: map[string]interface{}{
+			"Service": serviceName,
+		},
+	}
+
+	for _, dbClient := range dbClients {
+		switch strings.ToLower(dbClient) {
+		case "redis":
+			o.Vars["HasRedis"] = true
+		case "gorm":
+			o.Vars["HasGorm"] = true
+		case "ent", "entgo":
+			o.Vars["HasEnt"] = true
+		}
+	}
+
+	if _, err := g.GenerateData(context.Background(), o); err != nil {
 		return err
 	}
 
 	var functions []string
 	functions = append(functions, "NewData")
-	
 	for _, repo := range repos {
 		functions = append(functions, fmt.Sprintf("New%sRepo", stringcase.UpperCamelCase(repo)))
 	}
 	for _, dbClient := range dbClients {
 		functions = append(functions, fmt.Sprintf("New%sClient", stringcase.UpperCamelCase(dbClient)))
 	}
-
 	//fmt.Printf("functions: %v\n", functions)
-
-	return WriteInitWireFunctionCode(outputPath, "data", functions)
+	return writeInitWireFunctionCode(outputPath, "data", functions)
 }
 
 func generateMainPackageCode(
 	outputPath string,
-	projectName string, serviceName string,
+	moduleName string, serviceName string,
 	servers []string,
 ) error {
-	if err := WriteMainCode(
-		outputPath,
-		projectName, serviceName,
-		servers,
-	); err != nil {
+	g := generators.NewGoGenerator()
+	opts := code_generator.Options{
+		OutDir:      outputPath,
+		Module:      moduleName,
+		ProjectName: moduleName,
+		Vars: map[string]interface{}{
+			"Service":                  serviceName,
+			"ServerImports":            serverImportPath(servers),
+			"ServerFormalParameters":   serverFormalParameters(servers),
+			"ServerTransferParameters": serverTransferParameters(servers),
+		},
+	}
+
+	_, err := g.GenerateMain(context.Background(), opts)
+	if err != nil {
 		return err
 	}
 
-	return WriteWireCode(
+	return writeWireCode(
 		outputPath,
-		projectName, serviceName,
+		moduleName, serviceName,
 	)
 }
 
@@ -399,8 +446,7 @@ func writeAssets(outputPath string) error {
 
 	assetsPath := filepath.Join(outputPath, "assets.go")
 
-	content := `
-package assets
+	content := `package assets
 
 import _ "embed"
 
@@ -412,4 +458,62 @@ var OpenApiData []byte
 	}
 
 	return nil
+}
+
+func writeInitWireCode(
+	outputPath string,
+	packageName string,
+	postfix string,
+	services []string,
+) error {
+	var newFunctions []string
+	for _, service := range services {
+		funcName := "New" + stringcase.ToPascalCase(service) + postfix
+		newFunctions = append(newFunctions, funcName)
+	}
+
+	g := generators.NewGoGenerator()
+	opts := code_generator.Options{
+		OutDir: outputPath,
+		Vars: map[string]interface{}{
+			"Package":      packageName,
+			"NewFunctions": newFunctions,
+		},
+	}
+	_, err := g.GenerateInit(context.Background(), opts)
+	return err
+}
+
+func writeInitWireFunctionCode(
+	outputPath string,
+	packageName string,
+	functions []string,
+) error {
+	g := generators.NewGoGenerator()
+	opts := code_generator.Options{
+		OutDir: outputPath,
+		Vars: map[string]interface{}{
+			"Package":      packageName,
+			"NewFunctions": functions,
+		},
+	}
+	_, err := g.GenerateInit(context.Background(), opts)
+	return err
+}
+
+func writeWireCode(
+	outputPath string,
+	projectName string,
+	serviceName string,
+) error {
+	g := generators.NewGoGenerator()
+	opts := code_generator.Options{
+		OutDir: outputPath,
+		Module: projectName,
+		Vars: map[string]interface{}{
+			"Service": serviceName,
+		},
+	}
+	_, err := g.GenerateWire(context.Background(), opts)
+	return err
 }
