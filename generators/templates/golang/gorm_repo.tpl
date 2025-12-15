@@ -14,25 +14,25 @@ import (
 	pagination "github.com/tx7do/go-crud/api/gen/go/pagination/v1"
 	gormCurd "github.com/tx7do/go-crud/gorm"
 
-	"{{.Project}}/app/{{.Service}}/service/internal/data/gorm/models"
+	"{{.Module}}/app/{{lower .Service}}/service/internal/data/gorm/models"
 
-	{{.ApiPackage}} "{{.Project}}/api/gen/go/{{.Module}}/service/v1"
+	{{.ApiPackage}} "{{.Module}}/api/gen/go/{{lower .Service}}/service/{{.ApiPackageVersion}}"
 )
 
 type {{.ClassName}} struct {
 	data *Data
 	log  *log.Helper
 
-	mapper     *mapper.CopierMapper[{{.ApiPackage}}.{{.PascalName}}, models.{{.PascalName}}]
-	repository *gormCurd.Repository[{{.ApiPackage}}.{{.PascalName}}, models.{{.PascalName}}]
+	mapper     *mapper.CopierMapper[{{.ApiPackage}}.{{pascal .Model}}, models.{{pascal .Model}}]
+	repository *gormCurd.Repository[{{.ApiPackage}}.{{pascal .Model}}, models.{{pascal .Model}}]
 }
 
 func New{{.ClassName}}(data *Data, logger log.Logger) *{{.ClassName}} {
-	l := log.NewHelper(log.With(logger, "module", "user/repo/user-service"))
+	l := log.NewHelper(log.With(logger, "module", "{{lower .Model}}/repo/{{lower .Service}}-service"))
 	repo := &{{.ClassName}}{
 		data:   data,
 		log:    l,
-		mapper: mapper.NewCopierMapper[{{.ApiPackage}}.{{.PascalName}}, models.{{.PascalName}}](),
+		mapper: mapper.NewCopierMapper[{{.ApiPackage}}.{{pascal .Model}}, models.{{pascal .Model}}](),
 	}
 
 	repo.init()
@@ -41,7 +41,7 @@ func New{{.ClassName}}(data *Data, logger log.Logger) *{{.ClassName}} {
 }
 
 func (r *{{.ClassName}}) init() {
-    r.repository = gormCurd.NewRepository[{{.ApiPackage}}.{{.PascalName}}, models.{{.PascalName}}](
+    r.repository = gormCurd.NewRepository[{{.ApiPackage}}.{{pascal .Model}}, models.{{pascal .Model}}](
         repo.mapper,
     )
 
@@ -49,7 +49,7 @@ func (r *{{.ClassName}}) init() {
 	r.mapper.AppendConverters(copierutil.NewTimeTimestamppbConverterPair())
 }
 
-func (r *{{.ClassName}}) List(ctx context.Context, req *pagination.PagingRequest) (*{{.ApiPackage}}.List{{.PascalName}}Response, error) {
+func (r *{{.ClassName}}) List(ctx context.Context, req *pagination.PagingRequest) (*{{.ApiPackage}}.List{{pascal .Model}}Response, error) {
 	if req == nil {
 		return nil, errors.New("request is nil")
 	}
@@ -59,23 +59,23 @@ func (r *{{.ClassName}}) List(ctx context.Context, req *pagination.PagingRequest
 		return nil, err
 	}
 	if ret == nil {
-		return &{{.ApiPackage}}.List{{.PascalName}}Response{Total: 0, Items: nil}, nil
+		return &{{.ApiPackage}}.List{{pascal .Model}}Response{Total: 0, Items: nil}, nil
 	}
 
-	return &{{.ApiPackage}}.List{{.PascalName}}Response{
+	return &{{.ApiPackage}}.List{{pascal .Model}}Response{
 		Total: ret.Total,
 		Items: ret.Items,
 	}, nil
 }
 
-func (r *{{.ClassName}}) Get(ctx context.Context, req *{{.ApiPackage}}.Get{{.PascalName}}Request) (*{{.ApiPackage}}.{{.PascalName}}, error) {
+func (r *{{.ClassName}}) Get(ctx context.Context, req *{{.ApiPackage}}.Get{{pascal .Model}}Request) (*{{.ApiPackage}}.{{pascal .Model}}, error) {
 	if req == nil {
 		return nil, errors.New("request is nil")
 	}
 
 	var whereCond *gorm.DB
 	switch req.QueryBy.(type) {
-	case *{{.ApiPackage}}.Get{{.PascalName}}Request_Id:
+	case *{{.ApiPackage}}.Get{{pascal .Model}}Request_Id:
 		whereCond = r.data.db.Where("id = ?", req.GetId())
 	default:
 		whereCond = r.data.db.Where("id = ?", req.GetId())
@@ -89,7 +89,7 @@ func (r *{{.ClassName}}) Get(ctx context.Context, req *{{.ApiPackage}}.Get{{.Pas
 	return dto, err
 }
 
-func (r *{{.ClassName}}) Create(ctx context.Context, req *{{.ApiPackage}}.Create{{.PascalName}}Request) (*{{.ApiPackage}}.{{.PascalName}}, error) {
+func (r *{{.ClassName}}) Create(ctx context.Context, req *{{.ApiPackage}}.Create{{pascal .Model}}Request) (*{{.ApiPackage}}.{{pascal .Model}}, error) {
 	if req == nil || req.Data == nil {
 		return nil, errors.New("request is nil")
 	}
@@ -99,7 +99,7 @@ func (r *{{.ClassName}}) Create(ctx context.Context, req *{{.ApiPackage}}.Create
 	return result, err
 }
 
-func (r *{{.ClassName}}) Update(ctx context.Context, req *{{.ApiPackage}}.Update{{.PascalName}}Request) (*{{.ApiPackage}}.{{.PascalName}}, error) {
+func (r *{{.ClassName}}) Update(ctx context.Context, req *{{.ApiPackage}}.Update{{pascal .Model}}Request) (*{{.ApiPackage}}.{{pascal .Model}}, error) {
 	if req == nil || req.Data == nil {
 		return nil, errors.New("request is nil")
 	}
@@ -113,7 +113,7 @@ func (r *{{.ClassName}}) Update(ctx context.Context, req *{{.ApiPackage}}.Update
 	return result, err
 }
 
-func (r *{{.ClassName}}) Upsert(ctx context.Context, req *{{.ApiPackage}}.Update{{.PascalName}}Request) (*{{.ApiPackage}}.{{.PascalName}}, error) {
+func (r *{{.ClassName}}) Upsert(ctx context.Context, req *{{.ApiPackage}}.Update{{pascal .Model}}Request) (*{{.ApiPackage}}.{{pascal .Model}}, error) {
 	if req == nil || req.Data == nil {
 		return nil, errors.New("request is nil")
 	}
@@ -125,7 +125,7 @@ func (r *{{.ClassName}}) Upsert(ctx context.Context, req *{{.ApiPackage}}.Update
 	return result, err
 }
 
-func (r *{{.ClassName}}) Delete(ctx context.Context, req *{{.ApiPackage}}.Delete{{.PascalName}}Request) (bool, error) {
+func (r *{{.ClassName}}) Delete(ctx context.Context, req *{{.ApiPackage}}.Delete{{pascal .Model}}Request) (bool, error) {
 	if req == nil {
 		return false, errors.New("request is nil")
 	}

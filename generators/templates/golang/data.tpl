@@ -16,49 +16,69 @@ import (
 // Data .
 type Data struct {
 	log *log.Helper
-{{if .HasRedis}}
+{{- if .HasRedis}}
     rdb *redis.Client
-{{end}}{{if .HasGorm}}
+{{- end}}
+{{- if .HasGorm}}
     gorm *gormCrud.Client
-{{end}}{{if .HasEnt}}
+{{- end}}
+{{- if .HasEnt}}
     db *entCrud.EntClient[*ent.Client]
-{{end}}}
+{{- end}}
+}
 
 // NewData .
 func NewData(
 	logger log.Logger,
-{{if .HasRedis}}
-    rdb *redis.Client,
-{{end}}{{if .HasGorm}}
-    gorm *gormCrud.Client,
-{{end}}{{if .HasEnt}}
+{{- if .HasEnt}}
     db *entCrud.EntClient[*ent.Client],
-{{end}}) (*Data, func(), error) {
+{{- end}}
+{{- if .HasGorm}}
+    gorm *gormCrud.Client,
+{{- end}}
+{{- if .HasRedis}}
+    rdb *redis.Client,
+{{- end}}
+) (*Data, func(), error) {
 	l := log.NewHelper(log.With(logger, "module", "data/{{.Service}}-service"))
 
 	d := &Data{
 		log: l,
-{{if .HasRedis}}
-		rdb: rdb,
-{{end}}{{if .HasGorm}}
+{{- if .HasEnt }}
+		db:   db,
+{{- end }}
+{{- if .HasGorm }}
 		gorm: gorm,
-{{end}}{{if .HasEnt}}
-		db: db,
-{{end}}	}
+{{- end }}
+{{- if .HasRedis }}
+		rdb:  rdb,
+{{- end }}
+	}
 
-	return d, func() {
+	cleanup := func() {
 		l.Info("closing the data resources")
-{{if .HasRedis}}
-        if d.rdb != nil {
-            if err := d.rdb.Close(); err != nil {
-                l.Error(err)
-            }
-        }
-{{end}}{{if .HasEnt}}
-        if d.db != nil {
-            if err := d.db.Close(); err != nil {
-                l.Error(err)
-            }
-        }
-{{end}}	}, nil
+{{- if .HasEnt }}
+		if d.db != nil {
+			if err := d.db.Close(); err != nil {
+				l.Error(err)
+			}
+		}
+{{- end }}
+{{- if .HasGorm }}
+		if d.gorm != nil {
+			if err := d.gorm.Close(); err != nil {
+				l.Error(err)
+			}
+		}
+{{- end }}
+{{- if .HasRedis }}
+		if d.rdb != nil {
+			if err := d.rdb.Close(); err != nil {
+				l.Error(err)
+			}
+		}
+{{- end }}
+	}
+
+	return d, cleanup, nil
 }

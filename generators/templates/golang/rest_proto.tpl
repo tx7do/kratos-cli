@@ -9,47 +9,47 @@ import "pagination/v1/pagination.proto";
 
 import "{{.SourceProto}}";
 
-// {{.Comment}}管理服务
-service {{.PascalName}}Service {
-  // 查询列表
-  rpc List (pagination.PagingRequest) returns ({{.SourcePackage}}.List{{.PascalName}}Response) {
+// {{.ModelName}}管理服务
+service {{pascal .Model}}Service {
+  // 查询{{.ModelName}}列表
+  rpc List (pagination.PagingRequest) returns ({{.SourcePackage}}.List{{pascal .Model}}Response) {
     option (google.api.http) = {
         get: "{{.Path}}"
     };
   }
 
-  // 查询详情
-  rpc Get ({{.SourcePackage}}.Get{{.PascalName}}Request) returns ({{.SourcePackage}}.{{.PascalName}}) {
+  // 查询{{.ModelName}}详情
+  rpc Get ({{.SourcePackage}}.Get{{pascal .Model}}Request) returns ({{.SourcePackage}}.{{pascal .Model}}) {
     option (google.api.http) = {
         get: "{{.Path}}/{id}"
     };
   }
 
-  // 创建
-  rpc Create ({{.SourcePackage}}.Create{{.PascalName}}Request) returns ({{.SourcePackage}}.{{.PascalName}}) {
+  // 创建{{.ModelName}}
+  rpc Create ({{.SourcePackage}}.Create{{pascal .Model}}Request) returns ({{.SourcePackage}}.{{pascal .Model}}) {
     option (google.api.http) = {
         post: "{{.Path}}"
         body: "*"
     };
   }
 
-  // 更新
-  rpc Update ({{.SourcePackage}}.Update{{.PascalName}}Request) returns (google.protobuf.Empty) {
+  // 更新{{.ModelName}}
+  rpc Update ({{.SourcePackage}}.Update{{pascal .Model}}Request) returns (google.protobuf.Empty) {
     option (google.api.http) = {
         put: "{{.Path}}/{id}"
         body: "*"
     };
   }
 
-  // 删除
-  rpc Delete ({{.SourcePackage}}.Delete{{.PascalName}}Request) returns (google.protobuf.Empty) {
+  // 删除{{.ModelName}}
+  rpc Delete ({{.SourcePackage}}.Delete{{pascal .Model}}Request) returns (google.protobuf.Empty) {
     option (google.api.http) = {
         delete: "{{.Path}}/{id}"
     };
   }
 
-  // 批量创建
-  rpc BatchCreate ({{.SourcePackage}}.BatchCreate{{.PascalName}}Request) returns ({{.SourcePackage}}.BatchCreate{{.PascalName}}Response) {
+  // 批量创建{{.ModelName}}
+  rpc BatchCreate ({{.SourcePackage}}.BatchCreate{{pascal .Model}}Request) returns ({{.SourcePackage}}.BatchCreate{{pascal .Model}}Response) {
     option (google.api.http) = {
         post: "{{.Path}}/batch"
         body: "*"

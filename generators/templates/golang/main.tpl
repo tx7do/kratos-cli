@@ -8,8 +8,7 @@ import (
 	"github.com/tx7do/go-utils/trans"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 
-{{.ServerImportPath}}
-
+{{renderImports .ServerImports}}
 	"{{.Project}}/pkg/service"
 )
 
@@ -20,15 +19,13 @@ var version string
 func newApp(
 	lg log.Logger,
 	re registry.Registrar,
-{{.ServerFormalParameters}}
-) *kratos.App {
+{{renderFormalParameters .ServerFormalParameters}}) *kratos.App {
 	return bootstrap.NewApp(
 		lg,
 		re,
-{{.ServerTransferParameters}}
-	)
+{{renderInParameters .ServerTransferParameters 2}}	)
 }
 
 func main() {
-	bootstrap.Bootstrap(initApp, trans.Ptr(service.{{.Service}}Service), trans.Ptr(version))
+	bootstrap.Bootstrap(initApp, trans.Ptr(service.{{renderServiceName .Service}}), trans.Ptr(version))
 }

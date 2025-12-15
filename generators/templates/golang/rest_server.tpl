@@ -17,13 +17,13 @@ import (
 	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
 	"github.com/tx7do/kratos-bootstrap/rpc"
 
-	"{{.Project}}/app/{{.Service}}/service/cmd/server/assets"
-	"{{.Project}}/app/{{.Service}}/service/internal/service"
+	"{{.Module}}/app/{{lower .Service}}/service/cmd/server/assets"
+	"{{.Module}}/app/{{lower .Service}}/service/internal/service"
 
-	{{lower .Service}}V1 "{{.Project}}/api/gen/go/{{.Service}}/service/v1"
+	{{lower .Service}}V1 "{{.Module}}/api/gen/go/{{lower .Service}}/service/v1"
 
-	"{{.Project}}/pkg/middleware/auth"
-	applogging "{{.Project}}/pkg/middleware/logging"
+	"{{.Module}}/pkg/middleware/auth"
+	applogging "{{.Module}}/pkg/middleware/logging"
 )
 
 // NewWhiteListMatcher 创建jwt白名单
@@ -56,7 +56,7 @@ func newRestMiddleware(
 	return ms
 }
 
-// NewRestServer new an HTTP server.
+// NewRestServer create a REST server.
 func NewRestServer(
 	cfg *conf.Bootstrap, logger log.Logger,
 
@@ -72,7 +72,7 @@ func NewRestServer(
 
 	srv := rpc.CreateRestServer(cfg, newRestMiddleware(logger, authenticator, authorizer)...)
 {{range $key, $value := .Services}}
-    {{lower $value}}V1.Register{{pascal $key}}ServiceHTTPServer(srv, {{lower $key}}Service)
+    {{$value}}.Register{{pascal $key}}ServiceHTTPServer(srv, {{lower $key}}Service)
 {{- end}}
 
 	if cfg.GetServer().GetRest().GetEnableSwagger() {

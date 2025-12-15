@@ -15,33 +15,34 @@ import (
 	pagination "github.com/tx7do/go-crud/api/gen/go/pagination/v1"
 	entCurd "github.com/tx7do/go-crud/entgo"
 
-	"{{.Project}}/app/{{.Service}}/service/internal/data/ent"
-	"{{.Project}}/app/{{.Service}}/service/internal/data/ent/predicate"
-	"{{.Project}}/app/{{.Service}}/service/internal/data/ent/{{.LowerName}}"
+	"{{.Module}}/app/{{lower .Service}}/service/internal/data/ent"
+	"{{.Module}}/app/{{lower .Service}}/service/internal/data/ent/predicate"
+	"{{.Module}}/app/{{lower .Service}}/service/internal/data/ent/{{lower .Model}}"
 
-	{{.ApiPackage}} "{{.Project}}/api/gen/go/{{.Module}}/service/v1"
+	{{.ApiPackage}} "{{.Module}}/api/gen/go/{{lower .Service}}/service/{{.ApiPackageVersion}}"
 )
 
 type {{.ClassName}} struct {
 	data         *Data
 	log          *log.Helper
 
-	mapper     *mapper.CopierMapper[{{.ApiPackage}}.{{.PascalName}}, ent.{{.PascalName}}]
+	mapper     *mapper.CopierMapper[{{.ApiPackage}}.{{pascal .Model}}, ent.{{pascal .Model}}]
 	repository *entCurd.Repository[
-		ent.{{.PascalName}}Query, ent.{{.PascalName}}Select,
-		ent.{{.PascalName}}Create, ent.{{.PascalName}}CreateBulk,
-		ent.{{.PascalName}}Update, ent.{{.PascalName}}UpdateOne,
-		ent.{{.PascalName}}Delete,
-		predicate.{{.PascalName}},
-		{{.ApiPackage}}.{{.PascalName}}, ent.{{.PascalName}},
+		ent.{{pascal .Model}}Query, ent.{{pascal .Model}}Select,
+		ent.{{pascal .Model}}Create, ent.{{pascal .Model}}CreateBulk,
+		ent.{{pascal .Model}}Update, ent.{{pascal .Model}}UpdateOne,
+		ent.{{pascal .Model}}Delete,
+		predicate.{{pascal .Model}},
+		{{.ApiPackage}}.{{pascal .Model}}, ent.{{pascal .Model}},
 	]
 }
 
 func New{{.ClassName}}(data *Data, logger log.Logger) *{{.ClassName}} {
+	l := log.NewHelper(log.With(logger, "module", "{{lower .Model}}/repo/{{lower .Service}}-service"))
 	repo := &{{.ClassName}}{
-		log:  log.NewHelper(log.With(logger, "module", "{{.LowerName}}/repo/{{.Service}}-service")),
+		log:  l,
 		data: data,
-		mapper: mapper.NewCopierMapper[{{.ApiPackage}}.{{.PascalName}}, ent.{{.PascalName}}](),
+		mapper: mapper.NewCopierMapper[{{.ApiPackage}}.{{pascal .Model}}, ent.{{pascal .Model}}](),
 	}
 
 	repo.init()
@@ -51,12 +52,12 @@ func New{{.ClassName}}(data *Data, logger log.Logger) *{{.ClassName}} {
 
 func (r *{{.ClassName}}) init() {
 	r.repository = entCurd.NewRepository[
-		ent.{{.PascalName}}Query, ent.{{.PascalName}}Select,
-		ent.{{.PascalName}}Create, ent.{{.PascalName}}CreateBulk,
-		ent.{{.PascalName}}Update, ent.{{.PascalName}}UpdateOne,
-		ent.{{.PascalName}}Delete,
-		predicate.{{.PascalName}},
-		userV1.{{.PascalName}}, ent.{{.PascalName}},
+		ent.{{pascal .Model}}Query, ent.{{pascal .Model}}Select,
+		ent.{{pascal .Model}}Create, ent.{{pascal .Model}}CreateBulk,
+		ent.{{pascal .Model}}Update, ent.{{pascal .Model}}UpdateOne,
+		ent.{{pascal .Model}}Delete,
+		predicate.{{pascal .Model}},
+		userV1.{{pascal .Model}}, ent.{{pascal .Model}},
 	](r.mapper)
 
 	r.mapper.AppendConverters(copierutil.NewTimeStringConverterPair())
@@ -64,7 +65,7 @@ func (r *{{.ClassName}}) init() {
 }
 
 func (r *{{.ClassName}}) Count(ctx context.Context, whereCond []func(s *sql.Selector)) (int, error) {
-	builder := r.data.db.Client().{{.PascalName}}.Query()
+	builder := r.data.db.Client().{{pascal .Model}}.Query()
 	if len(whereCond) != 0 {
 		builder.Modify(whereCond...)
 	}
@@ -78,30 +79,30 @@ func (r *{{.ClassName}}) Count(ctx context.Context, whereCond []func(s *sql.Sele
 	return count, nil
 }
 
-func (r *{{.ClassName}}) List(ctx context.Context, req *pagination.PagingRequest) (*{{.ApiPackage}}.List{{.PascalName}}Response, error) {
+func (r *{{.ClassName}}) List(ctx context.Context, req *pagination.PagingRequest) (*{{.ApiPackage}}.List{{pascal .Model}}Response, error) {
 	if req == nil {
 		return nil, {{.ApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
 
-	builder := r.data.db.Client().{{.PascalName}}.Query()
+	builder := r.data.db.Client().{{pascal .Model}}.Query()
 
     ret, err := r.repository.ListWithPaging(ctx, builder, builder.Clone(), req)
     if err != nil {
         return nil, err
     }
     if ret == nil {
-        return &{{.ApiPackage}}.List{{.PascalName}}Response{Total: 0, Items: nil}, nil
+        return &{{.ApiPackage}}.List{{pascal .Model}}Response{Total: 0, Items: nil}, nil
     }
 
-    return &{{.ApiPackage}}.List{{.PascalName}}Response{
+    return &{{.ApiPackage}}.List{{pascal .Model}}Response{
         Total: ret.Total,
         Items: ret.Items,
     }, nil
 }
 
 func (r *{{.ClassName}}) IsExist(ctx context.Context, id uint32) (bool, error) {
-	exist, err := r.data.db.Client().{{.PascalName}}.Query().
-		Where({{.LowerName}}.IDEQ(id)).
+	exist, err := r.data.db.Client().{{pascal .Model}}.Query().
+		Where({{lower .Model}}.IDEQ(id)).
 		Exist(ctx)
 	if err != nil {
 		r.log.Errorf("query exist failed: %s", err.Error())
@@ -110,7 +111,7 @@ func (r *{{.ClassName}}) IsExist(ctx context.Context, id uint32) (bool, error) {
 	return exist, nil
 }
 
-func (r *{{.ClassName}}) Get(ctx context.Context, req *{{.ApiPackage}}.Get{{.PascalName}}Request) (*{{.ApiPackage}}.{{.PascalName}}, error) {
+func (r *{{.ClassName}}) Get(ctx context.Context, req *{{.ApiPackage}}.Get{{pascal .Model}}Request) (*{{.ApiPackage}}.{{pascal .Model}}, error) {
 	if req == nil {
 		return nil, {{.ApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
@@ -118,12 +119,12 @@ func (r *{{.ClassName}}) Get(ctx context.Context, req *{{.ApiPackage}}.Get{{.Pas
     var whereCond []func(s *sql.Selector)
     switch req.QueryBy.(type) {
     case *{{.ApiPackage}}.GetUserRequest_Id:
-        whereCond = append(whereCond, {{.LowerName}}.IDEQ(req.GetId()))
+        whereCond = append(whereCond, {{lower .Model}}.IDEQ(req.GetId()))
     default:
-        whereCond = append(whereCond, {{.LowerName}}.IDEQ(req.GetId()))
+        whereCond = append(whereCond, {{lower .Model}}.IDEQ(req.GetId()))
     }
 
-    builder := r.data.db.Client().{{.PascalName}}.Query()
+    builder := r.data.db.Client().{{pascal .Model}}.Query()
 	dto, err := r.repository.Get(ctx, builder, req.GetViewMask(), whereCond...)
 	if err != nil {
 		return nil, err
@@ -132,12 +133,12 @@ func (r *{{.ClassName}}) Get(ctx context.Context, req *{{.ApiPackage}}.Get{{.Pas
 	return dto, err
 }
 
-func (r *{{.ClassName}}) Create(ctx context.Context, req *{{.ApiPackage}}.Create{{.PascalName}}Request) (*{{.ApiPackage}}.{{.PascalName}}, error) {
+func (r *{{.ClassName}}) Create(ctx context.Context, req *{{.ApiPackage}}.Create{{pascal .Model}}Request) (*{{.ApiPackage}}.{{pascal .Model}}, error) {
 	if req == nil || req.Data == nil {
 		return {{.ApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
 
-	builder := r.data.db.Client().{{.PascalName}}.Create()
+	builder := r.data.db.Client().{{pascal .Model}}.Create()
 
 	builder{{range .Fields}}.{{newline}}		{{.EntSetNillableFunc}}
 {{- end}}
@@ -162,7 +163,7 @@ func (r *{{.ClassName}}) Create(ctx context.Context, req *{{.ApiPackage}}.Create
 	}
 }
 
-func (r *{{.ClassName}}) Update(ctx context.Context, req *{{.ApiPackage}}.Update{{.PascalName}}Request) (*{{.ApiPackage}}.{{.PascalName}}, error) {
+func (r *{{.ClassName}}) Update(ctx context.Context, req *{{.ApiPackage}}.Update{{pascal .Model}}Request) (*{{.ApiPackage}}.{{pascal .Model}}, error) {
 	if req == nil || req.Data == nil {
 		return {{.ApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
@@ -174,16 +175,16 @@ func (r *{{.ClassName}}) Update(ctx context.Context, req *{{.ApiPackage}}.Update
 			return err
 		}
 		if !exist {
-			createReq := &{{.ApiPackage}}.Create{{.PascalName}}Request{Data: req.Data}
+			createReq := &{{.ApiPackage}}.Create{{pascal .Model}}Request{Data: req.Data}
 			createReq.Data.CreateBy = createReq.Data.UpdateBy
 			createReq.Data.UpdateBy = nil
 			return r.Create(ctx, createReq)
 		}
 	}
 
-	builder := r.data.db.Client().{{.PascalName}}.UpdateOneID(req.Data.GetId())
+	builder := r.data.db.Client().{{pascal .Model}}.UpdateOneID(req.Data.GetId())
 	result, err := r.repository.UpdateOne(ctx, builder, req.Data, req.GetUpdateMask(),
-		func(dto *{{.ApiPackage}}.{{.PascalName}}) {
+		func(dto *{{.ApiPackage}}.{{pascal .Model}}) {
 			builder.
 				SetUpdatedAt(time.Now())
 		},
@@ -192,14 +193,14 @@ func (r *{{.ClassName}}) Update(ctx context.Context, req *{{.ApiPackage}}.Update
 	return result, err
 }
 
-func (r *{{.ClassName}}) Delete(ctx context.Context, req *{{.ApiPackage}}.Delete{{.PascalName}}Request) error {
+func (r *{{.ClassName}}) Delete(ctx context.Context, req *{{.ApiPackage}}.Delete{{pascal .Model}}Request) error {
 	if req == nil {
 		return {{.ApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
 
-	builder := r.data.db.Client().{{.PascalName}}.Delete()
+	builder := r.data.db.Client().{{pascal .Model}}.Delete()
 	_, err := r.repository.Delete(ctx, builder, func(s *sql.Selector) {
-		s.Where(sql.EQ({{.LowerName}}.FieldID, req.GetId()))
+		s.Where(sql.EQ({{lower .Model}}.FieldID, req.GetId()))
 	})
 
 	return nil

@@ -3,7 +3,7 @@
 import (
 	"github.com/tx7do/go-crud/gorm"
 
-	"{{.Module}}/app/{{.Service}}/service/internal/data/gorm/models"
+	"{{.Module}}/app/{{lower .Service}}/service/internal/data/gorm/models"
 )
 
 func init() {

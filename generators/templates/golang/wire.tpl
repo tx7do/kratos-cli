@@ -14,9 +14,9 @@ import (
 
 	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
 
-	"{{.Project}}/app/{{.Service}}/service/internal/data"
-	"{{.Project}}/app/{{.Service}}/service/internal/server"
-	"{{.Project}}/app/{{.Service}}/service/internal/service"
+	"{{.Module}}/app/{{lower .Service}}/service/internal/data"
+	"{{.Module}}/app/{{lower .Service}}/service/internal/server"
+	"{{.Module}}/app/{{lower .Service}}/service/internal/service"
 )
 
 // initApp init kratos application.

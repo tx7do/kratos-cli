@@ -1,127 +1,305 @@
 ﻿package generators
 
 import (
-	"errors"
-	"os"
-	"path/filepath"
-	"strings"
+	"context"
 	"testing"
+
+	"github.com/tx7do/go-utils/code_generator"
 )
 
-func TestGoGenerator_GenerateCreatesFile(t *testing.T) {
-	tmp := t.TempDir()
+func TestGoGenerator_Template_Main(t *testing.T) {
+	g := NewGoGenerator()
 
-	engine, err := NewEmbeddedTemplateEngineFromMap(map[string][]byte{
-		"pkg/main.tpl": []byte("package {{.Module}}\n// {{.ProjectName}}\nconst V = {{.Value}}"),
-	}, nil)
-	if err != nil {
-		t.Fatalf("failed to create engine: %v", err)
-	}
-
-	g := NewGoGeneratorWithEngine(engine)
-	opts := Options{
-		Module:      "github.com/example/mod",
-		ProjectName: "demo",
-		OutDir:      tmp,
+	opts := code_generator.Options{
+		OutDir:      "./output",
+		ProjectName: "MyProject",
 		Vars: map[string]interface{}{
-			"Value": 42,
+			"Service":                  "user",
+			"ServerImports":            []string{"github.com/example/myproject/server"},
+			"ServerFormalParameters":   []string{"hs http.Server"},
+			"ServerTransferParameters": []string{"hs"},
 		},
 	}
 
-	if err = g.Generate(opts, "pkg/main.tpl"); err != nil {
-		t.Fatalf("Generate failed: %v", err)
-	}
-
-	outPath := filepath.Join(tmp, "pkg", "main")
-	b, err := os.ReadFile(outPath)
-	if err != nil {
-		t.Fatalf("read output file failed: %v", err)
-	}
-	got := string(b)
-	if !strings.Contains(got, "package github.com/example/mod") || !strings.Contains(got, "// demo") || !strings.Contains(got, "V = 42") {
-		t.Fatalf("output content unexpected: %q", got)
+	if _, err := g.GenerateMain(context.Background(), opts); err != nil {
+		t.Fatalf("Generate main.go failed: %v", err)
 	}
 }
 
-func TestGoGenerator_RemovesSuffixAndCreatesNestedDirs(t *testing.T) {
-	tmp := t.TempDir()
+func TestGoGenerator_Template_Wire(t *testing.T) {
+	g := NewGoGenerator()
 
-	engine, err := NewEmbeddedTemplateEngineFromMap(map[string][]byte{
-		"a/b/c/file.tmpl": []byte("name: {{.ProjectName}}\n"),
-	}, nil)
-	if err != nil {
-		t.Fatalf("failed to create engine: %v", err)
-	}
-
-	g := NewGoGeneratorWithEngine(engine)
-	opts := Options{
-		ProjectName: "nested",
-		OutDir:      tmp,
-	}
-
-	if err = g.Generate(opts, "a/b/c/file.tmpl"); err != nil {
-		t.Fatalf("Generate failed: %v", err)
-	}
-
-	outPath := filepath.Join(tmp, "a", "b", "c", "file")
-	b, err := os.ReadFile(outPath)
-	if err != nil {
-		t.Fatalf("read output file failed: %v", err)
-	}
-	if strings.TrimSpace(string(b)) != "name: nested" {
-		t.Fatalf("unexpected file content: %q", string(b))
-	}
-}
-
-func TestGoGenerator_NoEngineReturnsError(t *testing.T) {
-	g := NewGoGeneratorWithEngine(nil)
-	opts := Options{OutDir: t.TempDir()}
-
-	err := g.Generate(opts, "doesnotmatter.tpl")
-	if err == nil {
-		t.Fatalf("expected error when engine is nil, got nil")
-	}
-	if !errors.Is(err, os.ErrInvalid) {
-		t.Fatalf("expected os.ErrInvalid, got: %v", err)
-	}
-}
-
-func TestGoGenerator_OverwriteExistingFile(t *testing.T) {
-	tmp := t.TempDir()
-
-	engine, err := NewEmbeddedTemplateEngineFromMap(map[string][]byte{
-		"dup.tpl": []byte("value: {{.Value}}"),
-	}, nil)
-	if err != nil {
-		t.Fatalf("failed to create engine: %v", err)
-	}
-
-	// create existing file with different content
-	outPath := filepath.Join(tmp, "dup")
-	if err = os.MkdirAll(filepath.Dir(outPath), 0o755); err != nil {
-		t.Fatalf("mkdir failed: %v", err)
-	}
-	if err = os.WriteFile(outPath, []byte("old"), 0o644); err != nil {
-		t.Fatalf("write initial file failed: %v", err)
-	}
-
-	g := NewGoGeneratorWithEngine(engine)
-	opts := Options{
-		OutDir: tmp,
+	opts := code_generator.Options{
+		OutDir:      "./output",
+		ProjectName: "MyProject",
+		Module:      "github.com/example/myproject",
 		Vars: map[string]interface{}{
-			"Value": "new",
+			"Service": "user",
 		},
 	}
 
-	if err = g.Generate(opts, "dup.tpl"); err != nil {
-		t.Fatalf("Generate failed: %v", err)
+	if _, err := g.GenerateWire(context.Background(), opts); err != nil {
+		t.Fatalf("Generate wire.go failed: %v", err)
+	}
+}
+
+func TestGoGenerator_Template_Init(t *testing.T) {
+	g := NewGoGenerator()
+
+	opts := code_generator.Options{
+		OutDir:      "./output",
+		ProjectName: "MyProject",
+		Module:      "github.com/example/myproject",
+		Vars: map[string]interface{}{
+			"Package":      "data",
+			"NewFunctions": []string{"NewUserRepo", "NewOrderRepo"},
+		},
 	}
 
-	b, err := os.ReadFile(outPath)
-	if err != nil {
-		t.Fatalf("read output file failed: %v", err)
+	if _, err := g.GenerateInit(context.Background(), opts); err != nil {
+		t.Fatalf("Generate init.go failed: %v", err)
 	}
-	if strings.TrimSpace(string(b)) != "value: new" {
-		t.Fatalf("file was not overwritten as expected, got: %q", string(b))
+}
+
+func TestGoGenerator_Template_Data(t *testing.T) {
+	g := NewGoGenerator()
+
+	opts := code_generator.Options{
+		OutDir: "./output",
+		Module: "github.com/example/myproject",
+		Vars: map[string]interface{}{
+			"Service":  "user",
+			"HasRedis": true,
+			"HasGorm":  true,
+			"HasEnt":   true,
+		},
+	}
+
+	if _, err := g.GenerateData(context.Background(), opts); err != nil {
+		t.Fatalf("Generate data.go failed: %v", err)
+	}
+}
+
+func TestGoGenerator_Template_EntClient(t *testing.T) {
+	g := NewGoGenerator()
+
+	opts := code_generator.Options{
+		OutDir: "./output",
+		Module: "github.com/example/myproject",
+		Vars: map[string]interface{}{
+			"Service": "user",
+		},
+	}
+
+	if _, err := g.GenerateEntClient(context.Background(), opts); err != nil {
+		t.Fatalf("Generate ent_client.go failed: %v", err)
+	}
+}
+
+func TestGoGenerator_Template_EntRepo(t *testing.T) {
+	g := NewGoGenerator()
+
+	opts := code_generator.Options{
+		OutDir: "./output",
+		Module: "github.com/example/myproject",
+		Vars: map[string]interface{}{
+			"Service":    "user",
+			"ApiPackage": "userV1",
+			"Model":      "user",
+		},
+	}
+
+	if _, err := g.GenerateEntRepo(context.Background(), opts); err != nil {
+		t.Fatalf("Generate ent_repo.go failed: %v", err)
+	}
+}
+
+func TestGoGenerator_Template_GormClient(t *testing.T) {
+	g := NewGoGenerator()
+
+	opts := code_generator.Options{
+		OutDir: "./output",
+		Module: "github.com/example/myproject",
+		Vars: map[string]interface{}{
+			"Service": "user",
+		},
+	}
+
+	if _, err := g.GenerateGormClient(context.Background(), opts); err != nil {
+		t.Fatalf("Generate gorm_client.go failed: %v", err)
+	}
+}
+
+func TestGoGenerator_Template_GormInit(t *testing.T) {
+	g := NewGoGenerator()
+
+	opts := code_generator.Options{
+		OutDir:     "./output",
+		OutputName: "gorm_init.go",
+		Module:     "github.com/example/myproject",
+		Vars: map[string]interface{}{
+			"Service": "user",
+		},
+	}
+
+	if _, err := g.GenerateGormInit(context.Background(), opts); err != nil {
+		t.Fatalf("Generate gorm_init.go failed: %v", err)
+	}
+}
+
+func TestGoGenerator_Template_GormRepo(t *testing.T) {
+	g := NewGoGenerator()
+
+	opts := code_generator.Options{
+		OutDir: "./output",
+		Module: "github.com/example/myproject",
+		Vars: map[string]interface{}{
+			"Service":    "user",
+			"ApiPackage": "userV1",
+			"Model":      "user",
+		},
+	}
+
+	if _, err := g.GenerateGormRepo(context.Background(), opts); err != nil {
+		t.Fatalf("Generate gorm_repo.go failed: %v", err)
+	}
+}
+
+func TestGoGenerator_Template_GrpcServiceProto(t *testing.T) {
+	g := NewGoGenerator()
+
+	opts := code_generator.Options{
+		OutDir: "./output",
+		Module: "github.com/example/myproject",
+		Vars: map[string]interface{}{
+			"Package":   "user.service.v1",
+			"Model":     "user",
+			"ModelName": "用户",
+			"Fields": []ProtoFieldData{
+				{Name: "id", Type: "int64", Comment: "用户ID", Number: 1},
+				{Name: "name", Type: "string", Comment: "用户名", Number: 2},
+				{Name: "email", Type: "string", Comment: "用户邮箱", Number: 3},
+			},
+		},
+	}
+
+	if _, err := g.GenerateGrpcServiceProto(context.Background(), opts); err != nil {
+		t.Fatalf("Generate grpc_proto.go failed: %v", err)
+	}
+}
+
+func TestGoGenerator_Template_GrpcServer(t *testing.T) {
+	g := NewGoGenerator()
+
+	opts := code_generator.Options{
+		OutDir: "./output",
+		Module: "github.com/example/myproject",
+		Vars: map[string]interface{}{
+			"Service":  "user",
+			"Packages": []string{"user"},
+			"Services": map[string]string{"user": "userV1", "role": "userV1"},
+		},
+	}
+
+	if _, err := g.GenerateGrpcServer(context.Background(), opts); err != nil {
+		t.Fatalf("Generate grpc_server.go failed: %v", err)
+	}
+}
+
+func TestGoGenerator_Template_RedisClient(t *testing.T) {
+	g := NewGoGenerator()
+
+	opts := code_generator.Options{
+		OutDir: "./output",
+		Module: "github.com/example/myproject",
+		Vars: map[string]interface{}{
+			"Service": "user",
+		},
+	}
+
+	if _, err := g.GenerateRedisClient(context.Background(), opts); err != nil {
+		t.Fatalf("Generate redis_client.go failed: %v", err)
+	}
+}
+
+func TestGoGenerator_Template_RestServiceProto(t *testing.T) {
+	g := NewGoGenerator()
+
+	opts := code_generator.Options{
+		OutDir: "./output",
+		Module: "github.com/example/myproject",
+		Vars: map[string]interface{}{
+			"TargetPackage": "admin.service.v1",
+			"SourcePackage": "user.service.v1",
+			"SourceProto":   "user/service/v1/user.proto",
+			"Model":         "user",
+			"Path":          "/admin/v1/users",
+			"ModelName":     "用户",
+		},
+	}
+
+	if _, err := g.GenerateRestServiceProto(context.Background(), opts); err != nil {
+		t.Fatalf("Generate rest_proto.go failed: %v", err)
+	}
+}
+
+func TestGoGenerator_Template_RestServer(t *testing.T) {
+	g := NewGoGenerator()
+
+	opts := code_generator.Options{
+		OutDir: "./output",
+		Module: "github.com/example/myproject",
+		Vars: map[string]interface{}{
+			"Service":  "admin",
+			"Services": map[string]string{"user": "userV1", "role": "userV1"},
+		},
+	}
+
+	if _, err := g.GenerateRestServer(context.Background(), opts); err != nil {
+		t.Fatalf("Generate rest_server.go failed: %v", err)
+	}
+}
+
+func TestGoGenerator_Template_Service(t *testing.T) {
+	g := NewGoGenerator()
+
+	opts1 := code_generator.Options{
+		OutDir: "./output",
+		Module: "github.com/example/myproject",
+		Vars: map[string]interface{}{
+			"TargetApiPackageName":    "user",
+			"TargetApiPackageVersion": "v1",
+
+			"SourceApiPackageName":    "user",
+			"SourceApiPackageVersion": "v1",
+
+			"Service": "user",
+			"Model":   "user",
+			"IsGrpc":  true,
+		},
+	}
+
+	if _, err := g.GenerateService(context.Background(), opts1); err != nil {
+		t.Fatalf("Generate service.go failed: %v", err)
+	}
+
+	opts2 := code_generator.Options{
+		OutDir: "./output",
+		Module: "github.com/example/myproject",
+		Vars: map[string]interface{}{
+			"TargetApiPackageName":    "admin",
+			"TargetApiPackageVersion": "v1",
+
+			"SourceApiPackageName":    "user",
+			"SourceApiPackageVersion": "v1",
+
+			"Service": "admin",
+			"Model":   "role",
+			"IsGrpc":  false,
+		},
+	}
+
+	if _, err := g.GenerateService(context.Background(), opts2); err != nil {
+		t.Fatalf("Generate service.go failed: %v", err)
 	}
 }

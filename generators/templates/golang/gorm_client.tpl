@@ -8,12 +8,12 @@ import (
 	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
 	gormBootstrap "github.com/tx7do/kratos-bootstrap/database/gorm"
 
-	"{{.Module}}/app/{{.Service}}/service/internal/data/gorm"
+	"{{.Module}}/app/{{lower .Service}}/service/internal/data/gorm"
 )
 
 // NewGormClient 创建GORM ORM数据库客户端
 func NewGormClient(cfg *conf.Bootstrap, logger log.Logger) *gormCrud.Client {
-	l := log.NewHelper(log.With(logger, "module", "gorm/data/{{.Service}}-service"))
+	l := log.NewHelper(log.With(logger, "module", "gorm/data/{{lower .Service}}-service"))
 
 	gorm.RegisterMigrateModels()
 

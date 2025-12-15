@@ -16,13 +16,13 @@ import (
 	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
 	entBootstrap "github.com/tx7do/kratos-bootstrap/database/ent"
 
-	"{{.Module}}/app/{{.Service}}/service/internal/data/ent"
-	"{{.Module}}/app/{{.Service}}/service/internal/data/ent/migrate"
+	"{{.Module}}/app/{{lower .Service}}/service/internal/data/ent"
+	"{{.Module}}/app/{{lower .Service}}/service/internal/data/ent/migrate"
 )
 
 // NewEntClient 创建Ent ORM数据库客户端
 func NewEntClient(cfg *conf.Bootstrap, logger log.Logger) *entCrud.EntClient[*ent.Client] {
-	l := log.NewHelper(log.With(logger, "module", "ent/data/{{.Service}}-service"))
+	l := log.NewHelper(log.With(logger, "module", "ent/data/{{lower .Service}}-service"))
 
 	return entBootstrap.NewEntClient(cfg, func(drv *sql.Driver) *ent.Client {
 		client := ent.NewClient(

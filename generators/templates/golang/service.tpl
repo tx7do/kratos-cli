@@ -9,15 +9,17 @@ import (
 {{end}}
 	"google.golang.org/protobuf/types/known/emptypb"
 	pagination "github.com/tx7do/kratos-bootstrap/api/gen/go/pagination/v1"
-
-	"{{.Project}}/app/{{.Service}}/service/internal/data"
-
-	{{.TargetApiPackage}} "{{.Project}}/api/gen/go/{{lower .TargetModuleName}}/service/v1"
-{{if not .IsSameApi}}	{{.SourceApiPackage}} "{{.Project}}/api/gen/go/{{lower .SourceModuleName}}/service/v1"{{end}}
+{{if not .IsGrpc}}
+	"{{.Module}}/app/{{.Service}}/service/internal/data"
+{{end}}
+	{{.TargetApiPackage}} "{{.Module}}/api/gen/go/{{lower .TargetApiPackageName}}/service/{{lower .TargetApiPackageVersion}}"
+{{- if not .IsSameApi}}
+	{{.SourceApiPackage}} "{{.Module}}/api/gen/go/{{lower .SourceApiPackageName}}/service/{{lower .SourceApiPackageVersion}}"
+{{end -}}
 
 {{if not .IsGrpc}}
-	"{{.Project}}/pkg/middleware/auth"
-{{end -}}
+	"{{.Module}}/pkg/middleware/auth"
+{{- end}}
 )
 
 type {{.ClassName}} struct {
@@ -33,24 +35,23 @@ func New{{.ClassName}}(
     {{.DataSourceVar}} {{.DataSourceType}},
 ) *{{.ClassName}} {
 	return &{{.ClassName}}{
-		log: log.NewHelper(log.With(logger, "module", "{{.LowerName}}/service/{{.Service}}-service")),
+		log: log.NewHelper(log.With(logger, "module", "{{lower .Model}}/service/{{lower .Service}}-service")),
 		{{.DataSourceVar}}:  {{.DataSourceVar}},
 	}
 }
 
-func (s *{{.ClassName}}) List(ctx context.Context, req *pagination.PagingRequest) (*{{.SourceApiPackage}}.List{{.PascalName}}Response, error) {
+func (s *{{.ClassName}}) List(ctx context.Context, req *pagination.PagingRequest) (*{{.SourceApiPackage}}.List{{pascal .Model}}Response, error) {
 	return s.{{.DataSourceVar}}.List(ctx, req)
 }
 
-func (s *{{.ClassName}}) Get(ctx context.Context, req *{{.SourceApiPackage}}.Get{{.PascalName}}Request) (*{{.SourceApiPackage}}.{{.PascalName}}, error) {
+func (s *{{.ClassName}}) Get(ctx context.Context, req *{{.SourceApiPackage}}.Get{{pascal .Model}}Request) (*{{.SourceApiPackage}}.{{pascal .Model}}, error) {
 	return s.{{.DataSourceVar}}.Get(ctx, req)
 }
 
-func (s *{{.ClassName}}) Create(ctx context.Context, req *{{.SourceApiPackage}}.Create{{.PascalName}}Request) (*{{.SourceApiPackage}}.{{.PascalName}}, error) {
+func (s *{{.ClassName}}) Create(ctx context.Context, req *{{.SourceApiPackage}}.Create{{pascal .Model}}Request) (*{{.SourceApiPackage}}.{{pascal .Model}}, error) {
 	if req == nil || req.Data == nil {
 		return nil, {{.SourceApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
-
 {{if not .IsGrpc}}
 	// 获取操作人信息
 	operator, err := auth.FromContext(ctx)
@@ -58,10 +59,10 @@ func (s *{{.ClassName}}) Create(ctx context.Context, req *{{.SourceApiPackage}}.
 		return &emptypb.Empty{}, err
 	}
 
-	req.Data.CreateBy = trans.Ptr(operator.UserId)
-{{end}}
+	req.Data.CreatedBy = trans.Ptr(operator.GetUserId())
+{{end -}}
 
-{{if not .UseRepo}}
+{{- if not .UseRepo}}
 	if result, err := s.{{.DataSourceVar}}.Create(ctx, req); err != nil {
 		return nil, err
 	} else {
@@ -72,11 +73,10 @@ func (s *{{.ClassName}}) Create(ctx context.Context, req *{{.SourceApiPackage}}.
 {{end -}}
 }
 
-func (s *{{.ClassName}}) Update(ctx context.Context, req *{{.SourceApiPackage}}.Update{{.PascalName}}Request) (*emptypb.Empty, error) {
+func (s *{{.ClassName}}) Update(ctx context.Context, req *{{.SourceApiPackage}}.Update{{pascal .Model}}Request) (*emptypb.Empty, error) {
 	if req == nil || req.Data == nil {
 		return nil, {{.SourceApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
-
 {{if not .IsGrpc}}
 	// 获取操作人信息
 	operator, err := auth.FromContext(ctx)
@@ -84,7 +84,7 @@ func (s *{{.ClassName}}) Update(ctx context.Context, req *{{.SourceApiPackage}}.
 		return &emptypb.Empty{}, err
 	}
 
-	req.Data.UpdateBy = trans.Ptr(operator.UserId)
+	req.Data.UpdatedBy = trans.Ptr(operator.GetUserId())
 {{end -}}
 
 {{if not .UseRepo}}
@@ -100,11 +100,10 @@ func (s *{{.ClassName}}) Update(ctx context.Context, req *{{.SourceApiPackage}}.
 {{end -}}
 }
 
-func (s *{{.ClassName}}) Delete(ctx context.Context, req *{{.SourceApiPackage}}.Delete{{.PascalName}}Request) (*emptypb.Empty, error) {
+func (s *{{.ClassName}}) Delete(ctx context.Context, req *{{.SourceApiPackage}}.Delete{{pascal .Model}}Request) (*emptypb.Empty, error) {
     if req == nil {
         return nil, {{.SourceApiPackage}}.ErrorBadRequest("invalid parameter")
     }
-
 {{if not .UseRepo}}
 	if err := s.{{.DataSourceVar}}.Delete(ctx, req); err != nil {
 		return nil, err

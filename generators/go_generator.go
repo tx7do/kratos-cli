@@ -1,109 +1,266 @@
 ﻿package generators
 
 import (
+	"context"
+	"fmt"
 	"os"
-	"path/filepath"
-	"strings"
-	"text/template"
 
+	"github.com/tx7do/go-utils/code_generator"
 	"github.com/tx7do/go-utils/stringcase"
 	"github.com/tx7do/kratos-cli/generatos/templates/golang"
 )
 
 // GoGenerator 使用 TemplateEngine 渲染并将结果写入磁盘
 type GoGenerator struct {
-	Engine TemplateEngine
+	*code_generator.CodeGenerator
 }
 
 // NewGoGenerator 创建生成器，engine 可为 nil（需要在调用前设置）
 func NewGoGenerator() *GoGenerator {
-	var funcMap = template.FuncMap{
-		"newlineIf": func(condition bool) string {
-			if condition {
-				return "\n"
-			}
-			return ""
-		},
-		"newline": func() string { return "\n" },
+	templateEngine, _ := code_generator.NewEmbeddedTemplateEngineFromMap(golang.TemplateMap, funcMap)
 
-		"upper": strings.ToUpper, // 转换为大写
-		"lower": strings.ToLower, // 转换为小写
-
-		"camel":  stringcase.LowerCamelCase, // 转换为 camelCase
-		"pascal": stringcase.ToPascalCase,   // 转换为 PascalCase
-		"kebab":  stringcase.KebabCase,      // 转换为 kebab-case
-		"snake":  stringcase.SnakeCase,      // 转换为 snake_case
-	}
-
-	templateEngine, _ := NewEmbeddedTemplateEngineFromMap(golang.TemplateMap, funcMap)
+	codeGenerator := code_generator.NewCodeGeneratorWithEngine(templateEngine)
 
 	g := &GoGenerator{
-		Engine: templateEngine,
+		CodeGenerator: codeGenerator,
 	}
 
 	return g
 }
 
-// NewGoGeneratorWithEngine 使用指定的引擎创建生成器
-func NewGoGeneratorWithEngine(engine TemplateEngine) *GoGenerator {
-	g := &GoGenerator{
-		Engine: engine,
+func (g *GoGenerator) GenerateMain(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+	if g.CodeGenerator == nil {
+		return "", os.ErrInvalid
 	}
-	return g
+	return g.Generate(ctx, opts, "main.tpl")
 }
 
-// Generate 渲染 tplName 并写入 opts.OutDir 下。
-// 规则：如果 tplName 以 .tpl 或 .tmpl 结尾，会在输出文件名中去掉该后缀。
-func (g *GoGenerator) Generate(opts Options, tplName string) error {
-	if g.Engine == nil {
-		return os.ErrInvalid
+func (g *GoGenerator) GenerateWire(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+	if g.CodeGenerator == nil {
+		return "", os.ErrInvalid
+	}
+	return g.Generate(ctx, opts, "wire.tpl")
+}
+
+func (g *GoGenerator) GenerateInit(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+	if g.CodeGenerator == nil {
+		return "", os.ErrInvalid
+	}
+	return g.Generate(ctx, opts, "init.tpl")
+}
+
+func (g *GoGenerator) GenerateData(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+	if g.CodeGenerator == nil {
+		return "", os.ErrInvalid
+	}
+	return g.Generate(ctx, opts, "data.tpl")
+}
+
+func (g *GoGenerator) GenerateEntClient(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+	if g.CodeGenerator == nil {
+		return "", os.ErrInvalid
+	}
+	return g.Generate(ctx, opts, "ent_client.tpl")
+}
+
+func (g *GoGenerator) GenerateEntRepo(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+	if g.CodeGenerator == nil {
+		return "", os.ErrInvalid
 	}
 
-	// 合并数据：以 opts.Vars 为基础，注入常用字段
-	data := map[string]any{}
-	if opts.Vars != nil {
-		for k, v := range opts.Vars {
-			data[k] = v
-		}
-	}
-	// 常用上下文
-	data["Module"] = opts.Module
-	data["ProjectName"] = opts.ProjectName
-	data["OutDir"] = opts.OutDir
-
-	// 渲染
-	outBytes, err := g.Engine.Render(tplName, data)
-	if err != nil {
-		return err
+	var modelName string
+	if v, ok := opts.Vars["Model"]; ok {
+		modelName, _ = v.(string)
 	}
 
-	// 计算默认输出名称（保持相对目录并去掉模板后缀）
-	defaultOutName := tplName
-	if strings.HasSuffix(defaultOutName, ".tpl") {
-		defaultOutName = strings.TrimSuffix(defaultOutName, ".tpl")
-	} else if strings.HasSuffix(defaultOutName, ".tmpl") {
-		defaultOutName = strings.TrimSuffix(defaultOutName, ".tmpl")
+	if _, ok := opts.Vars["ClassName"]; !ok {
+		opts.Vars["ClassName"] = stringcase.ToPascalCase(modelName) + "Repo"
 	}
-	defaultOutName = filepath.FromSlash(defaultOutName)
 
-	// 如果用户指定 OutputName，优先处理
-	finalRel := defaultOutName
-	if opts.OutputName != "" {
-		user := filepath.FromSlash(opts.OutputName)
-		// 判断 user 是否包含目录部分
-		if filepath.Dir(user) == "." || user == "." {
-			// 仅文件名：保留模板的目录结构，替换基础名
-			baseDir := filepath.Dir(defaultOutName)
-			finalRel = filepath.Join(baseDir, user)
+	if _, ok := opts.Vars["ApiPackageVersion"]; !ok {
+		opts.Vars["ApiPackageVersion"] = "v1"
+	}
+
+	if opts.OutputName == "" {
+		opts.OutputName = stringcase.ToSnakeCase(modelName) + "_repo.go"
+	}
+
+	return g.Generate(ctx, opts, "ent_repo.tpl")
+}
+
+func (g *GoGenerator) GenerateGormClient(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+	if g.CodeGenerator == nil {
+		return "", os.ErrInvalid
+	}
+	return g.Generate(ctx, opts, "gorm_client.tpl")
+}
+
+func (g *GoGenerator) GenerateGormInit(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+	if g.CodeGenerator == nil {
+		return "", os.ErrInvalid
+	}
+	return g.Generate(ctx, opts, "gorm_init.tpl")
+}
+
+func (g *GoGenerator) GenerateGormRepo(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+	if g.CodeGenerator == nil {
+		return "", os.ErrInvalid
+	}
+
+	var modelName string
+	if v, ok := opts.Vars["Model"]; ok {
+		modelName, _ = v.(string)
+	}
+
+	if _, ok := opts.Vars["ClassName"]; !ok {
+		opts.Vars["ClassName"] = stringcase.ToPascalCase(modelName) + "Repo"
+	}
+
+	if _, ok := opts.Vars["ApiPackageVersion"]; !ok {
+		opts.Vars["ApiPackageVersion"] = "v1"
+	}
+
+	if opts.OutputName == "" {
+		opts.OutputName = stringcase.ToSnakeCase(modelName) + "_repo.go"
+	}
+
+	return g.Generate(ctx, opts, "gorm_repo.tpl")
+}
+
+func (g *GoGenerator) GenerateGrpcServiceProto(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+	if g.CodeGenerator == nil {
+		return "", os.ErrInvalid
+	}
+
+	var modelName string
+	if v, ok := opts.Vars["Model"]; ok {
+		modelName, _ = v.(string)
+	}
+
+	if opts.OutputName == "" {
+		opts.OutputName = stringcase.ToSnakeCase(modelName) + ".proto"
+	}
+
+	return g.Generate(ctx, opts, "grpc_proto.tpl")
+}
+
+func (g *GoGenerator) GenerateGrpcServer(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+	if g.CodeGenerator == nil {
+		return "", os.ErrInvalid
+	}
+
+	return g.Generate(ctx, opts, "grpc_server.tpl")
+}
+
+func (g *GoGenerator) GenerateRedisClient(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+	if g.CodeGenerator == nil {
+		return "", os.ErrInvalid
+	}
+
+	return g.Generate(ctx, opts, "redis_client.tpl")
+}
+
+func (g *GoGenerator) GenerateRestServiceProto(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+	if g.CodeGenerator == nil {
+		return "", os.ErrInvalid
+	}
+
+	var modelName string
+	if v, ok := opts.Vars["Model"]; ok {
+		modelName, _ = v.(string)
+	}
+
+	if opts.OutputName == "" {
+		opts.OutputName = "i_" + stringcase.ToSnakeCase(modelName) + ".proto"
+	}
+
+	return g.Generate(ctx, opts, "rest_proto.tpl")
+}
+
+func (g *GoGenerator) GenerateRestServer(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+	if g.CodeGenerator == nil {
+		return "", os.ErrInvalid
+	}
+
+	return g.Generate(ctx, opts, "rest_server.tpl")
+}
+
+func (g *GoGenerator) GenerateService(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+	if g.CodeGenerator == nil {
+		return "", os.ErrInvalid
+	}
+
+	var modelName string
+	if v, ok := opts.Vars["Model"]; ok {
+		modelName, _ = v.(string)
+	}
+
+	var isGrpcService bool
+	if v, ok := opts.Vars["IsGrpc"]; ok {
+		isGrpcService, _ = v.(bool)
+	}
+
+	if _, ok := opts.Vars["ClassName"]; !ok {
+
+		opts.Vars["ClassName"] = stringcase.ToPascalCase(modelName) + "Service"
+	}
+
+	if _, ok := opts.Vars["TargetApiPackageVersion"]; !ok {
+		opts.Vars["TargetApiPackageVersion"] = "v1"
+	}
+	if _, ok := opts.Vars["SourceApiPackageVersion"]; !ok {
+		opts.Vars["SourceApiPackageVersion"] = "v1"
+	}
+
+	if _, ok := opts.Vars["SourceApiPackage"]; !ok {
+		opts.Vars["SourceApiPackage"] = stringcase.LowerCamelCase(opts.Vars["SourceApiPackageName"].(string)) + stringcase.UpperCamelCase(opts.Vars["SourceApiPackageVersion"].(string))
+	}
+	if _, ok := opts.Vars["TargetApiPackage"]; !ok {
+		opts.Vars["TargetApiPackage"] = stringcase.LowerCamelCase(opts.Vars["TargetApiPackageName"].(string)) + stringcase.UpperCamelCase(opts.Vars["TargetApiPackageVersion"].(string))
+	}
+
+	if _, ok := opts.Vars["ServiceInterface"]; !ok {
+		if isGrpcService {
+			opts.Vars["ServiceInterface"] = fmt.Sprintf("%s.Unimplemented%sServiceServer",
+				opts.Vars["TargetApiPackage"].(string),
+				stringcase.ToPascalCase(opts.Vars["Service"].(string)))
 		} else {
-			// 含目录：直接使用用户提供的相对路径
-			finalRel = user
+			opts.Vars["ServiceInterface"] = fmt.Sprintf("%s.%sServiceHTTPServer",
+				opts.Vars["TargetApiPackage"].(string),
+				stringcase.ToPascalCase(opts.Vars["Model"].(string)))
 		}
 	}
 
-	outPath := filepath.Join(opts.OutDir, finalRel)
-	if err = os.MkdirAll(filepath.Dir(outPath), 0o755); err != nil {
-		return err
+	if _, ok := opts.Vars["DataSourceVar"]; !ok {
+		if isGrpcService {
+			opts.Vars["DataSourceVar"] = stringcase.LowerCamelCase(opts.Vars["Model"].(string)) + "Repo"
+		} else {
+			opts.Vars["DataSourceVar"] = stringcase.LowerCamelCase(opts.Vars["Model"].(string)) + "ServiceClient"
+		}
 	}
-	return os.WriteFile(outPath, outBytes, 0o644)
+	if _, ok := opts.Vars["DataSourceType"]; !ok {
+		if isGrpcService {
+			opts.Vars["DataSourceType"] = "*data." + stringcase.UpperCamelCase(opts.Vars["Model"].(string)) + "Repo"
+		} else {
+			opts.Vars["DataSourceType"] = fmt.Sprintf("%s.%sServiceClient",
+				opts.Vars["SourceApiPackage"].(string),
+				stringcase.UpperCamelCase(opts.Vars["Model"].(string)))
+		}
+	}
+
+	if _, ok := opts.Vars["IsSameApi"]; !ok {
+		opts.Vars["IsSameApi"] = opts.Vars["SourceApiPackage"].(string) == opts.Vars["TargetApiPackage"].(string)
+	}
+
+	if _, ok := opts.Vars["UseRepo"]; !ok {
+		if isGrpcService {
+			opts.Vars["UseRepo"] = true
+		}
+	}
+
+	if opts.OutputName == "" {
+		opts.OutputName = stringcase.ToSnakeCase(modelName) + "_service.go"
+	}
+
+	return g.Generate(ctx, opts, "service.tpl")
 }

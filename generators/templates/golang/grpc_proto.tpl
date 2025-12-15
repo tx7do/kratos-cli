@@ -10,42 +10,43 @@ import "google/protobuf/field_mask.proto";
 
 import "pagination/v1/pagination.proto";
 
-// {{.Comment}}服务
-service {{.PascalName}}Service {
-  // 查询列表
-  rpc List (pagination.PagingRequest) returns (List{{.PascalName}}Response) {}
+// {{.ModelName}}服务
+service {{pascal .Model}}Service {
+  // 查询{{.ModelName}}列表
+  rpc List (pagination.PagingRequest) returns (List{{pascal .Model}}Response) {}
 
-  // 查询详情
-  rpc Get (Get{{.PascalName}}Request) returns ({{.PascalName}}) {}
+  // 查询{{.ModelName}}详情
+  rpc Get (Get{{pascal .Model}}Request) returns ({{pascal .Model}}) {}
 
-  // 创建
-  rpc Create (Create{{.PascalName}}Request) returns ({{.PascalName}}) {}
+  // 创建{{.ModelName}}
+  rpc Create (Create{{pascal .Model}}Request) returns ({{pascal .Model}}) {}
 
-  // 更新
-  rpc Update (Update{{.PascalName}}Request) returns (google.protobuf.Empty) {}
+  // 更新{{.ModelName}}
+  rpc Update (Update{{pascal .Model}}Request) returns (google.protobuf.Empty) {}
 
-  // 删除
-  rpc Delete (Delete{{.PascalName}}Request) returns (google.protobuf.Empty) {}
+  // 删除{{.ModelName}}
+  rpc Delete (Delete{{pascal .Model}}Request) returns (google.protobuf.Empty) {}
 
-  // 批量创建
-  rpc BatchCreate (BatchCreate{{.PascalName}}Request) returns (BatchCreate{{.PascalName}}Response) {}
+  // 批量创建{{.ModelName}}
+  rpc BatchCreate (BatchCreate{{pascal .Model}}Request) returns (BatchCreate{{pascal .Model}}Response) {}
 }
 
-// {{.Comment}}
-message {{.PascalName}} {
-{{range .Fields}}  optional {{.Type}} {{.SnakeName}} = {{.Number}} [
-    json_name = "{{.CamelName}}",
+// {{.ModelName}}
+message {{pascal .Model}} {
+{{range .Fields}}  optional {{.Type}} {{snake .Name}} = {{.Number}} [
+    json_name = "{{camel .Name}}",
     (gnostic.openapi.v3.property) = {description: "{{.Comment}}"}
   ]; // {{.Comment}}
 
-{{end -}}}
+{{end -}}
+}
 
-message List{{.PascalName}}Response {
-  repeated {{.PascalName}} items = 1;
+message List{{pascal .Model}}Response {
+  repeated {{pascal .Model}} items = 1;
   uint64 total = 2;
 }
 
-message Get{{.PascalName}}Request {
+message Get{{pascal .Model}}Request {
   oneof query_by {
     uint32 id = 1 [
       (gnostic.openapi.v3.property) = {description: "ID", read_only: true},
@@ -61,14 +62,14 @@ message Get{{.PascalName}}Request {
   ]; // 视图字段过滤器，用于控制返回的字段
 }
 
-message Create{{.PascalName}}Request {
-  {{.PascalName}} data = 1;
+message Create{{pascal .Model}}Request {
+  {{pascal .Model}} data = 1;
 }
 
-message Update{{.PascalName}}Request {
+message Update{{pascal .Model}}Request {
   uint32 id = 1;
 
-  {{.PascalName}} data = 2;
+  {{pascal .Model}} data = 2;
 
   google.protobuf.FieldMask update_mask = 100 [
     (gnostic.openapi.v3.property) = {
@@ -84,13 +85,13 @@ message Update{{.PascalName}}Request {
   ]; // 如果设置为true的时候，资源不存在则会新增(插入)，并且在这种情况下`updateMask`字段将会被忽略。
 }
 
-message Delete{{.PascalName}}Request {
+message Delete{{pascal .Model}}Request {
   uint32 id = 1;
 }
 
-message BatchCreate{{.PascalName}}Request {
-  repeated {{.PascalName}} data = 1;
+message BatchCreate{{pascal .Model}}Request {
+  repeated {{pascal .Model}} data = 1;
 }
-message BatchCreate{{.PascalName}}Response {
-  repeated {{.PascalName}} data = 1;
+message BatchCreate{{pascal .Model}}Response {
+  repeated {{pascal .Model}} data = 1;
 }

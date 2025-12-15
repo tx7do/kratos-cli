@@ -8,13 +8,13 @@ import (
 	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
 	"github.com/tx7do/kratos-bootstrap/rpc"
 
-	"{{.Project}}/app/{{.Service}}/service/internal/service"
-{{range $key, $value := .Modules}}
-    {{lower $value}}V1 "{{lower $.Project}}/api/gen/go/{{lower $value}}/service/v1"
+	"{{.Module}}/app/{{lower .Service}}/service/internal/service"
+{{range $key, $value := .Packages}}
+    {{lower $value}} "{{lower $.Module}}/api/gen/go/{{lower $value}}/service/v1"
 {{- end}}
 )
 
-// NewGrpcServer new a gRPC server.
+// NewGrpcServer creates a gRPC server.
 func NewGrpcServer(
 	cfg *conf.Bootstrap, logger log.Logger,
 {{range $key, $value := .Services}}
