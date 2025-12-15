@@ -4,33 +4,11 @@ import (
 	"strings"
 
 	"github.com/jinzhu/inflection"
+	"github.com/tx7do/go-utils/stringcase"
+	"github.com/tx7do/kratos-cli/generators"
 )
 
-// ProtoField protobuf字段定义
-type ProtoField struct {
-	Number  int    // 字段编号
-	Name    string // 字段名
-	Type    string // 字段类型
-	Comment string // 字段注释
-}
-
-type ProtoFieldArray []ProtoField
-
-func (f ProtoField) CamelName() string {
-	return snakeToCamel(f.Name)
-}
-
-func (f ProtoField) SnakeName() string {
-	return camelToSnake(f.Name)
-}
-
-func (f ProtoField) PascalName() string {
-	return snakeToPascal(f.Name)
-}
-
-func (f ProtoField) EntPascalName() string {
-	return snakeToPascalPlus(f.Name)
-}
+type ProtoFieldArray []generators.ProtoFieldData
 
 type GrpcProtoTemplateData struct {
 	Name    string // Proto文件名
@@ -43,10 +21,10 @@ type GrpcProtoTemplateData struct {
 }
 
 func (d GrpcProtoTemplateData) PascalName() string {
-	return snakeToPascal(d.Name)
+	return stringcase.ToPascalCase(d.Name)
 }
 func (d GrpcProtoTemplateData) SnakeName() string {
-	return camelToSnake(d.Name)
+	return stringcase.SnakeCase(d.Name)
 }
 
 func (d GrpcProtoTemplateData) Package() string {
@@ -63,12 +41,12 @@ type RestProtoTemplateData struct {
 }
 
 func (d RestProtoTemplateData) PascalName() string {
-	return snakeToPascal(d.Name)
+	return stringcase.ToPascalCase(d.Name)
 }
 
 func (d RestProtoTemplateData) Path() string {
 	// 比如：/admin/v1/users
-	return "/" + strings.ToLower(d.TargetModule) + "/" + d.Version + "/" + snakeToKebab(inflection.Plural(d.Name))
+	return "/" + strings.ToLower(d.TargetModule) + "/" + d.Version + "/" + stringcase.KebabCase(inflection.Plural(d.Name))
 }
 
 func (d RestProtoTemplateData) SourceProto() string {

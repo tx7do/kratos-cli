@@ -1,4 +1,4 @@
-package render
+package generators
 
 const (
 	ProtoFilePostfix    = ".proto"

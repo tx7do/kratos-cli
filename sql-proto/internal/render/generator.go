@@ -1,39 +1,65 @@
 package render
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/tx7do/kratos-cli/sql-proto/internal/render/templates"
+	"github.com/tx7do/go-utils/code_generator"
+	"github.com/tx7do/kratos-cli/generators"
 )
 
 // WriteGrpcServiceProto write gRPC service proto file
 func WriteGrpcServiceProto(outputPath string, data GrpcProtoTemplateData) error {
-	outputPath = outputPath + "/" + strings.ToLower(data.Module) + "/service/" + strings.ToLower(data.Version)
+	outputPath = filepath.Join(outputPath, strings.ToLower(data.Module), "service", strings.ToLower(data.Version))
 	outputPath = filepath.Clean(outputPath)
 
 	if err := os.MkdirAll(outputPath, os.ModePerm); err != nil {
 		return err
 	}
 
-	outputPath = outputPath + "/" + strings.ToLower(data.Name) + ProtoFilePostfix
-	outputPath = filepath.Clean(outputPath)
+	g := generators.NewGoGenerator()
 
-	return renderTemplate[GrpcProtoTemplateData](outputPath, data, "grpc_proto", string(templates.GrpcProtoTemplateData))
+	opts := code_generator.Options{
+		OutDir: outputPath,
+		Vars: map[string]interface{}{
+			"Package":   data.Package(),
+			"Model":     data.Module,
+			"ModelName": data.Comment,
+			"Fields":    data.Fields,
+		},
+	}
+
+	_, err := g.GenerateGrpcServiceProto(context.Background(), opts)
+
+	return err
 }
 
 // WriteRestServiceProto write REST service proto file
 func WriteRestServiceProto(outputPath string, data RestProtoTemplateData) error {
-	outputPath = outputPath + "/" + strings.ToLower(data.TargetModule) + "/service/" + strings.ToLower(data.Version)
+	outputPath = filepath.Join(outputPath, strings.ToLower(data.TargetModule), "service", strings.ToLower(data.Version))
 	outputPath = filepath.Clean(outputPath)
 
 	if err := os.MkdirAll(outputPath, os.ModePerm); err != nil {
 		return err
 	}
 
-	outputPath = outputPath + "/" + RestProtoFilePrefix + strings.ToLower(data.Name) + ProtoFilePostfix
-	outputPath = filepath.Clean(outputPath)
+	g := generators.NewGoGenerator()
 
-	return renderTemplate[RestProtoTemplateData](outputPath, data, "rest_proto", string(templates.RestProtoTemplateData))
+	opts := code_generator.Options{
+		OutDir: outputPath,
+		Vars: map[string]interface{}{
+			"TargetPackage": data.TargetPackage(),
+			"SourcePackage": data.SourcePackage(),
+			"SourceProto":   data.SourceProto(),
+			"ModelName":     data.Comment,
+			"Path":          data.Path(),
+			"Model":         data.Name,
+		},
+	}
+
+	_, err := g.GenerateRestServiceProto(context.Background(), opts)
+
+	return err
 }

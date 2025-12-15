@@ -1,8 +1,10 @@
 module github.com/tx7do/kratos-cli/sql-proto
 
-go 1.24
+go 1.24.0
 
 toolchain go1.24.4
+
+replace github.com/tx7do/kratos-cli/generators => ../generators
 
 require (
 	ariga.io/atlas v0.36.1
@@ -13,7 +15,9 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.7
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
+	github.com/tx7do/go-utils/code_generator v0.0.1
+	github.com/tx7do/kratos-cli/generators v0.0.3
 	golang.org/x/text v0.28.0
 )
 
@@ -32,6 +36,7 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
+	github.com/tx7do/go-utils v1.1.34 // indirect
 	github.com/zclconf/go-cty v1.16.3 // indirect
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
 	golang.org/x/mod v0.27.0 // indirect

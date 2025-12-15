@@ -3,15 +3,17 @@ package sqlproto
 import (
 	"errors"
 	"log"
+	"regexp"
 	"strings"
 
 	"github.com/jinzhu/inflection"
+	"github.com/tx7do/kratos-cli/generators"
 
 	"github.com/tx7do/kratos-cli/sql-proto/internal/render"
 )
 
-type ProtoField render.ProtoField
-type ProtoFieldArray []render.ProtoField
+type ProtoField generators.ProtoFieldData
+type ProtoFieldArray []generators.ProtoFieldData
 
 func WriteServiceProto(
 	outputPath string,
@@ -28,7 +30,7 @@ func WriteServiceProto(
 			Version: moduleVersion,
 
 			Name:    inflection.Singular(tableName),
-			Comment: render.RemoveTableCommentSuffix(tableComment),
+			Comment: RemoveTableCommentSuffix(tableComment),
 			Fields:  render.ProtoFieldArray(protoFields),
 		}
 		return render.WriteGrpcServiceProto(outputPath, data)
@@ -40,7 +42,7 @@ func WriteServiceProto(
 			Version:      moduleVersion,
 
 			Name:    inflection.Singular(tableName),
-			Comment: render.RemoveTableCommentSuffix(tableComment),
+			Comment: RemoveTableCommentSuffix(tableComment),
 		}
 		return render.WriteRestServiceProto(outputPath, data)
 
@@ -63,7 +65,7 @@ func WriteServicesProto(
 		protoFields = make(ProtoFieldArray, 0, len(table.Fields))
 		for n := 0; n < len(table.Fields); n++ {
 			field := table.Fields[n]
-			protoFields = append(protoFields, render.ProtoField{
+			protoFields = append(protoFields, generators.ProtoFieldData{
 				Number:  n + 1,
 				Name:    field.Name,
 				Comment: field.Comment,
@@ -84,4 +86,9 @@ func WriteServicesProto(
 	}
 
 	return nil
+}
+
+func RemoveTableCommentSuffix(input string) string {
+	re := regexp.MustCompile(`(表|table)$`)
+	return re.ReplaceAllString(input, "")
 }

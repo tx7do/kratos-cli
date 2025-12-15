@@ -21,5 +21,6 @@ func TestConverter(t *testing.T) {
 		&moduleName, &sourceModuleName, &moduleVersion,
 		&serviceType,
 		nil, nil,
+		true,
 	)
 }
