@@ -1,4 +1,4 @@
-package generators
+﻿package generators
 
 import (
 	"context"
@@ -138,7 +138,7 @@ func (g *GoGenerator) GenerateGrpcServiceProto(ctx context.Context, opts code_ge
 	}
 
 	if opts.OutputName == "" {
-		opts.OutputName = stringcase.ToSnakeCase(modelName) + ".proto"
+		opts.OutputName = stringcase.ToSnakeCase(modelName) + ProtoFilePostfix
 	}
 
 	return g.Generate(ctx, opts, "grpc_proto.tpl")
@@ -171,7 +171,7 @@ func (g *GoGenerator) GenerateRestServiceProto(ctx context.Context, opts code_ge
 	}
 
 	if opts.OutputName == "" {
-		opts.OutputName = "i_" + stringcase.ToSnakeCase(modelName) + ".proto"
+		opts.OutputName = RestProtoFilePrefix + stringcase.ToSnakeCase(modelName) + ProtoFilePostfix
 	}
 
 	return g.Generate(ctx, opts, "rest_proto.tpl")

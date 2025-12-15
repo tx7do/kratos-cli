@@ -170,7 +170,6 @@ func TestGoGenerator_Template_GrpcServiceProto(t *testing.T) {
 
 	opts := code_generator.Options{
 		OutDir: "./output",
-		Module: "github.com/example/myproject",
 		Vars: map[string]interface{}{
 			"Package":   "user.service.v1",
 			"Model":     "user",
@@ -227,7 +226,6 @@ func TestGoGenerator_Template_RestServiceProto(t *testing.T) {
 
 	opts := code_generator.Options{
 		OutDir: "./output",
-		Module: "github.com/example/myproject",
 		Vars: map[string]interface{}{
 			"TargetPackage": "admin.service.v1",
 			"SourcePackage": "user.service.v1",
