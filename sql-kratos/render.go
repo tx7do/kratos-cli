@@ -1,14 +1,14 @@
 package sqlkratos
 
 import (
+	"context"
 	"errors"
 	"strings"
 
-	"github.com/tx7do/kratos-cli/sql-kratos/internal/render"
+	"github.com/tx7do/go-utils/code_generator"
+	"github.com/tx7do/go-utils/stringcase"
+	"github.com/tx7do/kratos-cli/generators"
 )
-
-type DataField render.DataField
-type DataFieldArray []render.DataField
 
 func WriteDataPackageCode(
 	outputPath string,
@@ -17,15 +17,15 @@ func WriteDataPackageCode(
 	serviceName string,
 	name string,
 	moduleName, moduleVersion string,
-	protoFields []DataField,
+	protoFields []generators.DataField,
 ) error {
-	var copyDataFields render.DataFieldArray
+	var copyDataFields generators.DataFieldArray
 	for _, field := range protoFields {
 		if field.Type == "" {
 			continue
 		}
 
-		copyDataField := render.DataField{
+		copyDataField := generators.DataField{
 			Name:    field.Name,
 			Type:    field.Type,
 			Comment: field.Comment,
@@ -33,27 +33,127 @@ func WriteDataPackageCode(
 		copyDataFields = append(copyDataFields, copyDataField)
 	}
 
-	data := render.DataTemplateData{
-		Project: projectName,
-
-		Service: serviceName,
-		Name:    name,
-
-		Module:  moduleName,
-		Version: moduleVersion,
-
-		Fields: copyDataFields,
-	}
 	switch strings.TrimSpace(strings.ToLower(orm)) {
 	case "ent":
-		return render.WriteEntDataPackageCode(outputPath, data)
+		if err := writeEntClientCode(outputPath, projectName, serviceName); err != nil {
+			return err
+		}
+		return writeEntRepoCode(outputPath, projectName, serviceName, name, moduleName, moduleVersion, copyDataFields)
 
 	case "gorm":
-		return render.WriteGormDataPackageCode(outputPath, data)
+		if err := writeGormClientCode(outputPath, projectName, serviceName); err != nil {
+			return err
+		}
+		return writeGormRepoCode(outputPath, projectName, serviceName, name, moduleName, moduleVersion, copyDataFields)
 
 	default:
 		return errors.New("sqlproto: unsupported orm: " + orm)
 	}
+}
+
+func writeEntClientCode(
+	outputPath string,
+	projectModule string,
+	serviceName string,
+) error {
+	g := generators.NewGoGenerator()
+
+	opts := code_generator.Options{
+		OutDir: outputPath,
+		Module: projectModule,
+		Vars: map[string]interface{}{
+			"Service": serviceName,
+		},
+	}
+
+	_, err := g.GenerateEntClient(context.Background(), opts)
+	return err
+}
+
+func writeGormClientCode(
+	outputPath string,
+	projectModule string,
+	serviceName string,
+) error {
+	g := generators.NewGoGenerator()
+
+	opts1 := code_generator.Options{
+		OutDir: outputPath,
+		Module: projectModule,
+		Vars: map[string]interface{}{
+			"Service": serviceName,
+		},
+	}
+	_, err := g.GenerateGormClient(context.Background(), opts1)
+	if err != nil {
+		return err
+	}
+
+	opts2 := code_generator.Options{
+		OutDir: outputPath,
+		Module: projectModule,
+		Vars: map[string]interface{}{
+			"Service": serviceName,
+		},
+	}
+	_, err = g.GenerateGormInit(context.Background(), opts2)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func writeEntRepoCode(
+	outputPath string,
+	projectModule string,
+	serviceName string,
+	model string,
+	apiPackageName string,
+	apiPackageVersion string,
+	fields generators.DataFieldArray,
+) error {
+	g := generators.NewGoGenerator()
+
+	opts := code_generator.Options{
+		OutDir: outputPath,
+		Module: projectModule,
+		Vars: map[string]interface{}{
+			"Service":    serviceName,
+			"ApiPackage": stringcase.LowerCamelCase(apiPackageName) + stringcase.UpperCamelCase(apiPackageVersion),
+			"Model":      model,
+			"Fields":     fields,
+		},
+	}
+
+	_, err := g.GenerateEntRepo(context.Background(), opts)
+	return err
+}
+
+func writeGormRepoCode(
+	outputPath string,
+	projectModule string,
+	serviceName string,
+	model string,
+	apiPackageName string,
+	apiPackageVersion string,
+	fields generators.DataFieldArray,
+) error {
+	g := generators.NewGoGenerator()
+
+	opts := code_generator.Options{
+		OutDir: outputPath,
+		Module: projectModule,
+		Vars: map[string]interface{}{
+			"Service":    serviceName,
+			"ApiPackage": stringcase.LowerCamelCase(apiPackageName) + stringcase.UpperCamelCase(apiPackageVersion),
+			"Model":      model,
+			"Fields":     fields,
+		},
+	}
+
+	_, err := g.GenerateGormRepo(context.Background(), opts)
+	return err
 }
 
 func WriteServicePackageCode(
@@ -62,22 +162,32 @@ func WriteServicePackageCode(
 	serviceName string,
 	name string,
 	targetModuleName, sourceModuleName, moduleVersion string,
-	userRepo, isGrpcService bool,
+	useRepo, isGrpcService bool,
 ) error {
-	data := render.ServiceTemplateData{
-		Project: projectName,
+	g := generators.NewGoGenerator()
 
-		Service: serviceName,
-		Name:    name,
+	o := code_generator.Options{
+		OutDir: outputPath,
+		Module: projectName,
+		Vars: map[string]interface{}{
+			"TargetApiPackageName":    targetModuleName,
+			"TargetApiPackageVersion": moduleVersion,
 
-		SourceModuleName: sourceModuleName,
-		TargetModuleName: targetModuleName,
-		Version:          moduleVersion,
+			"SourceApiPackageName":    sourceModuleName,
+			"SourceApiPackageVersion": moduleVersion,
 
-		UseRepo: userRepo,
-		IsGrpc:  isGrpcService,
+			"Service": serviceName,
+			"Model":   name,
+			"IsGrpc":  isGrpcService,
+			"UseRepo": useRepo,
+		},
 	}
-	return render.WriteServicePackageCode(outputPath, data)
+
+	if _, err := g.GenerateService(context.Background(), o); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func WriteServerPackageCode(
@@ -87,13 +197,40 @@ func WriteServerPackageCode(
 	serviceName string,
 	services map[string]string,
 ) error {
-	data := render.ServerTemplateData{
-		Project:  projectName,
-		Type:     serviceType,
-		Service:  serviceName,
-		Services: services,
+	g := generators.NewGoGenerator()
+
+	switch strings.ToLower(serviceType) {
+	case "grpc":
+		o := code_generator.Options{
+			OutDir: outputPath,
+			Module: projectName,
+			Vars: map[string]interface{}{
+				"Service":  serviceName,
+				"Services": services,
+			},
+		}
+		if _, err := g.GenerateGrpcServer(context.Background(), o); err != nil {
+			return err
+		}
+
+	case "rest":
+		o := code_generator.Options{
+			OutDir: outputPath,
+			Module: projectName,
+			Vars: map[string]interface{}{
+				"Service":  serviceName,
+				"Services": services,
+			},
+		}
+		if _, err := g.GenerateRestServer(context.Background(), o); err != nil {
+			return err
+		}
+
+	default:
+		return errors.New("sqlproto: unsupported service type: " + serviceType)
 	}
-	return render.WriteServerPackageCode(outputPath, data)
+
+	return nil
 }
 
 func WriteInitWireCode(
@@ -103,12 +240,23 @@ func WriteInitWireCode(
 	postfix string,
 	services []string,
 ) error {
-	data := render.InitWireTemplateData{
-		Package:      packageName,
-		Postfix:      postfix,
-		ServiceNames: services,
+	g := generators.NewGoGenerator()
+
+	var newFunctions []string
+	for _, service := range services {
+		newFunction := "New" + stringcase.UpperCamelCase(service) + postfix
+		newFunctions = append(newFunctions, newFunction)
 	}
-	return render.WriteInitWireCode(outputPath, data)
+
+	opts := code_generator.Options{
+		OutDir: outputPath,
+		Vars: map[string]interface{}{
+			"Package":      packageName,
+			"NewFunctions": newFunctions,
+		},
+	}
+	_, err := g.GenerateInit(context.Background(), opts)
+	return err
 }
 
 func WriteWireCode(
@@ -117,11 +265,16 @@ func WriteWireCode(
 	projectName string,
 	serviceName string,
 ) error {
-	data := render.WireTemplateData{
-		Project: projectName,
-		Service: serviceName,
+	g := generators.NewGoGenerator()
+	opts := code_generator.Options{
+		OutDir: outputPath,
+		Module: projectName,
+		Vars: map[string]interface{}{
+			"Service": serviceName,
+		},
 	}
-	return render.WriteWireCode(outputPath, data)
+	_, err := g.GenerateWire(context.Background(), opts)
+	return err
 }
 
 func WriteMainCode(
@@ -132,10 +285,19 @@ func WriteMainCode(
 
 	servers []string,
 ) error {
-	data := render.MainTemplateData{
-		Project: projectName,
-		Service: serviceName,
-		Servers: servers,
+	g := generators.NewGoGenerator()
+
+	opts := code_generator.Options{
+		OutDir: outputPath,
+		Module: projectName,
+		Vars: map[string]interface{}{
+			"Service":                  serviceName,
+			"ServerImports":            generators.ServerImportPaths(servers),
+			"ServerFormalParameters":   generators.ServerFormalParameters(servers),
+			"ServerTransferParameters": generators.ServerTransferParameters(servers),
+		},
 	}
-	return render.WriteMainCode(outputPath, data)
+
+	_, err := g.GenerateMain(context.Background(), opts)
+	return err
 }

@@ -12,8 +12,8 @@ import (
 	"github.com/tx7do/kratos-cli/sql-proto/internal/render"
 )
 
-type ProtoField generators.ProtoFieldData
-type ProtoFieldArray []generators.ProtoFieldData
+type ProtoField generators.ProtoField
+type ProtoFieldArray []generators.ProtoField
 
 func WriteServiceProto(
 	outputPath string,
@@ -65,7 +65,7 @@ func WriteServicesProto(
 		protoFields = make(ProtoFieldArray, 0, len(table.Fields))
 		for n := 0; n < len(table.Fields); n++ {
 			field := table.Fields[n]
-			protoFields = append(protoFields, generators.ProtoFieldData{
+			protoFields = append(protoFields, generators.ProtoField{
 				Number:  n + 1,
 				Name:    field.Name,
 				Comment: field.Comment,

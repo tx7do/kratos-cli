@@ -210,14 +210,13 @@ func generateMainPackageCode(
 ) error {
 	g := generators.NewGoGenerator()
 	opts := code_generator.Options{
-		OutDir:      outputPath,
-		Module:      moduleName,
-		ProjectName: moduleName,
+		OutDir: outputPath,
+		Module: moduleName,
 		Vars: map[string]interface{}{
 			"Service":                  serviceName,
-			"ServerImports":            serverImportPath(servers),
-			"ServerFormalParameters":   serverFormalParameters(servers),
-			"ServerTransferParameters": serverTransferParameters(servers),
+			"ServerImports":            generators.ServerImportPaths(servers),
+			"ServerFormalParameters":   generators.ServerFormalParameters(servers),
+			"ServerTransferParameters": generators.ServerTransferParameters(servers),
 		},
 	}
 

@@ -6,14 +6,13 @@ import (
 	"log"
 
 	"github.com/jinzhu/inflection"
+	"github.com/tx7do/kratos-cli/generators"
 
 	sqlorm "github.com/tx7do/kratos-cli/sql-orm"
 	sqlproto "github.com/tx7do/kratos-cli/sql-proto"
-
-	"github.com/tx7do/kratos-cli/sql-kratos/internal"
 )
 
-func Generate(ctx context.Context, opts internal.GeneratorOptions) error {
+func Generate(ctx context.Context, opts GeneratorOptions) error {
 	var err error
 
 	var tables sqlproto.TableDataArray
@@ -54,7 +53,7 @@ func Generate(ctx context.Context, opts internal.GeneratorOptions) error {
 
 	// 生成data层代码
 	if opts.GenerateData {
-		dataPackagePath := fmt.Sprintf("%s/app/%s/service/internal/", opts.OutputPath, opts.ModuleName)
+		dataPackagePath := fmt.Sprintf("%s/app/%s/service/internal/data", opts.OutputPath, opts.ModuleName)
 		if err = generateDataPackageCode(
 			dataPackagePath,
 			opts.OrmType,
@@ -115,7 +114,7 @@ func Generate(ctx context.Context, opts internal.GeneratorOptions) error {
 }
 
 // generateProtobufCode generates the Protobuf code from the database schema.
-func generateProtobufCode(ctx context.Context, opts internal.GeneratorOptions) (sqlproto.TableDataArray, error) {
+func generateProtobufCode(ctx context.Context, opts GeneratorOptions) (sqlproto.TableDataArray, error) {
 	var err error
 	var tables sqlproto.TableDataArray
 
@@ -148,7 +147,7 @@ func generateProtobufCode(ctx context.Context, opts internal.GeneratorOptions) (
 // generateOrmCode generates the ORM code based on the specified ORM type.
 func generateOrmCode(
 	ctx context.Context,
-	opts internal.GeneratorOptions,
+	opts GeneratorOptions,
 	serviceRootPath string,
 ) error {
 	var err error
@@ -246,7 +245,7 @@ func generateDataPackageCode(
 		return nil
 	}
 
-	var dataFields []DataField
+	var dataFields []generators.DataField
 	for _, table := range tables {
 		if len(table.Fields) == 0 {
 			continue
@@ -254,13 +253,13 @@ func generateDataPackageCode(
 
 		name := inflection.Singular(table.Name)
 
-		dataFields = make([]DataField, 0)
+		dataFields = make([]generators.DataField, 0)
 		for _, field := range table.Fields {
 			if field.Type == "" {
 				continue
 			}
 
-			dataField := DataField{
+			dataField := generators.DataField{
 				Name: field.Name,
 				Type: field.Type,
 				//Null:    field.Null,

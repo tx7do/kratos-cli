@@ -1,4 +1,4 @@
-package internal
+package sqlkratos
 
 type (
 	GeneratorOptions struct {

@@ -1,4 +1,4 @@
-﻿package generators
+package generators
 
 import (
 	"context"
@@ -174,7 +174,7 @@ func TestGoGenerator_Template_GrpcServiceProto(t *testing.T) {
 			"Package":   "user.service.v1",
 			"Model":     "user",
 			"ModelName": "用户",
-			"Fields": []ProtoFieldData{
+			"Fields": []ProtoField{
 				{Name: "id", Type: "int64", Comment: "用户ID", Number: 1},
 				{Name: "name", Type: "string", Comment: "用户名", Number: 2},
 				{Name: "email", Type: "string", Comment: "用户邮箱", Number: 3},

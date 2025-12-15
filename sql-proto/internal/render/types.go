@@ -8,7 +8,7 @@ import (
 	"github.com/tx7do/kratos-cli/generators"
 )
 
-type ProtoFieldArray []generators.ProtoFieldData
+type ProtoFieldArray []generators.ProtoField
 
 type GrpcProtoTemplateData struct {
 	Name    string // Proto文件名
