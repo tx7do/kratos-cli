@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/pflag"
 
 	sqlkratos "github.com/tx7do/kratos-cli/sql-kratos"
-	"github.com/tx7do/kratos-cli/sql-kratos/internal"
 )
 
 var rootCmd = &cobra.Command{
@@ -19,7 +18,7 @@ var rootCmd = &cobra.Command{
 	Run:   command,
 }
 
-var opts internal.GeneratorOptions
+var opts sqlkratos.GeneratorOptions
 
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&opts.Source, "dsn", "n", "", `Data source name (connection information), for example:
