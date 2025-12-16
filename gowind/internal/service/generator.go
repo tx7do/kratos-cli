@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -15,13 +14,32 @@ import (
 	"github.com/tx7do/kratos-cli/gowind/internal/pkg"
 )
 
-func Generate(_ context.Context, opts GeneratorOptions) error {
+func Generate(ctx context.Context, opts GeneratorOptions) error {
+	g := NewGenerator()
+	return g.Generate(ctx, opts)
+}
+
+type Generator struct {
+	goGenerator       *generators.GoGenerator
+	yamlGenerator     *generators.YamlGenerator
+	makefileGenerator *generators.MakefileGenerator
+}
+
+func NewGenerator() *Generator {
+	return &Generator{
+		goGenerator:       generators.NewGoGenerator(),
+		yamlGenerator:     generators.NewYamlGenerator(),
+		makefileGenerator: generators.NewMakefileGenerator(),
+	}
+}
+
+func (g *Generator) Generate(_ context.Context, opts GeneratorOptions) error {
 	var err error
 
 	// 生成server层代码
 	if opts.GenerateServer {
 		serverPackagePath := filepath.Join(opts.OutputPath, "/app/", opts.ServiceName, "/service/internal/server")
-		if err = generateServerPackageCode(
+		if err = g.generateServerPackageCode(
 			serverPackagePath,
 			opts.ProjectModule,
 			opts.ServiceName,
@@ -34,7 +52,7 @@ func Generate(_ context.Context, opts GeneratorOptions) error {
 	// 生成service层代码
 	if opts.GenerateService {
 		servicePackagePath := filepath.Join(opts.OutputPath, "/app/", opts.ServiceName, "/service/internal/service")
-		if err = generateServicePackageCode(
+		if err = g.generateServicePackageCode(
 			servicePackagePath,
 			opts.ProjectModule,
 			opts.ServiceName,
@@ -47,7 +65,7 @@ func Generate(_ context.Context, opts GeneratorOptions) error {
 	// 生成data层代码
 	if opts.GenerateData {
 		dataPackagePath := filepath.Join(opts.OutputPath, "/app/", opts.ServiceName, "/service/internal/data")
-		if err = generateDataPackageCode(
+		if err = g.generateDataPackageCode(
 			dataPackagePath,
 			opts.ProjectModule,
 			opts.ProjectName,
@@ -62,7 +80,7 @@ func Generate(_ context.Context, opts GeneratorOptions) error {
 	// 生成main包代码
 	if opts.GenerateMain {
 		mainPackagePath := filepath.Join(opts.OutputPath, "/app/", opts.ServiceName, "/service/cmd/server")
-		if err = generateMainPackageCode(
+		if err = g.generateMainPackageCode(
 			mainPackagePath,
 			opts.ProjectModule,
 			opts.ServiceName,
@@ -75,7 +93,7 @@ func Generate(_ context.Context, opts GeneratorOptions) error {
 	// 生成Makefile
 	if opts.GenerateMakefile {
 		makefilePath := filepath.Join(opts.OutputPath, "/app/", opts.ServiceName, "/service")
-		if err = writeMakefile(makefilePath); err != nil {
+		if err = g.writeMakefile(makefilePath); err != nil {
 			return err
 		}
 	}
@@ -83,7 +101,7 @@ func Generate(_ context.Context, opts GeneratorOptions) error {
 	// 生成configs
 	if opts.GenerateConfigs {
 		configsPath := filepath.Join(opts.OutputPath, "/app/", opts.ServiceName, "/service/configs")
-		if err = writeConfigs(configsPath); err != nil {
+		if err = g.writeConfigs(configsPath); err != nil {
 			return err
 		}
 	}
@@ -91,7 +109,7 @@ func Generate(_ context.Context, opts GeneratorOptions) error {
 	// 追加服务名称常量定义
 	{
 		servicePackagePath := filepath.Join(opts.OutputPath, "/pkg/service")
-		if err = appendServiceName(
+		if err = g.appendServiceName(
 			servicePackagePath,
 			opts.ProjectName,
 			opts.ServiceName,
@@ -104,7 +122,7 @@ func Generate(_ context.Context, opts GeneratorOptions) error {
 	// 生成assets包代码
 	if opts.HasBFFService() {
 		assetsPath := filepath.Join(opts.OutputPath, "/app/", opts.ServiceName, "/service/cmd/server/assets")
-		if err = writeAssets(assetsPath); err != nil {
+		if err = g.writeAssets(assetsPath); err != nil {
 			return err
 		}
 	}
@@ -112,13 +130,12 @@ func Generate(_ context.Context, opts GeneratorOptions) error {
 	return nil
 }
 
-func generateServerPackageCode(
+func (g *Generator) generateServerPackageCode(
 	outputPath string,
 	projectModule string,
 	serviceName string,
 	servers []string,
 ) error {
-	g := generators.NewGoGenerator()
 	for _, server := range servers {
 		switch strings.ToLower(server) {
 		case "grpc":
@@ -129,7 +146,7 @@ func generateServerPackageCode(
 					"Service": serviceName,
 				},
 			}
-			if _, err := g.GenerateGrpcServer(context.Background(), o); err != nil {
+			if _, err := g.goGenerator.GenerateGrpcServer(context.Background(), o); err != nil {
 				return err
 			}
 		case "rest":
@@ -140,25 +157,25 @@ func generateServerPackageCode(
 					"Service": serviceName,
 				},
 			}
-			if _, err := g.GenerateRestServer(context.Background(), o); err != nil {
+			if _, err := g.goGenerator.GenerateRestServer(context.Background(), o); err != nil {
 				return err
 			}
 		}
 	}
 
-	return writeInitWireCode(outputPath, "server", "Server", servers)
+	return g.writeWireSetCode(outputPath, projectModule, serviceName, "server", "Server", servers)
 }
 
-func generateServicePackageCode(
+func (g *Generator) generateServicePackageCode(
 	outputPath string,
 	projectName string,
 	serviceName string,
 	services []string,
 ) error {
-	return writeInitWireCode(outputPath, "service", "Service", services)
+	return g.writeWireSetCode(outputPath, projectName, serviceName, "service", "Service", services)
 }
 
-func generateDataPackageCode(
+func (g *Generator) generateDataPackageCode(
 	outputPath string,
 	projectModule string,
 	projectName string,
@@ -166,8 +183,6 @@ func generateDataPackageCode(
 	dbClients []string,
 	repos []string,
 ) error {
-	g := generators.NewGoGenerator()
-
 	o := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectModule,
@@ -187,7 +202,7 @@ func generateDataPackageCode(
 		}
 	}
 
-	if _, err := g.GenerateData(context.Background(), o); err != nil {
+	if _, err := g.goGenerator.GenerateData(context.Background(), o); err != nil {
 		return err
 	}
 
@@ -200,15 +215,14 @@ func generateDataPackageCode(
 		functions = append(functions, fmt.Sprintf("New%sClient", stringcase.UpperCamelCase(dbClient)))
 	}
 	//fmt.Printf("functions: %v\n", functions)
-	return writeInitWireFunctionCode(outputPath, "data", functions)
+	return g.writeWireSetFunctionCode(outputPath, projectModule, serviceName, "data", functions)
 }
 
-func generateMainPackageCode(
+func (g *Generator) generateMainPackageCode(
 	outputPath string,
 	moduleName string, serviceName string,
 	servers []string,
 ) error {
-	g := generators.NewGoGenerator()
 	opts := code_generator.Options{
 		OutDir: outputPath,
 		Module: moduleName,
@@ -220,160 +234,67 @@ func generateMainPackageCode(
 		},
 	}
 
-	_, err := g.GenerateMain(context.Background(), opts)
+	_, err := g.goGenerator.GenerateMain(context.Background(), opts)
 	if err != nil {
 		return err
 	}
 
-	return writeWireCode(
+	return g.writeWireCode(
 		outputPath,
 		moduleName, serviceName,
 	)
 }
 
 // writeMakefile 生成默认的 Makefile 到指定目录。
-func writeMakefile(outputPath string) error {
-	outputPath = outputPath + "/"
+func (g *Generator) writeMakefile(outputPath string) error {
 	outputPath = filepath.Clean(outputPath)
 	if err := os.MkdirAll(outputPath, os.ModePerm); err != nil {
 		return err
 	}
 
-	makefilePath := path.Join(outputPath, "Makefile")
-	makefilePath = filepath.Clean(makefilePath)
-
-	const makefileContent string = `include ../../../app.mk`
-	if !pkg.IsFileExists(makefilePath) {
-		if err := os.WriteFile(makefilePath, []byte(makefileContent), 0644); err != nil {
-			return fmt.Errorf("write Makefile: %w", err)
-		}
+	if _, err := g.makefileGenerator.GenerateAppMakefile(context.Background(), code_generator.Options{
+		OutDir: outputPath,
+	}); err != nil {
+		return err
 	}
 
 	return nil
 }
 
 // writeConfigs 生成默认的配置文件到指定目录。
-func writeConfigs(outputPath string) error {
-	const dataYaml string = `data:
-  database:
-    driver: "postgres"
-    source: "host=postgres port=5432 user=postgres password=<your_password> dbname=<your_database> sslmode=disable"
-#    driver: "mysql"
-#    source: "root:<you_password>@tcp(localhost:3306)/<your_database>?parseTime=true&charset=utf8mb4&loc=Asia%2FShanghai"
-    migrate: true
-    debug: false
-    enable_trace: false
-    enable_metrics: false
-    max_idle_connections: 25
-    max_open_connections: 25
-    connection_max_lifetime: 300s
+func (g *Generator) writeConfigs(outputPath string) error {
+	ctx := context.Background()
+	var err error
 
-  redis:
-    addr: "redis:6379"
-    password: "<your_password>"
-    dial_timeout: 10s
-    read_timeout: 0.4s
-    write_timeout: 0.6s
-`
-
-	const serverYaml string = `server:
-  grpc:
-    addr: "0.0.0.0:0"
-    timeout: 120s
-    middleware:
-      enable_logging: true
-      enable_recovery: true
-      enable_tracing: true
-      enable_validate: true
-      enable_circuit_breaker: true
-      enable_metadata: true
-`
-
-	const loggerYaml string = `logger:
-  type: std # Options: std, file, fluent, zap, logrus, aliyun, tencent
-
-  fluent:
-    endpoint: "tcp://localhost:24224"
-
-  zap:
-    level: "debug"
-    filename: "./logs/info.log"
-    max_size: 1
-    max_age: 30
-    max_backups: 5
-
-  logrus:
-    level: "debug"
-    formatter: "text"
-    timestamp_format: "2006-01-02 15:04:05"
-    disable_colors: false
-    disable_timestamp: false
-
-  aliyun:
-    endpoint: ""
-    project: ""
-    access_key: "<access_key>"
-    access_secret: "<access_secret>"
-
-  tencent:
-    endpoint: ""
-    topic_id:
-    access_key: "<access_key>"
-    access_secret: "<access_secret>"
-`
-
-	const clientYaml string = `client:
-  grpc:
-    timeout: 10s
-    middleware:
-      enable_logging: true
-      enable_recovery: true
-      enable_tracing: true
-      enable_validate: true
-      enable_circuit_breaker: true
-      enable_metadata: true
-      auth:
-        method: "HS256"
-        key: "<some_api_key>"
-`
-
-	if err := os.MkdirAll(outputPath, os.ModePerm); err != nil {
-		return fmt.Errorf("create configs dir: %w", err)
+	if _, err = g.yamlGenerator.GenerateServerYaml(ctx, code_generator.Options{
+		OutDir: outputPath,
+	}); err != nil {
+		return err
 	}
 
-	serverYamlFile := filepath.Join(outputPath, "server.yaml")
-	if !pkg.IsFileExists(serverYamlFile) {
-		if err := os.WriteFile(serverYamlFile, []byte(serverYaml), 0644); err != nil {
-			return fmt.Errorf("write server.yaml file: %w", err)
-		}
+	if _, err = g.yamlGenerator.GenerateClientYaml(ctx, code_generator.Options{
+		OutDir: outputPath,
+	}); err != nil {
+		return err
 	}
 
-	dataYamlFile := filepath.Join(outputPath, "data.yaml")
-	if !pkg.IsFileExists(dataYamlFile) {
-		if err := os.WriteFile(dataYamlFile, []byte(dataYaml), 0644); err != nil {
-			return fmt.Errorf("write data.yaml file: %w", err)
-		}
+	if _, err = g.yamlGenerator.GenerateDataYaml(ctx, code_generator.Options{
+		OutDir: outputPath,
+	}); err != nil {
+		return err
 	}
 
-	loggerYamlFile := filepath.Join(outputPath, "logger.yaml")
-	if !pkg.IsFileExists(loggerYamlFile) {
-		if err := os.WriteFile(loggerYamlFile, []byte(loggerYaml), 0644); err != nil {
-			return fmt.Errorf("write logger.yaml file: %w", err)
-		}
-	}
-
-	clientYamlFile := filepath.Join(outputPath, "client.yaml")
-	if !pkg.IsFileExists(clientYamlFile) {
-		if err := os.WriteFile(clientYamlFile, []byte(clientYaml), 0644); err != nil {
-			return fmt.Errorf("write client.yaml file: %w", err)
-		}
+	if _, err = g.yamlGenerator.GenerateLoggerYaml(ctx, code_generator.Options{
+		OutDir: outputPath,
+	}); err != nil {
+		return err
 	}
 
 	return nil
 }
 
 // appendServiceName 向 pkg/service/name.go 文件追加服务名称常量定义。
-func appendServiceName(outputPath string, projectName, serviceName string, isBff bool) error {
+func (g *Generator) appendServiceName(outputPath string, projectName, serviceName string, isBff bool) error {
 	if err := os.MkdirAll(outputPath, os.ModePerm); err != nil {
 		return fmt.Errorf("create pkg/service dir: %w", err)
 	}
@@ -438,29 +359,24 @@ func appendServiceName(outputPath string, projectName, serviceName string, isBff
 }
 
 // writeAssets 生成 assets 包代码到指定目录。
-func writeAssets(outputPath string) error {
+func (g *Generator) writeAssets(outputPath string) error {
 	if err := os.MkdirAll(outputPath, os.ModePerm); err != nil {
 		return fmt.Errorf("create assets dir: %w", err)
 	}
 
-	assetsPath := filepath.Join(outputPath, "assets.go")
-
-	content := `package assets
-
-import _ "embed"
-
-//go:embed openapi.yaml
-var OpenApiData []byte
-`
-	if err := os.WriteFile(assetsPath, []byte(content), 0644); err != nil {
-		return fmt.Errorf("write assets.go file: %w", err)
+	if _, err := g.goGenerator.GenerateAssets(context.Background(), code_generator.Options{
+		OutDir: outputPath,
+	}); err != nil {
+		return err
 	}
 
 	return nil
 }
 
-func writeInitWireCode(
+func (g *Generator) writeWireSetCode(
 	outputPath string,
+	projectModule string,
+	serviceName string,
 	packageName string,
 	postfix string,
 	services []string,
@@ -471,41 +387,44 @@ func writeInitWireCode(
 		newFunctions = append(newFunctions, funcName)
 	}
 
-	g := generators.NewGoGenerator()
 	opts := code_generator.Options{
-		OutDir: outputPath,
+		OutDir: filepath.Join(outputPath, "providers"),
+		Module: projectModule,
 		Vars: map[string]interface{}{
+			"Service":      serviceName,
 			"Package":      packageName,
 			"NewFunctions": newFunctions,
 		},
 	}
-	_, err := g.GenerateInit(context.Background(), opts)
+	_, err := g.goGenerator.GenerateWireSet(context.Background(), opts)
 	return err
 }
 
-func writeInitWireFunctionCode(
+func (g *Generator) writeWireSetFunctionCode(
 	outputPath string,
+	projectModule string,
+	serviceName string,
 	packageName string,
 	functions []string,
 ) error {
-	g := generators.NewGoGenerator()
 	opts := code_generator.Options{
-		OutDir: outputPath,
+		OutDir: filepath.Join(outputPath, "providers"),
+		Module: projectModule,
 		Vars: map[string]interface{}{
+			"Service":      serviceName,
 			"Package":      packageName,
 			"NewFunctions": functions,
 		},
 	}
-	_, err := g.GenerateInit(context.Background(), opts)
+	_, err := g.goGenerator.GenerateWireSet(context.Background(), opts)
 	return err
 }
 
-func writeWireCode(
+func (g *Generator) writeWireCode(
 	outputPath string,
 	projectName string,
 	serviceName string,
 ) error {
-	g := generators.NewGoGenerator()
 	opts := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectName,
@@ -513,6 +432,6 @@ func writeWireCode(
 			"Service": serviceName,
 		},
 	}
-	_, err := g.GenerateWire(context.Background(), opts)
+	_, err := g.goGenerator.GenerateWire(context.Background(), opts)
 	return err
 }

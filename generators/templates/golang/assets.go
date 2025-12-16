@@ -16,6 +16,7 @@ var TemplateMap = map[string][]byte{
 	"ent_repo.tpl":     EntRepoTemplate,
 	"gorm_repo.tpl":    GormRepoTemplate,
 	"service.tpl":      ServiceTemplate,
+	"assets.tpl":       AssetsTemplate,
 }
 
 //go:embed main.tpl
@@ -56,3 +57,6 @@ var GormRepoTemplate []byte
 
 //go:embed service.tpl
 var ServiceTemplate []byte
+
+//go:embed assets.tpl
+var AssetsTemplate []byte

@@ -29,27 +29,33 @@ func TestGenerate(t *testing.T) {
 }
 
 func TestAppendServiceName(t *testing.T) {
+	g := NewGenerator()
+
 	//names := []string{"user", "order"}
-	err := appendServiceName("./", "test", "user", false)
+	err := g.appendServiceName("./", "test", "user", false)
 	assert.Nil(t, err)
 
-	err = appendServiceName("./", "test", "order", false)
+	err = g.appendServiceName("./", "test", "order", false)
 	assert.Nil(t, err)
 
-	err = appendServiceName("./", "test", "admin", true)
+	err = g.appendServiceName("./", "test", "admin", true)
 	assert.Nil(t, err)
 
-	err = appendServiceName("./", "test", "front", true)
+	err = g.appendServiceName("./", "test", "front", true)
 	assert.Nil(t, err)
 }
 
 func TestWriteMakefile(t *testing.T) {
-	err := writeMakefile("./")
+	g := NewGenerator()
+
+	err := g.writeMakefile("./")
 	assert.Nil(t, err)
 }
 
 func TestWriteConfigs(t *testing.T) {
-	err := writeConfigs("./configs")
+	g := NewGenerator()
+
+	err := g.writeConfigs("./configs")
 	assert.Nil(t, err)
 }
 

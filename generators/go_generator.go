@@ -244,3 +244,13 @@ func (g *GoGenerator) GenerateService(ctx context.Context, opts code_generator.O
 
 	return g.Generate(ctx, opts, "service.tpl")
 }
+
+func (g *GoGenerator) GenerateAssets(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+	if g.CodeGenerator == nil {
+		return "", os.ErrInvalid
+	}
+
+	opts.OutputName = "assets.go"
+
+	return g.Generate(ctx, opts, "assets.tpl")
+}
