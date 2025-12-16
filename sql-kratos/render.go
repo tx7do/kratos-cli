@@ -3,6 +3,7 @@ package sqlkratos
 import (
 	"context"
 	"errors"
+	"path/filepath"
 	"strings"
 
 	"github.com/tx7do/go-utils/code_generator"
@@ -10,7 +11,7 @@ import (
 	"github.com/tx7do/kratos-cli/generators"
 )
 
-func WriteDataPackageCode(
+func (g *Generator) WriteDataPackageCode(
 	outputPath string,
 	orm string,
 	projectName string,
@@ -35,29 +36,27 @@ func WriteDataPackageCode(
 
 	switch strings.TrimSpace(strings.ToLower(orm)) {
 	case "ent":
-		if err := writeEntClientCode(outputPath, projectName, serviceName); err != nil {
+		if err := g.writeEntClientCode(outputPath, projectName, serviceName); err != nil {
 			return err
 		}
-		return writeEntRepoCode(outputPath, projectName, serviceName, name, moduleName, moduleVersion, copyDataFields)
+		return g.writeEntRepoCode(outputPath, projectName, serviceName, name, moduleName, moduleVersion, copyDataFields)
 
 	case "gorm":
-		if err := writeGormClientCode(outputPath, projectName, serviceName); err != nil {
+		if err := g.writeGormClientCode(outputPath, projectName, serviceName); err != nil {
 			return err
 		}
-		return writeGormRepoCode(outputPath, projectName, serviceName, name, moduleName, moduleVersion, copyDataFields)
+		return g.writeGormRepoCode(outputPath, projectName, serviceName, name, moduleName, moduleVersion, copyDataFields)
 
 	default:
 		return errors.New("sqlproto: unsupported orm: " + orm)
 	}
 }
 
-func writeEntClientCode(
+func (g *Generator) writeEntClientCode(
 	outputPath string,
 	projectModule string,
 	serviceName string,
 ) error {
-	g := generators.NewGoGenerator()
-
 	opts := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectModule,
@@ -66,17 +65,15 @@ func writeEntClientCode(
 		},
 	}
 
-	_, err := g.GenerateEntClient(context.Background(), opts)
+	_, err := g.goGenerator.GenerateEntClient(context.Background(), opts)
 	return err
 }
 
-func writeGormClientCode(
+func (g *Generator) writeGormClientCode(
 	outputPath string,
 	projectModule string,
 	serviceName string,
 ) error {
-	g := generators.NewGoGenerator()
-
 	opts1 := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectModule,
@@ -84,7 +81,7 @@ func writeGormClientCode(
 			"Service": serviceName,
 		},
 	}
-	_, err := g.GenerateGormClient(context.Background(), opts1)
+	_, err := g.goGenerator.GenerateGormClient(context.Background(), opts1)
 	if err != nil {
 		return err
 	}
@@ -96,7 +93,7 @@ func writeGormClientCode(
 			"Service": serviceName,
 		},
 	}
-	_, err = g.GenerateGormInit(context.Background(), opts2)
+	_, err = g.goGenerator.GenerateGormInit(context.Background(), opts2)
 	if err != nil {
 		return err
 	}
@@ -104,7 +101,7 @@ func writeGormClientCode(
 	return nil
 }
 
-func writeEntRepoCode(
+func (g *Generator) writeEntRepoCode(
 	outputPath string,
 	projectModule string,
 	serviceName string,
@@ -113,8 +110,6 @@ func writeEntRepoCode(
 	apiPackageVersion string,
 	fields generators.DataFieldArray,
 ) error {
-	g := generators.NewGoGenerator()
-
 	opts := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectModule,
@@ -126,11 +121,11 @@ func writeEntRepoCode(
 		},
 	}
 
-	_, err := g.GenerateEntRepo(context.Background(), opts)
+	_, err := g.goGenerator.GenerateEntRepo(context.Background(), opts)
 	return err
 }
 
-func writeGormRepoCode(
+func (g *Generator) writeGormRepoCode(
 	outputPath string,
 	projectModule string,
 	serviceName string,
@@ -139,8 +134,6 @@ func writeGormRepoCode(
 	apiPackageVersion string,
 	fields generators.DataFieldArray,
 ) error {
-	g := generators.NewGoGenerator()
-
 	opts := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectModule,
@@ -152,11 +145,11 @@ func writeGormRepoCode(
 		},
 	}
 
-	_, err := g.GenerateGormRepo(context.Background(), opts)
+	_, err := g.goGenerator.GenerateGormRepo(context.Background(), opts)
 	return err
 }
 
-func WriteServicePackageCode(
+func (g *Generator) WriteServicePackageCode(
 	outputPath string,
 	projectName string,
 	serviceName string,
@@ -164,8 +157,6 @@ func WriteServicePackageCode(
 	targetModuleName, sourceModuleName, moduleVersion string,
 	useRepo, isGrpcService bool,
 ) error {
-	g := generators.NewGoGenerator()
-
 	o := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectName,
@@ -183,22 +174,20 @@ func WriteServicePackageCode(
 		},
 	}
 
-	if _, err := g.GenerateService(context.Background(), o); err != nil {
+	if _, err := g.goGenerator.GenerateService(context.Background(), o); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func WriteServerPackageCode(
+func (g *Generator) WriteServerPackageCode(
 	outputPath string,
 	projectName string,
 	serviceType string,
 	serviceName string,
 	services map[string]string,
 ) error {
-	g := generators.NewGoGenerator()
-
 	switch strings.ToLower(serviceType) {
 	case "grpc":
 		o := code_generator.Options{
@@ -209,7 +198,7 @@ func WriteServerPackageCode(
 				"Services": services,
 			},
 		}
-		if _, err := g.GenerateGrpcServer(context.Background(), o); err != nil {
+		if _, err := g.goGenerator.GenerateGrpcServer(context.Background(), o); err != nil {
 			return err
 		}
 
@@ -222,7 +211,7 @@ func WriteServerPackageCode(
 				"Services": services,
 			},
 		}
-		if _, err := g.GenerateRestServer(context.Background(), o); err != nil {
+		if _, err := g.goGenerator.GenerateRestServer(context.Background(), o); err != nil {
 			return err
 		}
 
@@ -233,15 +222,14 @@ func WriteServerPackageCode(
 	return nil
 }
 
-func WriteInitWireCode(
+func (g *Generator) WriteWireSetCode(
 	outputPath string,
-
+	projectModule string,
+	serviceName string,
 	packageName string,
 	postfix string,
 	services []string,
 ) error {
-	g := generators.NewGoGenerator()
-
 	var newFunctions []string
 	for _, service := range services {
 		newFunction := "New" + stringcase.UpperCamelCase(service) + postfix
@@ -249,23 +237,24 @@ func WriteInitWireCode(
 	}
 
 	opts := code_generator.Options{
-		OutDir: outputPath,
+		OutDir: filepath.Join(outputPath, "providers"),
+		Module: projectModule,
 		Vars: map[string]interface{}{
+			"Service":      serviceName,
 			"Package":      packageName,
 			"NewFunctions": newFunctions,
 		},
 	}
-	_, err := g.GenerateInit(context.Background(), opts)
+	_, err := g.goGenerator.GenerateWireSet(context.Background(), opts)
 	return err
 }
 
-func WriteWireCode(
+func (g *Generator) WriteWireCode(
 	outputPath string,
 
 	projectName string,
 	serviceName string,
 ) error {
-	g := generators.NewGoGenerator()
 	opts := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectName,
@@ -273,11 +262,11 @@ func WriteWireCode(
 			"Service": serviceName,
 		},
 	}
-	_, err := g.GenerateWire(context.Background(), opts)
+	_, err := g.goGenerator.GenerateWire(context.Background(), opts)
 	return err
 }
 
-func WriteMainCode(
+func (g *Generator) WriteMainCode(
 	outputPath string,
 
 	projectName string,
@@ -285,8 +274,6 @@ func WriteMainCode(
 
 	servers []string,
 ) error {
-	g := generators.NewGoGenerator()
-
 	opts := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectName,
@@ -298,6 +285,6 @@ func WriteMainCode(
 		},
 	}
 
-	_, err := g.GenerateMain(context.Background(), opts)
+	_, err := g.goGenerator.GenerateMain(context.Background(), opts)
 	return err
 }

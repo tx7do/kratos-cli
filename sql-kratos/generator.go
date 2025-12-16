@@ -13,12 +13,33 @@ import (
 )
 
 func Generate(ctx context.Context, opts GeneratorOptions) error {
+	g := NewGenerator()
+	return g.Generate(ctx, opts)
+}
+
+type Generator struct {
+	goGenerator       *generators.GoGenerator
+	yamlGenerator     *generators.YamlGenerator
+	makefileGenerator *generators.MakefileGenerator
+	protoGenerator    *generators.ProtoGenerator
+}
+
+func NewGenerator() *Generator {
+	return &Generator{
+		goGenerator:       generators.NewGoGenerator(),
+		yamlGenerator:     generators.NewYamlGenerator(),
+		makefileGenerator: generators.NewMakefileGenerator(),
+		protoGenerator:    generators.NewProtoGenerator(),
+	}
+}
+
+func (g *Generator) Generate(ctx context.Context, opts GeneratorOptions) error {
 	var err error
 
 	var tables sqlproto.TableDataArray
 
 	// 生成 Protobuf schema
-	if tables, err = generateProtobufCode(ctx, opts); err != nil {
+	if tables, err = g.generateProtobufCode(ctx, opts); err != nil {
 		return err
 	}
 
@@ -46,7 +67,7 @@ func Generate(ctx context.Context, opts GeneratorOptions) error {
 	// 生成ORM代码
 	if opts.GenerateORM {
 		dataPackagePath := fmt.Sprintf("%s/app/%s/service/internal/", opts.OutputPath, opts.ModuleName)
-		if err = generateOrmCode(ctx, opts, dataPackagePath); err != nil {
+		if err = g.generateOrmCode(ctx, opts, dataPackagePath); err != nil {
 			return err
 		}
 	}
@@ -54,7 +75,7 @@ func Generate(ctx context.Context, opts GeneratorOptions) error {
 	// 生成data层代码
 	if opts.GenerateData {
 		dataPackagePath := fmt.Sprintf("%s/app/%s/service/internal/data", opts.OutputPath, opts.ModuleName)
-		if err = generateDataPackageCode(
+		if err = g.generateDataPackageCode(
 			dataPackagePath,
 			opts.OrmType,
 			opts.ProjectName,
@@ -70,7 +91,7 @@ func Generate(ctx context.Context, opts GeneratorOptions) error {
 	// 生成service层代码
 	if opts.GenerateService {
 		servicePackagePath := fmt.Sprintf("%s/app/%s/service/internal/", opts.OutputPath, opts.ModuleName)
-		if err = generateServicePackageCode(
+		if err = g.generateServicePackageCode(
 			servicePackagePath,
 			opts.ProjectName,
 			opts.ServiceName,
@@ -86,7 +107,7 @@ func Generate(ctx context.Context, opts GeneratorOptions) error {
 	// 生成server层代码
 	if opts.GenerateServer {
 		serverPackagePath := fmt.Sprintf("%s/app/%s/service/internal/", opts.OutputPath, opts.ModuleName)
-		if err = generateServerPackageCode(
+		if err = g.generateServerPackageCode(
 			serverPackagePath,
 			opts.ProjectName,
 			opts.ServiceName,
@@ -100,7 +121,7 @@ func Generate(ctx context.Context, opts GeneratorOptions) error {
 	// 生成main包代码
 	if opts.GenerateMain {
 		mainPackagePath := fmt.Sprintf("%s/app/%s/service/cmd/server", opts.OutputPath, opts.ModuleName)
-		if err = generateMainPackageCode(
+		if err = g.generateMainPackageCode(
 			mainPackagePath,
 			opts.ProjectName,
 			opts.ServiceName,
@@ -114,7 +135,7 @@ func Generate(ctx context.Context, opts GeneratorOptions) error {
 }
 
 // generateProtobufCode generates the Protobuf code from the database schema.
-func generateProtobufCode(ctx context.Context, opts GeneratorOptions) (sqlproto.TableDataArray, error) {
+func (g *Generator) generateProtobufCode(ctx context.Context, opts GeneratorOptions) (sqlproto.TableDataArray, error) {
 	var err error
 	var tables sqlproto.TableDataArray
 
@@ -145,7 +166,7 @@ func generateProtobufCode(ctx context.Context, opts GeneratorOptions) (sqlproto.
 }
 
 // generateOrmCode generates the ORM code based on the specified ORM type.
-func generateOrmCode(
+func (g *Generator) generateOrmCode(
 	ctx context.Context,
 	opts GeneratorOptions,
 	serviceRootPath string,
@@ -182,16 +203,15 @@ func generateOrmCode(
 	return nil
 }
 
-func generateServerPackageCode(
+func (g *Generator) generateServerPackageCode(
 	outputPath string,
 	projectName string,
 	serviceName string,
 	servicePackageMap map[string]string,
 	servers []string,
 ) error {
-
 	for _, server := range servers {
-		if err := WriteServerPackageCode(
+		if err := g.WriteServerPackageCode(
 			outputPath,
 			projectName, server, serviceName,
 			servicePackageMap,
@@ -200,10 +220,10 @@ func generateServerPackageCode(
 		}
 	}
 
-	return WriteInitWireCode(outputPath, "server", "Server", servers)
+	return g.WriteWireSetCode(outputPath, projectName, serviceName, "server", "Server", servers)
 }
 
-func generateServicePackageCode(
+func (g *Generator) generateServicePackageCode(
 	outputPath string,
 	projectName, serviceName string,
 	targetModuleName, sourceModuleName, moduleVersion string,
@@ -219,7 +239,7 @@ func generateServicePackageCode(
 
 		name := inflection.Singular(table.Name)
 
-		if err := WriteServicePackageCode(
+		if err := g.WriteServicePackageCode(
 			outputPath,
 			projectName, serviceName,
 			name,
@@ -230,10 +250,10 @@ func generateServicePackageCode(
 		}
 	}
 
-	return WriteInitWireCode(outputPath, "service", "Service", services)
+	return g.WriteWireSetCode(outputPath, projectName, serviceName, "service", "Service", services)
 }
 
-func generateDataPackageCode(
+func (g *Generator) generateDataPackageCode(
 	outputPath string,
 	orm string,
 	projectName string, serviceName string,
@@ -268,7 +288,7 @@ func generateDataPackageCode(
 			dataFields = append(dataFields, dataField)
 		}
 
-		if err := WriteDataPackageCode(
+		if err := g.WriteDataPackageCode(
 			outputPath,
 			orm,
 			projectName, serviceName, name,
@@ -279,17 +299,17 @@ func generateDataPackageCode(
 		}
 	}
 
-	return WriteInitWireCode(outputPath, "data", "Repo", services)
+	return g.WriteWireSetCode(outputPath, projectName, serviceName, "data", "Repo", services)
 }
 
-func generateMainPackageCode(
+func (g *Generator) generateMainPackageCode(
 	outputPath string,
 
 	projectName string, serviceName string,
 
 	servers []string,
 ) error {
-	if err := WriteMainCode(
+	if err := g.WriteMainCode(
 		outputPath,
 		projectName, serviceName,
 		servers,
@@ -297,7 +317,7 @@ func generateMainPackageCode(
 		return err
 	}
 
-	return WriteWireCode(
+	return g.WriteWireCode(
 		outputPath,
 		projectName, serviceName,
 	)

@@ -19,7 +19,7 @@ func WriteGrpcServiceProto(outputPath string, data GrpcProtoTemplateData) error 
 		return err
 	}
 
-	g := generators.NewGoGenerator()
+	g := generators.NewProtoGenerator()
 
 	opts := code_generator.Options{
 		OutDir: outputPath,
@@ -45,7 +45,7 @@ func WriteRestServiceProto(outputPath string, data RestProtoTemplateData) error 
 		return err
 	}
 
-	g := generators.NewGoGenerator()
+	g := generators.NewProtoGenerator()
 
 	opts := code_generator.Options{
 		OutDir: outputPath,
