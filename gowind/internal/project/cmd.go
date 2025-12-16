@@ -1,9 +1,10 @@
-﻿package project
+package project
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
@@ -37,9 +38,24 @@ const (
 	GiteeRepoURL  = "https://gitee.com/tx7do/go-wind-admin-template.git"
 )
 
+func canReach(addr string, d time.Duration) bool {
+	conn, err := net.DialTimeout("tcp", addr, d)
+	if err != nil {
+		return false
+	}
+	_ = conn.Close()
+	return true
+}
+
 func init() {
-	repoURL = GithubRepoURL
 	timeout = "60s"
+
+	// 优先使用 GitHub，若不可达则回退到 Gitee
+	if canReach("github.com:443", 3*time.Second) {
+		repoURL = GithubRepoURL
+	} else {
+		repoURL = GiteeRepoURL
+	}
 
 	CmdProject.Flags().StringVarP(&repoURL, "repo-url", "r", repoURL, "layout repo")
 	CmdProject.Flags().StringVarP(&branch, "branch", "b", branch, "repo branch")
