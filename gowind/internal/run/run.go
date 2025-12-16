@@ -24,7 +24,7 @@ var serviceName string
 
 // Run service.
 func Run(cmd *cobra.Command, args []string) {
-	cmdArgs, _ := splitArgs(cmd, args)
+	cmdArgs, _ := pkg.SplitArgs(cmd, args)
 
 	if len(cmdArgs) > 0 {
 		serviceName = strings.TrimSpace(cmdArgs[0])
@@ -40,7 +40,7 @@ func Run(cmd *cobra.Command, args []string) {
 			fmt.Printf("os.Getwd error: %v\n", err)
 		}
 
-		hasCmd, hasConfigs, err := HasCmdAndConfigs(wd)
+		hasCmd, hasConfigs, err := pkg.HasCmdAndConfigs(wd)
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
 			return
@@ -71,14 +71,6 @@ func Run(cmd *cobra.Command, args []string) {
 	if err = runService(servicePath); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
 	}
-}
-
-func splitArgs(cmd *cobra.Command, args []string) (cmdArgs, programArgs []string) {
-	dashAt := cmd.ArgsLenAtDash()
-	if dashAt >= 0 {
-		return args[:dashAt], args[dashAt:]
-	}
-	return args, []string{}
 }
 
 // runService 运行服务，使用命令: go run ./cmd/server -conf ./configs。
@@ -113,41 +105,4 @@ func runService(serviceWorkPath string) error {
 	}
 
 	return nil
-}
-
-// HasCmdAndConfigs 检查 dir（为空则使用工作目录）下是否存在 cmd 和 configs 目录。
-// 返回 (hasCmd, hasConfigs, error)。
-func HasCmdAndConfigs(dir string) (bool, bool, error) {
-	var d string
-	if len(dir) == 0 {
-		wd, err := os.Getwd()
-		if err != nil {
-			return false, false, err
-		}
-		d = wd
-	} else {
-		d = dir
-	}
-
-	hasMain := false
-	mainPath := filepath.Join(d, "cmd", "server", "main.go")
-	if fi, err := os.Stat(mainPath); err == nil {
-		if !fi.IsDir() {
-			hasMain = true
-		}
-	} else if !os.IsNotExist(err) {
-		return false, false, err
-	}
-
-	hasConfigs := false
-	configsPath := filepath.Join(d, "configs")
-	if fi, err := os.Stat(configsPath); err == nil {
-		if fi.IsDir() {
-			hasConfigs = true
-		}
-	} else if !os.IsNotExist(err) {
-		return false, false, err
-	}
-
-	return hasMain, hasConfigs, nil
 }

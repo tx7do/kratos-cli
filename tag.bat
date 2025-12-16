@@ -1,4 +1,4 @@
-git tag generators/v0.0.4 --force
+git tag generators/v0.0.5 --force
 
 git tag config-exporter/v0.0.6 --force
 

@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/spf13/cobra"
 )
 
 func kratosHome() string {
@@ -105,4 +106,49 @@ func Tree(path string, dir string) {
 		}
 		return nil
 	})
+}
+
+func SplitArgs(cmd *cobra.Command, args []string) (cmdArgs, programArgs []string) {
+	dashAt := cmd.ArgsLenAtDash()
+	if dashAt >= 0 {
+		return args[:dashAt], args[dashAt:]
+	}
+	return args, []string{}
+}
+
+// HasCmdAndConfigs 检查 dir（为空则使用工作目录）下是否存在 cmd 和 configs 目录。
+// 返回 (hasCmd, hasConfigs, error)。
+func HasCmdAndConfigs(dir string) (bool, bool, error) {
+	var d string
+	if len(dir) == 0 {
+		wd, err := os.Getwd()
+		if err != nil {
+			return false, false, err
+		}
+		d = wd
+	} else {
+		d = dir
+	}
+
+	hasMain := false
+	mainPath := filepath.Join(d, "cmd", "server", "main.go")
+	if fi, err := os.Stat(mainPath); err == nil {
+		if !fi.IsDir() {
+			hasMain = true
+		}
+	} else if !os.IsNotExist(err) {
+		return false, false, err
+	}
+
+	hasConfigs := false
+	configsPath := filepath.Join(d, "configs")
+	if fi, err := os.Stat(configsPath); err == nil {
+		if fi.IsDir() {
+			hasConfigs = true
+		}
+	} else if !os.IsNotExist(err) {
+		return false, false, err
+	}
+
+	return hasMain, hasConfigs, nil
 }

@@ -1,26 +1,35 @@
-﻿package pkg
+package pkg
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 )
 
 // GoCmd 封装 go 命令执行。
 type GoCmd struct {
-	Dir    string   // 工作目录
-	Env    []string // 额外环境变量（追加到 os.Environ()）
+	Dir     string        // 工作目录
+	Env     []string      // 额外环境变量（追加到 os.Environ()）
+	Timeout time.Duration // 若 >0，为每次执行设置超时
+
 	Stdin  io.Reader
 	Stdout io.Writer // 若为 nil，Run 会使用 os.Stdout
 	Stderr io.Writer // 若为 nil，Run 会使用 os.Stderr
 }
 
-// NewGoCmd 返回一个默认的 GoCmd。
+// NewGoCmd 返回一个默认的 GoCmd（无超时）。
 func NewGoCmd(dir string) *GoCmd {
 	return &GoCmd{Dir: dir}
+}
+
+// NewGoCmdWithTimeout 返回一个带超时的 GoCmd。
+func NewGoCmdWithTimeout(dir string, timeout time.Duration) *GoCmd {
+	return &GoCmd{Dir: dir, Timeout: timeout}
 }
 
 // prepareEnv 返回完整环境变量切片。
@@ -32,10 +41,22 @@ func (g *GoCmd) prepareEnv() []string {
 	return env
 }
 
+// makeContext 返回基于 g.Timeout 的 context。
+func (g *GoCmd) makeContext() (context.Context, context.CancelFunc) {
+	if g.Timeout > 0 {
+		return context.WithTimeout(context.Background(), g.Timeout)
+	}
+	return context.WithCancel(context.Background())
+}
+
 // Run 直接执行 go 命令，输出到 GoCmd 指定的 Stdout/Stderr（或终端）。
 func (g *GoCmd) Run(args ...string) error {
 	fmt.Printf("go %s\n", joinArgs(args))
-	cmd := exec.Command("go", args...)
+
+	ctx, cancel := g.makeContext()
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "go", args...)
 	if g.Dir != "" {
 		cmd.Dir = g.Dir
 	}
@@ -58,7 +79,10 @@ func (g *GoCmd) Run(args ...string) error {
 
 // Output 执行并返回 stdout（不包含 stderr）。
 func (g *GoCmd) Output(args ...string) ([]byte, error) {
-	cmd := exec.Command("go", args...)
+	ctx, cancel := g.makeContext()
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "go", args...)
 	if g.Dir != "" {
 		cmd.Dir = g.Dir
 	}
@@ -71,7 +95,10 @@ func (g *GoCmd) Output(args ...string) ([]byte, error) {
 
 // CombinedOutput 执行并返回 stdout+stderr。
 func (g *GoCmd) CombinedOutput(args ...string) ([]byte, error) {
-	cmd := exec.Command("go", args...)
+	ctx, cancel := g.makeContext()
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "go", args...)
 	if g.Dir != "" {
 		cmd.Dir = g.Dir
 	}
