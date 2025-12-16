@@ -2,8 +2,6 @@ module github.com/tx7do/kratos-cli/sql-proto
 
 go 1.24.6
 
-replace github.com/tx7do/kratos-cli/generators => ../generators
-
 require (
 	ariga.io/atlas v0.38.0
 	entgo.io/ent v0.14.5

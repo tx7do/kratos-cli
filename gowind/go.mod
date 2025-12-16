@@ -4,8 +4,6 @@ go 1.24.0
 
 toolchain go1.24.3
 
-replace github.com/tx7do/kratos-cli/generators => ../generators
-
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/fatih/color v1.18.0
