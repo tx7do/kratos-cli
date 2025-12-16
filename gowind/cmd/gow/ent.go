@@ -18,8 +18,8 @@ var entCmd = &cobra.Command{
 var entGenerateCmd = &cobra.Command{
 	Use:   "generate <service>",
 	Short: "generate ent code for a service",
-	Args:  cobra.MinimumNArgs(1),
-	RunE:  ent.RunGenerate,
+	//Args:  cobra.MinimumNArgs(1),
+	RunE: ent.RunGenerate,
 }
 
 var entAddCmd = &cobra.Command{

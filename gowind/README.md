@@ -53,7 +53,8 @@ gow add service admin -s rest -s grpc -d gorm -d redis
 
 ### Run The Microservice Application
 
-You can directly execute the microservice in the current path without parameters, For example you are currently in 'app/admin/service':
+You can directly execute the microservice in the current path without parameters, For example you are currently in '
+app/admin/service':
 
 ```shell
 gow run
@@ -63,4 +64,24 @@ or run a specified microservice, for example `admin` service:
 
 ```shell
 gow run admin
+```
+
+### Ent Code Generation
+
+add ent schema for a microservice, for example `admin` service:
+
+```shell
+gow ent add admin User,Group
+```
+
+generate ent code for all microservices:
+
+```shell
+gow ent generate
+```
+
+generate ent code for a specified microservice, for example `admin` service:
+
+```shell
+gow ent generate admin
 ```
