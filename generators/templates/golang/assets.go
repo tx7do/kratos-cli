@@ -2,14 +2,30 @@ package golang
 
 import _ "embed"
 
+var TemplateMap = map[string][]byte{
+	"main.tpl":         MainTemplate,
+	"wire.tpl":         WireTemplate,
+	"wire_set.tpl":     WireSetTemplate,
+	"grpc_server.tpl":  GrpcServerTemplate,
+	"rest_server.tpl":  RestServerTemplate,
+	"data.tpl":         DataTemplate,
+	"ent_client.tpl":   EntClientTemplate,
+	"gorm_client.tpl":  GormClientTemplate,
+	"gorm_init.tpl":    GormInitTemplate,
+	"redis_client.tpl": RedisClientTemplate,
+	"ent_repo.tpl":     EntRepoTemplate,
+	"gorm_repo.tpl":    GormRepoTemplate,
+	"service.tpl":      ServiceTemplate,
+}
+
 //go:embed main.tpl
 var MainTemplate []byte
 
 //go:embed wire.tpl
 var WireTemplate []byte
 
-//go:embed init.tpl
-var InitTemplate []byte
+//go:embed wire_set.tpl
+var WireSetTemplate []byte
 
 //go:embed grpc_server.tpl
 var GrpcServerTemplate []byte
@@ -32,12 +48,6 @@ var GormInitTemplate []byte
 //go:embed redis_client.tpl
 var RedisClientTemplate []byte
 
-//go:embed grpc_proto.tpl
-var GrpcProtoTemplateData []byte
-
-//go:embed rest_proto.tpl
-var RestProtoTemplateData []byte
-
 //go:embed ent_repo.tpl
 var EntRepoTemplate []byte
 
@@ -46,21 +56,3 @@ var GormRepoTemplate []byte
 
 //go:embed service.tpl
 var ServiceTemplate []byte
-
-var TemplateMap = map[string][]byte{
-	"main.tpl":         MainTemplate,
-	"wire.tpl":         WireTemplate,
-	"init.tpl":         InitTemplate,
-	"grpc_server.tpl":  GrpcServerTemplate,
-	"rest_server.tpl":  RestServerTemplate,
-	"data.tpl":         DataTemplate,
-	"ent_client.tpl":   EntClientTemplate,
-	"gorm_client.tpl":  GormClientTemplate,
-	"gorm_init.tpl":    GormInitTemplate,
-	"redis_client.tpl": RedisClientTemplate,
-	"grpc_proto.tpl":   GrpcProtoTemplateData,
-	"rest_proto.tpl":   RestProtoTemplateData,
-	"ent_repo.tpl":     EntRepoTemplate,
-	"gorm_repo.tpl":    GormRepoTemplate,
-	"service.tpl":      ServiceTemplate,
-}

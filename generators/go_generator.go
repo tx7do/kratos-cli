@@ -42,11 +42,25 @@ func (g *GoGenerator) GenerateWire(ctx context.Context, opts code_generator.Opti
 	return g.Generate(ctx, opts, "wire.tpl")
 }
 
-func (g *GoGenerator) GenerateInit(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
+func (g *GoGenerator) GenerateWireSet(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
 	if g.CodeGenerator == nil {
 		return "", os.ErrInvalid
 	}
-	return g.Generate(ctx, opts, "init.tpl")
+
+	var packageName string
+	if v, ok := opts.Vars["Package"]; ok {
+		packageName, _ = v.(string)
+	}
+
+	if _, ok := opts.Vars["NewFunctions"]; ok && packageName != "" {
+		newFunctions, _ := opts.Vars["NewFunctions"].([]string)
+		for i, fn := range newFunctions {
+			newFunctions[i] = fmt.Sprintf("%s.%s", packageName, fn)
+		}
+		opts.Vars["NewFunctions"] = newFunctions
+	}
+
+	return g.Generate(ctx, opts, "wire_set.tpl")
 }
 
 func (g *GoGenerator) GenerateData(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
@@ -127,23 +141,6 @@ func (g *GoGenerator) GenerateGormRepo(ctx context.Context, opts code_generator.
 	return g.Generate(ctx, opts, "gorm_repo.tpl")
 }
 
-func (g *GoGenerator) GenerateGrpcServiceProto(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
-	if g.CodeGenerator == nil {
-		return "", os.ErrInvalid
-	}
-
-	var modelName string
-	if v, ok := opts.Vars["Model"]; ok {
-		modelName, _ = v.(string)
-	}
-
-	if opts.OutputName == "" {
-		opts.OutputName = stringcase.ToSnakeCase(modelName) + ProtoFilePostfix
-	}
-
-	return g.Generate(ctx, opts, "grpc_proto.tpl")
-}
-
 func (g *GoGenerator) GenerateGrpcServer(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
 	if g.CodeGenerator == nil {
 		return "", os.ErrInvalid
@@ -158,23 +155,6 @@ func (g *GoGenerator) GenerateRedisClient(ctx context.Context, opts code_generat
 	}
 
 	return g.Generate(ctx, opts, "redis_client.tpl")
-}
-
-func (g *GoGenerator) GenerateRestServiceProto(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
-	if g.CodeGenerator == nil {
-		return "", os.ErrInvalid
-	}
-
-	var modelName string
-	if v, ok := opts.Vars["Model"]; ok {
-		modelName, _ = v.(string)
-	}
-
-	if opts.OutputName == "" {
-		opts.OutputName = RestProtoFilePrefix + stringcase.ToSnakeCase(modelName) + ProtoFilePostfix
-	}
-
-	return g.Generate(ctx, opts, "rest_proto.tpl")
 }
 
 func (g *GoGenerator) GenerateRestServer(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
