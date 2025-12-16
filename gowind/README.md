@@ -85,3 +85,17 @@ generate ent code for a specified microservice, for example `admin` service:
 ```shell
 gow ent generate admin
 ```
+
+## Wire Code Generation
+
+generate wire code for all microservices:
+
+```shell
+gow wire generate
+```
+
+generate wire code for a specified microservice, for example `admin` service:
+
+```shell
+gow wire generate admin
+```
