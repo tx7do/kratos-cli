@@ -45,12 +45,16 @@ func RunGenerate(_ *cobra.Command, args []string) error {
 			if !entry.IsDir() {
 				continue
 			}
+
 			svc := entry.Name()
 			servicePath := filepath.Join(appDir, svc, "service")
-			if _, statErr := os.Stat(servicePath); statErr != nil {
+
+			entSchemaPath := filepath.Join(servicePath, "internal", "data", "ent", "schema")
+			if _, statErr := os.Stat(entSchemaPath); statErr != nil {
 				// 没有 service 子目录则跳过
 				continue
 			}
+
 			processed++
 			if genErr := generateEnt(servicePath); genErr != nil {
 				_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: generate for service %s failed: %v\033[m\n", svc, genErr)

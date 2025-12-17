@@ -81,7 +81,7 @@ func (e *EntCmd) runGlobalEntIfAvailable(args ...string) error {
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
 
-	fmt.Println("running global ent:", entPath, args)
+	//fmt.Println("running global ent:", entPath, args)
 	if err = cmd.Run(); err != nil {
 		return fmt.Errorf("global ent failed: %w", err)
 	}
