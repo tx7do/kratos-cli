@@ -73,7 +73,7 @@ func Run(cmd *cobra.Command, args []string) {
 	}
 }
 
-// runService 运行服务，使用命令: go run ./cmd/server -conf ./configs。
+// runService 运行服务，使用命令: go run ./cmd/server -c ./configs。
 func runService(serviceWorkPath string) error {
 	// 使用 pkg.NewGoCmd 执行 go run . [programArgs...]
 	g := pkg.NewGoCmd(serviceWorkPath)
@@ -97,7 +97,7 @@ func runService(serviceWorkPath string) error {
 	}
 	configPathAbs = filepath.Clean(configPathAbs)
 
-	runArgs := []string{"run", appPathAbs, "-conf", configPathAbs}
+	runArgs := []string{"run", appPathAbs, "-c", configPathAbs}
 
 	if err = g.Run(runArgs...); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
