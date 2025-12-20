@@ -57,14 +57,14 @@ require (
 	github.com/microsoft/go-mssqldb v1.9.5 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/paulmach/orb v0.12.0 // indirect
-	github.com/pierrec/lz4/v4 v4.1.22 // indirect
+	github.com/pierrec/lz4/v4 v4.1.23 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/stretchr/objx v0.5.3 // indirect
 	github.com/zclconf/go-cty v1.17.0 // indirect
-	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
+	github.com/zclconf/go-cty-yaml v1.2.0 // indirect
 	go.opentelemetry.io/otel v1.39.0 // indirect
 	go.opentelemetry.io/otel/trace v1.39.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
