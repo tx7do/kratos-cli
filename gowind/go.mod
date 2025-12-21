@@ -11,7 +11,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/tx7do/go-utils v1.1.34
 	github.com/tx7do/go-utils/code_generator v0.0.1
-	github.com/tx7do/kratos-cli/generators v0.0.7
+	github.com/tx7do/kratos-cli/generators v0.0.8
 	golang.org/x/mod v0.31.0
 )
 

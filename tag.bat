@@ -1,6 +1,6 @@
-git tag generators/v0.0.7 --force
+git tag generators/v0.0.8 --force
 
-git tag config-exporter/v0.0.7 --force
+git tag config-exporter/v0.0.8 --force
 
 git tag sql-orm/v0.0.8 --force
 git tag sql-proto/v0.0.18 --force
