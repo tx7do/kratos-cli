@@ -4,6 +4,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 
 	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
+	"github.com/tx7do/kratos-bootstrap/bootstrap"
 {{if .HasRedis}}
     "github.com/redis/go-redis/v9"
 {{end}}{{if .HasGorm}}
@@ -29,7 +30,7 @@ type Data struct {
 
 // NewData .
 func NewData(
-	logger log.Logger,
+	ctx *bootstrap.Context,
 {{- if .HasEnt}}
     db *entCrud.EntClient[*ent.Client],
 {{- end}}
@@ -40,10 +41,8 @@ func NewData(
     rdb *redis.Client,
 {{- end}}
 ) (*Data, func(), error) {
-	l := log.NewHelper(log.With(logger, "module", "data/{{.Service}}-service"))
-
 	d := &Data{
-		log: l,
+		log: ctx.NewLoggerHelper("data/{{.Service}}-service"),
 {{- if .HasEnt }}
 		db:   db,
 {{- end }}
@@ -56,25 +55,25 @@ func NewData(
 	}
 
 	cleanup := func() {
-		l.Info("closing the data resources")
+		d.log.Info("closing the data resources")
 {{- if .HasEnt }}
 		if d.db != nil {
 			if err := d.db.Close(); err != nil {
-				l.Error(err)
+				d.log.Error(err)
 			}
 		}
 {{- end }}
 {{- if .HasGorm }}
 		if d.gorm != nil {
 			if err := d.gorm.Close(); err != nil {
-				l.Error(err)
+				d.log.Error(err)
 			}
 		}
 {{- end }}
 {{- if .HasRedis }}
 		if d.rdb != nil {
 			if err := d.rdb.Close(); err != nil {
-				l.Error(err)
+				d.log.Error(err)
 			}
 		}
 {{- end }}

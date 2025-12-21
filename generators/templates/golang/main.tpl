@@ -1,6 +1,8 @@
 ﻿package main
 
 import (
+	"context"
+
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
@@ -39,27 +41,27 @@ import (
 	"{{.Module}}/pkg/service"
 )
 
-var version string
+var version = "1.0.0"
 
 // go build -ldflags "-X main.version=x.y.z"
 
 func newApp(
-	lg log.Logger,
-	re registry.Registrar,
+	ctx *bootstrap.Context,
 {{renderFormalParameters .ServerFormalParameters}}) *kratos.App {
-	return bootstrap.NewApp(
-		lg,
-		re,
+	return bootstrap.NewApp(ctx,
 {{renderInParameters .ServerTransferParameters 2}}	)
 }
 
 func runApp() error {
-	return bootstrap.RunApp(func(ctx *bootstrap.Context) (app *kratos.App, cleanup func(), err error) {
-		return initApp(ctx.Logger, ctx.Registrar, ctx.Config)
-	},
-		trans.Ptr(service.{{renderServiceName .Service}}),
-		trans.Ptr(version),
+	ctx := bootstrap.NewContext(
+		context.Background(),
+		&conf.AppInfo{
+			Project: service.Project,
+			AppId:   service.{{renderServiceName .Service}},
+			Version: version,
+		},
 	)
+	return bootstrap.RunApp(ctx, initApp)
 }
 
 func main() {

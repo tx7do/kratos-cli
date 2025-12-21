@@ -7,6 +7,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/tx7do/kratos-bootstrap/bootstrap"
 
 	"github.com/tx7do/go-utils/copierutil"
 	"github.com/tx7do/go-utils/crypto"
@@ -37,10 +38,9 @@ type {{.ClassName}} struct {
 	]
 }
 
-func New{{.ClassName}}(data *Data, logger log.Logger) *{{.ClassName}} {
-	l := log.NewHelper(log.With(logger, "module", "{{lower .Model}}/repo/{{lower .Service}}-service"))
+func New{{.ClassName}}(ctx *bootstrap.Context, data *Data) *{{.ClassName}} {
 	repo := &{{.ClassName}}{
-		log:  l,
+		log:  ctx.NewLoggerHelper("{{lower .Model}}/repo/{{lower .Service}}-service"),
 		data: data,
 		mapper: mapper.NewCopierMapper[{{.ApiPackage}}.{{pascal .Model}}, ent.{{pascal .Model}}](),
 	}

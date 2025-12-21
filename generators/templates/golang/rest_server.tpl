@@ -14,7 +14,7 @@ import (
 
 	swaggerUI "github.com/tx7do/kratos-swagger-ui"
 
-	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
+	"github.com/tx7do/kratos-bootstrap/bootstrap"
 	"github.com/tx7do/kratos-bootstrap/rpc"
 
 	"{{.Module}}/app/{{lower .Service}}/service/cmd/server/assets"
@@ -58,7 +58,7 @@ func newRestMiddleware(
 
 // NewRestServer create a REST server.
 func NewRestServer(
-	cfg *conf.Bootstrap, logger log.Logger,
+	ctx *bootstrap.Context,
 
 	authenticator authnEngine.Authenticator,
 	authorizer authzEngine.Engine,
@@ -66,11 +66,13 @@ func NewRestServer(
     {{lower $key}}Service *service.{{pascal $key}}Service,
 {{- end}}
 ) *http.Server {
+	cfg := ctx.GetConfig()
+
 	if cfg == nil || cfg.Server == nil || cfg.Server.Rest == nil {
 		return nil
 	}
 
-	srv := rpc.CreateRestServer(cfg, newRestMiddleware(logger, authenticator, authorizer)...)
+	srv := rpc.CreateRestServer(cfg, newRestMiddleware(ctx.GetLogger(), authenticator, authorizer)...)
 {{range $key, $value := .Services}}
     {{$value}}.Register{{pascal $key}}ServiceHTTPServer(srv, {{lower $key}}Service)
 {{- end}}

@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/tx7do/kratos-bootstrap/bootstrap"
 	"gorm.io/gorm"
 
 	"github.com/tx7do/go-utils/copierutil"
@@ -27,11 +28,10 @@ type {{.ClassName}} struct {
 	repository *gormCurd.Repository[{{.ApiPackage}}.{{pascal .Model}}, models.{{pascal .Model}}]
 }
 
-func New{{.ClassName}}(data *Data, logger log.Logger) *{{.ClassName}} {
-	l := log.NewHelper(log.With(logger, "module", "{{lower .Model}}/repo/{{lower .Service}}-service"))
+func New{{.ClassName}}(ctx *bootstrap.Context, data *Data) *{{.ClassName}} {
 	repo := &{{.ClassName}}{
 		data:   data,
-		log:    l,
+		log:    ctx.NewLoggerHelper("{{lower .Model}}/repo/{{lower .Service}}-service"),
 		mapper: mapper.NewCopierMapper[{{.ApiPackage}}.{{pascal .Model}}, models.{{pascal .Model}}](),
 	}
 

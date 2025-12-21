@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/tx7do/kratos-bootstrap/bootstrap"
 {{if not .IsGrpc}}
 	"github.com/tx7do/go-utils/trans"
 {{end}}
 	"google.golang.org/protobuf/types/known/emptypb"
-	pagination "github.com/tx7do/kratos-bootstrap/api/gen/go/pagination/v1"
+	pagination "github.com/tx7do/go-crud/api/gen/go/pagination/v1"
 {{if not .IsGrpc}}
 	"{{.Module}}/app/{{.Service}}/service/internal/data"
 {{end}}
@@ -31,11 +32,11 @@ type {{.ClassName}} struct {
 }
 
 func New{{.ClassName}}(
-    logger log.Logger,
+    ctx *bootstrap.Context,
     {{.DataSourceVar}} {{.DataSourceType}},
 ) *{{.ClassName}} {
 	return &{{.ClassName}}{
-		log: log.NewHelper(log.With(logger, "module", "{{lower .Model}}/service/{{lower .Service}}-service")),
+		log:  ctx.NewLoggerHelper("{{lower .Model}}/service/{{lower .Service}}-service"),
 		{{.DataSourceVar}}:  {{.DataSourceVar}},
 	}
 }

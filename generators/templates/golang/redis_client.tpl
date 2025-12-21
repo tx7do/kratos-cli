@@ -9,7 +9,10 @@ import (
 )
 
 // NewRedisClient 创建Redis客户端
-func NewRedisClient(cfg *conf.Bootstrap, logger log.Logger) *redis.Client {
-	l := log.NewHelper(log.With(logger, "module", "redis/data/{{.Service}}-service"))
-	return redisClient.NewClient(cfg.Data, l)
+func NewRedisClient(ctx *bootstrap.Context) *redis.Client {
+	cfg := ctx.GetConfig()
+	if cfg == nil {
+		return nil
+	}
+	return redisClient.NewClient(cfg.Data, ctx.NewLoggerHelper("redis/data/{{.Service}}-service"))
 }
