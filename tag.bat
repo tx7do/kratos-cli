@@ -6,6 +6,6 @@ git tag sql-orm/v0.0.8 --force
 git tag sql-proto/v0.0.19 --force
 git tag sql-kratos/v0.0.8 --force
 
-git tag gowind/v0.0.7 --force
+git tag gowind/v0.0.8 --force
 
 git push origin --tags
