@@ -100,3 +100,11 @@ generate wire code for a specified microservice, for example `admin` service:
 ```shell
 gow wire generate admin
 ```
+
+## Proto Code Generation
+
+generate proto code for all microservices:
+
+```shell
+gow api
+```

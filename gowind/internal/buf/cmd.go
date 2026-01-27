@@ -21,6 +21,8 @@ const (
 )
 
 func RunGenerate(_ *cobra.Command, args []string) error {
+	ctx := context.Background()
+
 	inspector, err := pkg.NewModuleInspectorFromGo("")
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
@@ -28,7 +30,7 @@ func RunGenerate(_ *cobra.Command, args []string) error {
 	}
 
 	// 先在模块根目录运行 `go mod tidy`
-	tidyCmd := exec.CommandContext(context.Background(), "go", "mod", "tidy")
+	tidyCmd := exec.CommandContext(ctx, "go", "mod", "tidy")
 	tidyCmd.Dir = inspector.Root
 	tidyCmd.Env = os.Environ()
 	tidyCmd.Stdout = os.Stdout
@@ -37,6 +39,9 @@ func RunGenerate(_ *cobra.Command, args []string) error {
 		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: failed to run `go mod tidy`: %s\033[m\n", err.Error())
 		return err
 	}
+
+	// 确保 buf 已安装
+	ensureBufInstalled(ctx)
 
 	apiPath := filepath.Join(inspector.Root, "api")
 	if !isDirExists(apiPath) {
@@ -51,7 +56,7 @@ func RunGenerate(_ *cobra.Command, args []string) error {
 
 	if !isBufLockExists(apiPath) {
 		fmt.Printf("buf.lock not found in api directory, running `buf dep update`...\n")
-		if err = runBufDepUpdate(context.Background(), apiPath); err != nil {
+		if err = runBufDepUpdate(ctx, apiPath); err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
 			return err
 		}
@@ -73,21 +78,18 @@ func RunGenerate(_ *cobra.Command, args []string) error {
 	fmt.Printf("Running `buf generate` in api directory...\n")
 	for _, yamlFile := range yamlFiles {
 		fmt.Printf("Using template file: %s\n", yamlFile)
-		if err = runBufGenerate(context.Background(), apiPath, yamlFile); err != nil {
+		if err = runBufGenerate(ctx, apiPath, yamlFile); err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
 			return err
 		}
 	}
 
-	fmt.Printf("Generating ent code using default template (%s)...\n", defaultBufGenConfigFile)
+	fmt.Printf("Code generation completed successfully.\n")
 	return nil
 }
 
 // runBufDepUpdate 在指定目录执行 `buf dep update`，并将输出转发到标准输出/错误。
 func runBufDepUpdate(ctx context.Context, apiPath string) error {
-	// 确保 buf 已安装
-	ensureBufInstalled(ctx)
-
 	cmd := exec.CommandContext(ctx, "buf", "dep", "update")
 	cmd.Dir = apiPath
 	cmd.Env = os.Environ()
@@ -107,9 +109,6 @@ func runBufGenerate(ctx context.Context, apiPath, template string) error {
 	if template == "" {
 		template = defaultBufGenConfigFile
 	}
-
-	// 确保 buf 已安装（函数在同一文件中）
-	ensureBufInstalled(ctx)
 
 	cmd := exec.CommandContext(ctx, "buf", "generate", "--template", template)
 	cmd.Dir = apiPath
