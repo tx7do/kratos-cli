@@ -30,13 +30,7 @@ func RunGenerate(_ *cobra.Command, args []string) error {
 	}
 
 	// 先在模块根目录运行 `go mod tidy`
-	tidyCmd := exec.CommandContext(ctx, "go", "mod", "tidy")
-	tidyCmd.Dir = inspector.Root
-	tidyCmd.Env = os.Environ()
-	tidyCmd.Stdout = os.Stdout
-	tidyCmd.Stderr = os.Stderr
-	if err = tidyCmd.Run(); err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: failed to run `go mod tidy`: %s\033[m\n", err.Error())
+	if err = pkg.GoModTidy(ctx, inspector.Root); err != nil {
 		return err
 	}
 
@@ -49,6 +43,19 @@ func RunGenerate(_ *cobra.Command, args []string) error {
 		return fmt.Errorf("api directory does not exist: %s", apiPath)
 	}
 
+	return GenerateFromPath(ctx, apiPath)
+}
+
+// GenerateFromPath 从指定路径生成 Protobuf 代码。
+func GenerateFromPath(ctx context.Context, apiPath string) error {
+	// 确保 buf 已安装
+	ensureBufInstalled(ctx)
+
+	if !isDirExists(apiPath) {
+		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: api directory does not exist: %s\033[m\n", apiPath)
+		return fmt.Errorf("api directory does not exist: %s", apiPath)
+	}
+
 	if !isBufConfigExists(apiPath) {
 		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: buf config file (%s) does not exist in api directory: %s\033[m\n", defaultBufConfigFile, apiPath)
 		return fmt.Errorf("buf config file (%s) does not exist in api directory: %s", defaultBufConfigFile, apiPath)
@@ -56,13 +63,13 @@ func RunGenerate(_ *cobra.Command, args []string) error {
 
 	if !isBufLockExists(apiPath) {
 		fmt.Printf("buf.lock not found in api directory, running `buf dep update`...\n")
-		if err = runBufDepUpdate(ctx, apiPath); err != nil {
+		if err := RunBufDepUpdate(ctx, apiPath); err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
 			return err
 		}
 	}
 
-	fmt.Printf("Generating ent code from YAML files in api directory...\n")
+	fmt.Printf("Generating proto code from YAML files in api directory...\n")
 
 	yamlFiles, err := scanYAMLFiles(apiPath)
 	if err != nil {
@@ -78,18 +85,18 @@ func RunGenerate(_ *cobra.Command, args []string) error {
 	fmt.Printf("Running `buf generate` in api directory...\n")
 	for _, yamlFile := range yamlFiles {
 		fmt.Printf("Using template file: %s\n", yamlFile)
-		if err = runBufGenerate(ctx, apiPath, yamlFile); err != nil {
+		if err = RunBufGenerate(ctx, apiPath, yamlFile); err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
 			return err
 		}
 	}
 
-	fmt.Printf("Code generation completed successfully.\n")
+	fmt.Printf("Protobuf Code generation completed successfully.\n")
 	return nil
 }
 
-// runBufDepUpdate 在指定目录执行 `buf dep update`，并将输出转发到标准输出/错误。
-func runBufDepUpdate(ctx context.Context, apiPath string) error {
+// RunBufDepUpdate 在指定目录执行 `buf dep update`，并将输出转发到标准输出/错误。
+func RunBufDepUpdate(ctx context.Context, apiPath string) error {
 	cmd := exec.CommandContext(ctx, "buf", "dep", "update")
 	cmd.Dir = apiPath
 	cmd.Env = os.Environ()
@@ -102,10 +109,10 @@ func runBufDepUpdate(ctx context.Context, apiPath string) error {
 	return nil
 }
 
-// runBufGenerate 在指定目录执行 `buf generate --template <template>`。
+// RunBufGenerate 在指定目录执行 `buf generate --template <template>`。
 // 如果 template 为空，使用常量 `defaultBufGenConfigFile`。
 // 在执行前会调用 ensureBufInstalled 确保 buf 可用，命令输出会直接写入标准输出/错误。
-func runBufGenerate(ctx context.Context, apiPath, template string) error {
+func RunBufGenerate(ctx context.Context, apiPath, template string) error {
 	if template == "" {
 		template = defaultBufGenConfigFile
 	}

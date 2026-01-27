@@ -170,3 +170,17 @@ func containsAt(s string) bool {
 	}
 	return false
 }
+
+// GoModTidy 在目录下执行 `go mod tidy`。
+func GoModTidy(ctx context.Context, rootPath string) error {
+	tidyCmd := exec.CommandContext(ctx, "go", "mod", "tidy")
+	tidyCmd.Dir = rootPath
+	tidyCmd.Env = os.Environ()
+	tidyCmd.Stdout = os.Stdout
+	tidyCmd.Stderr = os.Stderr
+	if err := tidyCmd.Run(); err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: failed to run `go mod tidy`: %s\033[m\n", err.Error())
+		return err
+	}
+	return nil
+}

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -13,20 +12,15 @@ import (
 )
 
 func RunGenerate(_ *cobra.Command, args []string) error {
+	ctx := context.Background()
+
 	inspector, err := pkg.NewModuleInspectorFromGo("")
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
 		return err
 	}
 
-	// 先在模块根目录运行 `go mod tidy`
-	tidyCmd := exec.CommandContext(context.Background(), "go", "mod", "tidy")
-	tidyCmd.Dir = inspector.Root
-	tidyCmd.Env = os.Environ()
-	tidyCmd.Stdout = os.Stdout
-	tidyCmd.Stderr = os.Stderr
-	if err = tidyCmd.Run(); err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: failed to run `go mod tidy`: %s\033[m\n", err.Error())
+	if err = pkg.GoModTidy(ctx, inspector.Root); err != nil {
 		return err
 	}
 

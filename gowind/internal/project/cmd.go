@@ -12,6 +12,8 @@ import (
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/spf13/cobra"
+
+	"github.com/tx7do/kratos-cli/gowind/internal/buf"
 	"github.com/tx7do/kratos-cli/gowind/internal/pkg"
 )
 
@@ -149,6 +151,7 @@ func run(_ *cobra.Command, args []string) {
 		p.Path = filepath.Join(strings.TrimPrefix(workingDir, projectRoot+"/"), p.Name)
 		done <- p.Add(ctx, workingDir, repoURL, branch, mod, packagePath)
 	}()
+
 	select {
 	case <-ctx.Done():
 		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
@@ -156,9 +159,21 @@ func run(_ *cobra.Command, args []string) {
 			return
 		}
 		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: failed to create project(%s)\033[m\n", ctx.Err().Error())
+
 	case err = <-done:
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: Failed to create project(%s)\033[m\n", err.Error())
 		}
+
+		if err = pkg.GoModTidy(ctx, filepath.Join(workingDir, projectName)); err != nil {
+			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: failed to run `go mod tidy`: %s\033[m\n", err.Error())
+			return
+		}
+
+		if err = buf.GenerateFromPath(ctx, filepath.Join(workingDir, projectName, "api")); err != nil {
+			return
+		}
+
+		fmt.Printf("✅ Project %s created successfully at %s\n", projectName, filepath.Join(workingDir, projectName))
 	}
 }
