@@ -60,25 +60,6 @@ func TestGoGenerator_Template_WireSet(t *testing.T) {
 	}
 }
 
-func TestGoGenerator_Template_Data(t *testing.T) {
-	g := NewGoGenerator()
-
-	opts := code_generator.Options{
-		OutDir: "./output",
-		Module: "github.com/example/myproject",
-		Vars: map[string]interface{}{
-			"Service":  "user",
-			"HasRedis": true,
-			"HasGorm":  true,
-			"HasEnt":   true,
-		},
-	}
-
-	if _, err := g.GenerateData(context.Background(), opts); err != nil {
-		t.Fatalf("Generate data.go failed: %v", err)
-	}
-}
-
 func TestGoGenerator_Template_EntClient(t *testing.T) {
 	g := NewGoGenerator()
 

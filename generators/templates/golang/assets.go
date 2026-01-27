@@ -8,7 +8,6 @@ var TemplateMap = map[string][]byte{
 	"wire_set.tpl":     WireSetTemplate,
 	"grpc_server.tpl":  GrpcServerTemplate,
 	"rest_server.tpl":  RestServerTemplate,
-	"data.tpl":         DataTemplate,
 	"ent_client.tpl":   EntClientTemplate,
 	"gorm_client.tpl":  GormClientTemplate,
 	"gorm_init.tpl":    GormInitTemplate,
@@ -33,9 +32,6 @@ var GrpcServerTemplate []byte
 
 //go:embed rest_server.tpl
 var RestServerTemplate []byte
-
-//go:embed data.tpl
-var DataTemplate []byte
 
 //go:embed ent_client.tpl
 var EntClientTemplate []byte

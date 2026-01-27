@@ -21,16 +21,16 @@ import (
 )
 
 type {{.ClassName}} struct {
-	data *Data
+	gormClient *gormCrud.Client
 	log  *log.Helper
 
 	mapper     *mapper.CopierMapper[{{.ApiPackage}}.{{pascal .Model}}, models.{{pascal .Model}}]
 	repository *gormCurd.Repository[{{.ApiPackage}}.{{pascal .Model}}, models.{{pascal .Model}}]
 }
 
-func New{{.ClassName}}(ctx *bootstrap.Context, data *Data) *{{.ClassName}} {
+func New{{.ClassName}}(ctx *bootstrap.Context, gormClient *gormCrud.Client) *{{.ClassName}} {
 	repo := &{{.ClassName}}{
-		data:   data,
+		gormClient:   gormClient,
 		log:    ctx.NewLoggerHelper("{{lower .Model}}/repo/{{lower .Service}}-service"),
 		mapper: mapper.NewCopierMapper[{{.ApiPackage}}.{{pascal .Model}}, models.{{pascal .Model}}](),
 	}
@@ -54,7 +54,7 @@ func (r *{{.ClassName}}) List(ctx context.Context, req *pagination.PagingRequest
 		return nil, errors.New("request is nil")
 	}
 
-	ret, err := r.repository.ListWithPaging(ctx, r.data.db, req)
+	ret, err := r.repository.ListWithPaging(ctx, r.gormClient, req)
 	if err != nil {
 		return nil, err
 	}
@@ -76,9 +76,9 @@ func (r *{{.ClassName}}) Get(ctx context.Context, req *{{.ApiPackage}}.Get{{pasc
 	var whereCond *gorm.DB
 	switch req.QueryBy.(type) {
 	case *{{.ApiPackage}}.Get{{pascal .Model}}Request_Id:
-		whereCond = r.data.db.Where("id = ?", req.GetId())
+		whereCond = r.gormClient.Where("id = ?", req.GetId())
 	default:
-		whereCond = r.data.db.Where("id = ?", req.GetId())
+		whereCond = r.gormClient.Where("id = ?", req.GetId())
 	}
 
 	dto, err := r.repository.Get(ctx, whereCond, req.GetViewMask())
@@ -94,7 +94,7 @@ func (r *{{.ClassName}}) Create(ctx context.Context, req *{{.ApiPackage}}.Create
 		return nil, errors.New("request is nil")
 	}
 
-	result, err := r.repository.Create(ctx, r.data.db, req.Data, nil)
+	result, err := r.repository.Create(ctx, r.gormClient, req.Data, nil)
 
 	return result, err
 }
@@ -105,7 +105,7 @@ func (r *{{.ClassName}}) Update(ctx context.Context, req *{{.ApiPackage}}.Update
 	}
 
 	result, err := r.repository.Update(ctx,
-		r.data.db.Where("id = ?", req.Data.GetId()),
+		r.gormClient.Where("id = ?", req.Data.GetId()),
 		req.Data,
 		req.GetUpdateMask(),
 	)
@@ -120,7 +120,7 @@ func (r *{{.ClassName}}) Upsert(ctx context.Context, req *{{.ApiPackage}}.Update
 
 	var err error
 
-	result, err := r.repository.Upsert(ctx, r.data.db, req.Data, req.GetUpdateMask())
+	result, err := r.repository.Upsert(ctx, r.gormClient, req.Data, req.GetUpdateMask())
 
 	return result, err
 }
@@ -132,7 +132,7 @@ func (r *{{.ClassName}}) Delete(ctx context.Context, req *{{.ApiPackage}}.Delete
 
 	result, err := r.repository.Delete(
 		ctx,
-		r.data.db.Where("id = ?", req.GetId()),
+		r.gormClient.Where("id = ?", req.GetId()),
 		true,
 	)
 

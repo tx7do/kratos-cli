@@ -1,4 +1,4 @@
-﻿package generators
+package generators
 
 import (
 	"context"
@@ -61,13 +61,6 @@ func (g *GoGenerator) GenerateWireSet(ctx context.Context, opts code_generator.O
 	}
 
 	return g.Generate(ctx, opts, "wire_set.tpl")
-}
-
-func (g *GoGenerator) GenerateData(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {
-	if g.CodeGenerator == nil {
-		return "", os.ErrInvalid
-	}
-	return g.Generate(ctx, opts, "data.tpl")
 }
 
 func (g *GoGenerator) GenerateEntClient(ctx context.Context, opts code_generator.Options) (outputPath string, err error) {

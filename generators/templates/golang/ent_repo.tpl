@@ -24,7 +24,7 @@ import (
 )
 
 type {{.ClassName}} struct {
-	data         *Data
+	entClient *entCrud.EntClient[*ent.Client]
 	log          *log.Helper
 
 	mapper     *mapper.CopierMapper[{{.ApiPackage}}.{{pascal .Model}}, ent.{{pascal .Model}}]
@@ -38,10 +38,10 @@ type {{.ClassName}} struct {
 	]
 }
 
-func New{{.ClassName}}(ctx *bootstrap.Context, data *Data) *{{.ClassName}} {
+func New{{.ClassName}}(ctx *bootstrap.Context, entClient *entCrud.EntClient[*ent.Client]) *{{.ClassName}} {
 	repo := &{{.ClassName}}{
 		log:  ctx.NewLoggerHelper("{{lower .Model}}/repo/{{lower .Service}}-service"),
-		data: data,
+		entClient: entClient,
 		mapper: mapper.NewCopierMapper[{{.ApiPackage}}.{{pascal .Model}}, ent.{{pascal .Model}}](),
 	}
 
@@ -65,7 +65,7 @@ func (r *{{.ClassName}}) init() {
 }
 
 func (r *{{.ClassName}}) Count(ctx context.Context, whereCond []func(s *sql.Selector)) (int, error) {
-	builder := r.data.db.Client().{{pascal .Model}}.Query()
+	builder := r.entClient.Client().{{pascal .Model}}.Query()
 	if len(whereCond) != 0 {
 		builder.Modify(whereCond...)
 	}
@@ -84,7 +84,7 @@ func (r *{{.ClassName}}) List(ctx context.Context, req *pagination.PagingRequest
 		return nil, {{.ApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
 
-	builder := r.data.db.Client().{{pascal .Model}}.Query()
+	builder := r.entClient.Client().{{pascal .Model}}.Query()
 
     ret, err := r.repository.ListWithPaging(ctx, builder, builder.Clone(), req)
     if err != nil {
@@ -101,7 +101,7 @@ func (r *{{.ClassName}}) List(ctx context.Context, req *pagination.PagingRequest
 }
 
 func (r *{{.ClassName}}) IsExist(ctx context.Context, id uint32) (bool, error) {
-	exist, err := r.data.db.Client().{{pascal .Model}}.Query().
+	exist, err := r.entClient.Client().{{pascal .Model}}.Query().
 		Where({{lower .Model}}.IDEQ(id)).
 		Exist(ctx)
 	if err != nil {
@@ -124,7 +124,7 @@ func (r *{{.ClassName}}) Get(ctx context.Context, req *{{.ApiPackage}}.Get{{pasc
         whereCond = append(whereCond, {{lower .Model}}.IDEQ(req.GetId()))
     }
 
-    builder := r.data.db.Client().{{pascal .Model}}.Query()
+    builder := r.entClient.Client().{{pascal .Model}}.Query()
 	dto, err := r.repository.Get(ctx, builder, req.GetViewMask(), whereCond...)
 	if err != nil {
 		return nil, err
@@ -138,7 +138,7 @@ func (r *{{.ClassName}}) Create(ctx context.Context, req *{{.ApiPackage}}.Create
 		return {{.ApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
 
-	builder := r.data.db.Client().{{pascal .Model}}.Create()
+	builder := r.entClient.Client().{{pascal .Model}}.Create()
 
 	builder{{range .Fields}}.{{newline}}		{{.EntSetNillableFunc}}
 {{- end}}
@@ -182,7 +182,7 @@ func (r *{{.ClassName}}) Update(ctx context.Context, req *{{.ApiPackage}}.Update
 		}
 	}
 
-	builder := r.data.db.Client().{{pascal .Model}}.UpdateOneID(req.Data.GetId())
+	builder := r.entClient.Client().{{pascal .Model}}.UpdateOneID(req.Data.GetId())
 	result, err := r.repository.UpdateOne(ctx, builder, req.Data, req.GetUpdateMask(),
 		func(dto *{{.ApiPackage}}.{{pascal .Model}}) {
 			builder.
@@ -198,7 +198,7 @@ func (r *{{.ClassName}}) Delete(ctx context.Context, req *{{.ApiPackage}}.Delete
 		return {{.ApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
 
-	builder := r.data.db.Client().{{pascal .Model}}.Delete()
+	builder := r.entClient.Client().{{pascal .Model}}.Delete()
 	_, err := r.repository.Delete(ctx, builder, func(s *sql.Selector) {
 		s.Where(sql.EQ({{lower .Model}}.FieldID, req.GetId()))
 	})

@@ -20,20 +20,23 @@ func NewGrpcServer(
 {{range $key, $value := .Services}}
     {{lower $key}}Service *service.{{pascal $key}}Service,
 {{- end}}
-) *grpc.Server {
+) (*grpc.Server, error) {
 	cfg := ctx.GetConfig()
 
 	if cfg == nil || cfg.Server == nil || cfg.Server.Grpc == nil {
-		return nil
+		return nil, nil
 	}
 
-	srv := rpc.CreateGrpcServer(
+	srv, err := rpc.CreateGrpcServer(
 		cfg,
 		logging.Server(ctx.GetLogger()),
 	)
+	if err != nil {
+		return nil, err
+	}
 {{range $key, $value := .Services}}
     {{lower $value}}V1.Register{{pascal $key}}ServiceServer(srv, {{lower $key}}Service)
 {{- end}}
 
-	return srv
+	return srv, nil
 }

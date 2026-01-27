@@ -65,14 +65,17 @@ func NewRestServer(
 {{range $key, $value := .Services}}
     {{lower $key}}Service *service.{{pascal $key}}Service,
 {{- end}}
-) *http.Server {
+) (*http.Server, error) {
 	cfg := ctx.GetConfig()
 
 	if cfg == nil || cfg.Server == nil || cfg.Server.Rest == nil {
-		return nil
+		return nil, nil
 	}
 
-	srv := rpc.CreateRestServer(cfg, newRestMiddleware(ctx.GetLogger(), authenticator, authorizer)...)
+	srv, err := rpc.CreateRestServer(cfg, newRestMiddleware(ctx.GetLogger(), authenticator, authorizer)...)
+	if err != nil {
+		return nil, err
+	}
 {{range $key, $value := .Services}}
     {{$value}}.Register{{pascal $key}}ServiceHTTPServer(srv, {{lower $key}}Service)
 {{- end}}
@@ -85,5 +88,5 @@ func NewRestServer(
 		)
 	}
 
-	return srv
+	return srv, nil
 }

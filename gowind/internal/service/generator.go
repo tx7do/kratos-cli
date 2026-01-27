@@ -202,12 +202,7 @@ func (g *Generator) generateDataPackageCode(
 		}
 	}
 
-	if _, err := g.goGenerator.GenerateData(context.Background(), o); err != nil {
-		return err
-	}
-
 	var functions []string
-	functions = append(functions, "NewData")
 	for _, repo := range repos {
 		functions = append(functions, fmt.Sprintf("New%sRepo", stringcase.UpperCamelCase(repo)))
 	}
