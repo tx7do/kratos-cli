@@ -4,14 +4,12 @@ import (
 	"context"
 
 	"github.com/go-kratos/kratos/v2"
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
 
 {{renderImports .ServerImports}}
 
-	"github.com/tx7do/go-utils/trans"
-
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
+	conf "github.com/tx7do/kratos-bootstrap/api/gen/go/conf/v1"
 
 	//_ "github.com/tx7do/kratos-bootstrap/config/apollo"
 	//_ "github.com/tx7do/kratos-bootstrap/config/consul"
