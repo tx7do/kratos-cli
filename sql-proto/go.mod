@@ -14,7 +14,7 @@ require (
 	github.com/tx7do/go-utils v1.1.34
 	github.com/tx7do/go-utils/code_generator v0.0.1
 	github.com/tx7do/go-utils/ddl_parser v0.0.3
-	github.com/tx7do/kratos-cli/generators v0.0.9
+	github.com/tx7do/kratos-cli/generators v0.0.10
 )
 
 require (
@@ -34,7 +34,7 @@ require (
 	github.com/zclconf/go-cty-yaml v1.2.0 // indirect
 	golang.org/x/mod v0.32.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/text v0.33.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
 	golang.org/x/tools v0.41.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -8,7 +8,7 @@ require (
 	github.com/spf13/pflag v1.0.10
 	github.com/tx7do/go-utils v1.1.34
 	github.com/tx7do/go-utils/code_generator v0.0.1
-	github.com/tx7do/kratos-cli/generators v0.0.9
+	github.com/tx7do/kratos-cli/generators v0.0.10
 	github.com/tx7do/kratos-cli/sql-orm v0.0.8
 	github.com/tx7do/kratos-cli/sql-proto v0.0.19
 )
