@@ -201,8 +201,8 @@ github.com/tx7do/go-utils/ddl_parser v0.0.3 h1:91SZHzARpjlJHu/jJT7D1IsG/3x5/ZZZs
 github.com/tx7do/go-utils/ddl_parser v0.0.3/go.mod h1:jxT6rjw6bPKBX33PYTOJdJh0Dj4rX+dJ2nPIXbRK9P4=
 github.com/tx7do/kratos-cli/generators v0.0.10 h1:JAUA4AjSM87bXXIC/ilRqys+qrruqQoEsKiwZ3K/OEw=
 github.com/tx7do/kratos-cli/generators v0.0.10/go.mod h1:hd/CSg1elH/L0oujxqO7kVJZWW1xXND8oB4bWlPYM5U=
-github.com/tx7do/kratos-cli/sql-orm v0.0.10 h1:dARCmrLpFltQ3hwKIhLcHG4FpLtsjNyY6cjNIAknmaM=
-github.com/tx7do/kratos-cli/sql-orm v0.0.10/go.mod h1:Z4aAtUfpOHej7a8tPgPJXuVEhFKbv2Whkw5UU13JlHk=
+github.com/tx7do/kratos-cli/sql-orm v0.0.11 h1:zcxXV6f8PD3zAEW48/3rkzuH7rpiVLjLNOvW5e+ZUqc=
+github.com/tx7do/kratos-cli/sql-orm v0.0.11/go.mod h1:bStCzCsn0FNVHSAuPEfwpFLSCSk77HLEhOidhRGQZVA=
 github.com/tx7do/kratos-cli/sql-proto v0.0.22 h1:7DqzRPy7r1dVqxmGAsRGbPfCYvaT/tZrflsWX6CkGKs=
 github.com/tx7do/kratos-cli/sql-proto v0.0.22/go.mod h1:zfzEMYekZmTfxY9M6pQH+DmjYE70TeqhFRFmgqpcGFQ=
 github.com/xdg-go/pbkdf2 v1.0.0/go.mod h1:jrpuAogTd400dnrH08LKmI/xc1MbPOebTwRqcT5RDeI=
