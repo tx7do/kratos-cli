@@ -1,12 +1,11 @@
 module github.com/tx7do/kratos-cli/sql-orm
 
-go 1.24.6
+go 1.24.11
 
 require (
-	ariga.io/atlas v0.38.0
+	ariga.io/atlas v1.1.0
 	entgo.io/contrib v0.7.0
 	entgo.io/ent v0.14.5
-	github.com/blastrain/vitess-sqlparser v0.0.0-20201030050434-a139afbb1aba
 	github.com/go-openapi/inflect v0.21.5
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/google/uuid v1.6.0
@@ -14,6 +13,7 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.11.1
+	github.com/tx7do/go-utils/ddl_parser v0.0.3
 	gorm.io/driver/clickhouse v0.7.0
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/driver/postgres v1.6.0
@@ -51,7 +51,6 @@ require (
 	github.com/jhump/protoreflect v1.17.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/juju/errors v1.0.0 // indirect
 	github.com/klauspost/compress v1.18.2 // indirect
 	github.com/mattn/go-sqlite3 v1.14.32 // indirect
 	github.com/microsoft/go-mssqldb v1.9.5 // indirect

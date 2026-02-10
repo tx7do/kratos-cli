@@ -17,7 +17,7 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:  "app",
+		Title:  "GoWind Toolkit",
 		Width:  1024,
 		Height: 768,
 		AssetServer: &assetserver.Options{
@@ -27,6 +27,9 @@ func main() {
 		OnStartup:        app.startup,
 		Bind: []interface{}{
 			app,
+		},
+		Debug: options.Debug{
+			OpenInspectorOnStartup: true,
 		},
 	})
 

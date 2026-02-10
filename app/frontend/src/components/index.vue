@@ -1,0 +1,92 @@
+<script setup lang="ts">
+import {Tabs} from 'ant-design-vue';
+
+import Header from "./Header.vue";
+import CodeGeneratorPage from "./CodeGeneratorPage.vue";
+import RemoteConfigPage from "./RemoteConfigPage.vue";
+
+const settingList = [
+  {
+    key: '1',
+    name: '代码生成',
+    component: CodeGeneratorPage,
+  },
+  {
+    key: '2',
+    name: '远程配置',
+    component: RemoteConfigPage,
+  },
+];
+</script>
+
+<template>
+  <div class="page-container">
+    <Header/>
+    <div class="layout-wrapper">
+      <Tabs
+          tab-position="left"
+          class="tabs-container"
+      >
+        <template v-for="item in settingList" :key="item.key">
+          <a-tab-pane :tab="item.name">
+            <component :is="item.component"/>
+          </a-tab-pane>
+        </template>
+      </Tabs>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.layout-wrapper {
+  flex: 1;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.tabs-container {
+  height: 100%;
+  background-color: #ffffff;
+}
+
+:deep(.ant-tabs) {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  background-color: #ffffff;
+}
+
+:deep(.ant-tabs-nav) {
+  background-color: #f5f5f5;
+  border-right: 1px solid #f0f0f0;
+}
+
+:deep(.ant-tabs-tabpane) {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow: auto;
+  background-color: #ffffff;
+}
+
+:deep(.ant-tabs-content) {
+  height: 100%;
+}
+
+:deep(.ant-tabs-content-holder) {
+  flex: 1;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+</style>

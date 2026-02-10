@@ -55,4 +55,3 @@ sql2orm \
 
 - [ent](https://entgo.io) generator code is based on Copy from <https://github.com/zeevmoney/entimport>.
 - [gorm](https://gorm.io) generator code is based on [GORM GEN](https://gorm.io/gen/index.html)
-- sql parser is <https://github.com/blastrain/vitess-sqlparser>

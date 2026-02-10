@@ -11,7 +11,7 @@ import (
 	"ariga.io/atlas/sql/schema"
 	"ariga.io/atlas/sql/sqlite"
 
-	"github.com/blastrain/vitess-sqlparser/sqlparser"
+	ddlparser "github.com/tx7do/go-utils/ddl_parser"
 )
 
 type Text struct {
@@ -66,161 +66,98 @@ func (t *Text) ParseType(raw string) (schema.Type, error) {
 	return &schema.UnsupportedType{T: raw}, nil
 }
 
-func (t *Text) toColumnType(raw string, options []*sqlparser.ColumnOption) (*schema.ColumnType, error) {
-	parsedType, err := t.ParseType(raw)
+func (t *Text) toColumnType(col ddlparser.ColumnDef) (*schema.ColumnType, error) {
+	parsedType, err := t.ParseType(col.Type)
 	if err != nil {
 		return nil, err
 	}
 
-	isNull := true
-	if options != nil {
-		for _, option := range options {
-			if option.Type == sqlparser.ColumnOptionNotNull {
-				isNull = false
-				break // 一旦找到 NOT NULL 选项，就可以停止检查
-			}
-		}
-	}
-
 	return &schema.ColumnType{
 		Type: parsedType,
-		Raw:  raw,
-		Null: isNull,
+		Raw:  col.Type,
+		Null: col.Nullable,
 	}, nil
 }
 
-func (t *Text) InspectSchema(sqlText string, s *schema.Schema) (*schema.Schema, error) {
+func (t *Text) InspectSchema(sqlContent string, s *schema.Schema) (*schema.Schema, error) {
+	if sqlContent == "" {
+		return nil, fmt.Errorf("SQL 内容为空，无法解析")
+	}
+	if s == nil {
+		s = &schema.Schema{}
+	}
+
 	// 解析 SQL 文本
-	orgStmt, err := sqlparser.Parse(sqlText)
+	tables, err := ddlparser.ParseCreateTables(sqlContent)
 	if err != nil {
 		return nil, fmt.Errorf("解析失败: %v", err)
 	}
-	//fmt.Printf("stmt = %+v\n", orgStmt)
 
-	switch stmt := orgStmt.(type) {
-	case *sqlparser.CreateTable:
-		//case *sqlparser.DDL:
-		switch stmt.Action {
-		case sqlparser.CreateStr:
-			fmt.Println("解析到 CREATE TABLE 语句")
-			fmt.Printf("表名: %v\n", stmt.NewName.Name.String())
-
-			table := &schema.Table{
-				Name:   stmt.NewName.Name.String(),
-				Schema: s,
-			}
-
-			for _, opt := range stmt.Options {
-				switch opt.Type {
-				case sqlparser.TableOptionEngine:
-					fmt.Printf("表引擎: %v\n", opt.String())
-
-				case sqlparser.TableOptionCollate:
-					fmt.Printf("表排序规则: %v\n", opt.String())
-					table.Attrs = append(table.Attrs, &schema.Collation{
-						V: opt.StrValue,
-					})
-
-				case sqlparser.TableOptionCharset:
-					fmt.Printf("字符集: %v\n", opt.String())
-					table.Attrs = append(table.Attrs, &schema.Charset{
-						V: opt.StrValue,
-					})
-
-				case sqlparser.TableOptionComment:
-					fmt.Printf("表注释: %v\n", opt.String())
-					table.Attrs = append(table.Attrs, &schema.Comment{
-						Text: opt.StrValue,
-					})
-
-				default:
-					panic(fmt.Sprintf("unhandled default case %v", opt.Type))
-				}
-			}
-
-			for _, col := range stmt.Columns {
-				fmt.Printf("列名: %v, 类型: %v\n", col.Name, col.Type)
-
-				colType, err := t.toColumnType(col.Type, col.Options)
-				if err != nil {
-					fmt.Printf("解析失败: %v\n", err)
-					continue
-				}
-				//fmt.Printf("原始类型: %s, 解析后类型: %T %v\n", col.Type, colType.Type, colType.Null)
-
-				column := &schema.Column{
-					Name: col.Name,
-					Type: colType,
-				}
-
-				table.Columns = append(table.Columns, column)
-			}
-
-			for _, idx := range stmt.Constraints {
-				fmt.Printf("索引名: %v, 类型: %v\n", idx.Name, idx.Type)
-				for _, key := range idx.Keys {
-					fmt.Printf("索引列: %v 类型: %v\n", key.String(), idx.Type)
-
-					switch idx.Type {
-					case sqlparser.ConstraintPrimaryKey:
-
-						var colFind *schema.Column
-						for _, col := range table.Columns {
-							if col.Name == key.String() {
-								colFind = col
-								continue
-							}
-						}
-
-						if table.PrimaryKey == nil {
-							table.PrimaryKey = &schema.Index{
-								Table: table,
-								Name:  idx.Name,
-								Parts: []*schema.IndexPart{
-									{
-										C: colFind,
-									},
-								},
-							}
-						} else {
-							table.PrimaryKey.Parts = append(table.PrimaryKey.Parts, &schema.IndexPart{
-								C: colFind,
-							})
-						}
-
-					case sqlparser.ConstraintForeignKey:
-						table.ForeignKeys = append(table.ForeignKeys, &schema.ForeignKey{
-							Table:  table,
-							Symbol: idx.Name,
-						})
-
-					case sqlparser.ConstraintKey:
-					case sqlparser.ConstraintUniq:
-
-					case sqlparser.ConstraintUniqKey:
-
-					case sqlparser.ConstraintIndex:
-						table.Indexes = append(table.Indexes, &schema.Index{
-							Table: table,
-							Name:  idx.Name,
-						})
-
-					case sqlparser.ConstraintUniqIndex:
-						table.Indexes = append(table.Indexes, &schema.Index{
-							Table:  table,
-							Name:   idx.Name,
-							Unique: true,
-						})
-
-					default:
-						panic("unhandled default case")
-					}
-
-				}
-			}
-
-			s.Tables = append(s.Tables, table)
+	for _, tbl := range tables {
+		table := &schema.Table{
+			Name:   tbl.Name,
+			Schema: s,
 		}
+
+		if tbl.Comment != "" {
+			table.Attrs = append(table.Attrs, &schema.Comment{
+				Text: tbl.Comment,
+			})
+		}
+		if tbl.Collation != "" {
+			table.Attrs = append(table.Attrs, &schema.Collation{
+				V: tbl.Collation,
+			})
+		}
+		if tbl.Charset != "" {
+			table.Attrs = append(table.Attrs, &schema.Charset{
+				V: tbl.Charset,
+			})
+		}
+
+		for _, col := range tbl.Columns {
+			fmt.Printf("列名: %v, 类型: %v\n", col.Name, col.Type)
+
+			colType, err := t.toColumnType(col)
+			if err != nil {
+				fmt.Printf("解析失败: %v\n", err)
+				continue
+			}
+
+			column := &schema.Column{
+				Name: col.Name,
+				Type: colType,
+			}
+			if col.Comment != "" {
+				column.SetComment(col.Comment)
+			}
+			if col.Default != "" {
+				column.SetDefault(&schema.NamedDefault{Expr: &schema.Literal{V: col.Default}})
+			}
+
+			if col.PrimaryKey {
+				table.PrimaryKey = &schema.Index{
+					Table: table,
+					Name:  col.Name,
+					Parts: []*schema.IndexPart{
+						{
+							C: column,
+						},
+					},
+				}
+			}
+
+			table.Columns = append(table.Columns, column)
+		}
+
+		for _, idx := range tbl.Indexes {
+			table.Indexes = append(table.Indexes, &schema.Index{
+				Table: table,
+				Name:  idx,
+			})
+		}
+
+		s.Tables = append(s.Tables, table)
 	}
 
 	return s, nil
