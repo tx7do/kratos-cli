@@ -7,6 +7,7 @@ import (
 	"context"
 
 	ddlparser "github.com/tx7do/go-utils/ddl_parser"
+	sqlkratos "github.com/tx7do/kratos-cli/sql-kratos"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -178,7 +179,10 @@ func (a *App) GenerateCode(cfg database.DBConfig, ormType string) string {
 	}
 	defer conn.Close()
 
-	//sqlkratos.Generate(a.ctx, conn, cfg.Type, ormType, a.generator.GetOptions())
+	var options sqlkratos.GeneratorOptions
+	if err = sqlkratos.Generate(a.ctx, options); err != nil {
+
+	}
 
 	runtime.EventsEmit(a.ctx, "code-generated")
 
