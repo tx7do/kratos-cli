@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, watch, reactive } from "vue";
-import { message } from "ant-design-vue";
+import {ref, watch, reactive} from "vue";
+import {message} from "ant-design-vue";
+import {GenerateCode} from "../../wailsjs/go/main/App";
 
 const props = defineProps<{
   open?: boolean
@@ -20,20 +21,20 @@ const formData = reactive({
 })
 
 const ormTypes = [
-  { value: 'ent', label: 'Ent' },
-  { value: 'gorm', label: 'GORM' }
+  {value: 'ent', label: 'Ent'},
+  {value: 'gorm', label: 'GORM'}
 ]
 
 const formRules = {
   ormType: [
-    { required: true, message: '请选择 ORM 类型', trigger: 'change' }
+    {required: true, message: '请选择 ORM 类型', trigger: 'change'}
   ]
 }
 
 // 同步外部的 open 状态
 watch(() => props.open, (val) => {
   innerOpen.value = val ?? false
-}, { immediate: true })
+}, {immediate: true})
 
 // 关闭模态框
 function handleClose() {
@@ -58,9 +59,15 @@ async function handleCommit() {
     // 模拟处理过程
     await new Promise(resolve => setTimeout(resolve, 500))
 
-    message.success('代码生成配置已确认！')
+    message.success('代码生成配置已确认！');
 
-    emit('success', { ormType: formData.ormType })
+    const res = await GenerateCode(formData.ormType);
+    if (res == "") {
+      emit('success', {ormType: formData.ormType})
+    } else {
+      message.error('代码生成失败: ' + res)
+    }
+
     handleClose()
   } catch (error) {
     console.error('表单验证失败:', error)
@@ -72,27 +79,27 @@ async function handleCommit() {
 
 <template>
   <a-modal
-    v-model:open="innerOpen"
-    title="代码生成配置"
-    :width="500"
-    @cancel="handleClose"
+      v-model:open="innerOpen"
+      title="代码生成配置"
+      :width="500"
+      @cancel="handleClose"
   >
     <a-form
-      ref="formRef"
-      :model="formData"
-      :rules="formRules"
-      :label-col="{ span: 6 }"
-      :wrapper-col="{ span: 16 }"
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+        :label-col="{ span: 6 }"
+        :wrapper-col="{ span: 16 }"
     >
       <a-form-item label="ORM 类型" name="ormType">
         <a-select
-          v-model:value="formData.ormType"
-          placeholder="请选择 ORM 类型"
+            v-model:value="formData.ormType"
+            placeholder="请选择 ORM 类型"
         >
           <a-select-option
-            v-for="item in ormTypes"
-            :key="item.value"
-            :value="item.value"
+              v-for="item in ormTypes"
+              :key="item.value"
+              :value="item.value"
           >
             {{ item.label }}
           </a-select-option>
@@ -103,9 +110,9 @@ async function handleCommit() {
     <template #footer>
       <a-button @click="handleClose">取消</a-button>
       <a-button
-        type="primary"
-        :loading="confirmLoading"
-        @click="handleCommit"
+          type="primary"
+          :loading="confirmLoading"
+          @click="handleCommit"
       >
         确定
       </a-button>

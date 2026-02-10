@@ -95,6 +95,7 @@ export namespace database {
 	    dbPath: string;
 	    useDSN?: boolean;
 	    dsn?: string;
+	    sqlContent?: string;
 	    timeout?: number;
 	    maxOpenConns?: number;
 	
@@ -114,6 +115,7 @@ export namespace database {
 	        this.dbPath = source["dbPath"];
 	        this.useDSN = source["useDSN"];
 	        this.dsn = source["dsn"];
+	        this.sqlContent = source["sqlContent"];
 	        this.timeout = source["timeout"];
 	        this.maxOpenConns = source["maxOpenConns"];
 	    }

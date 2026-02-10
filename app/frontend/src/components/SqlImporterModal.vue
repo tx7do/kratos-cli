@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import {ref, watch, nextTick, computed} from "vue";
 import {message} from "ant-design-vue";
+
+import {ImportSqlTables, SetDBConfig} from "../../wailsjs/go/main/App";
+
 import MonacoEditor from './MonacoEditor.vue';
-import * as monaco from 'monaco-editor'
-import {ImportSqlTables} from "../../wailsjs/go/main/App";
 
 const props = defineProps<{
   open?: boolean
@@ -18,7 +19,9 @@ const emit = defineEmits<{
 }>()
 
 const innerOpen = ref(false)
-const sqlContent = ref(`SELECT * FROM users WHERE id = 1;`);
+const sqlContent = ref(`SELECT *
+                        FROM users
+                        WHERE id = 1;`);
 
 const editorRef = ref<InstanceType<typeof MonacoEditor>>()
 const validateLoading = ref(false)
@@ -74,6 +77,13 @@ async function handleCommit() {
     message.error('SQL 导入失败，请检查语句是否正确')
     return
   }
+
+  message.success('SQL导入成功！');
+
+  await SetDBConfig({
+    sqlContent: trimmed,
+    type: props.dbType || '',
+  });
 
   emit('submit', trimmed)
   handleClose()

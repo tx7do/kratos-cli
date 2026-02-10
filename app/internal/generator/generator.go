@@ -1,5 +1,14 @@
 package generator
 
+import (
+	"context"
+
+	sqlkratos "github.com/tx7do/kratos-cli/sql-kratos"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
+
+	"app/internal/database"
+)
+
 type Generator struct {
 	options GeneratorOptions
 }
@@ -10,14 +19,17 @@ func NewGenerator() *Generator {
 	}
 }
 
+// GetOptions 获取选项
 func (g *Generator) GetOptions() GeneratorOptions {
 	return g.options
 }
 
+// SetOptions 设置选项
 func (g *Generator) SetOptions(options GeneratorOptions) {
 	g.options = options
 }
 
+// EditOption 编辑已有的选项
 func (g *Generator) EditOption(o *Option) {
 	if o == nil {
 		return
@@ -31,6 +43,7 @@ func (g *Generator) EditOption(o *Option) {
 	}
 }
 
+// AddOption 添加新的选项
 func (g *Generator) AddOption(o *Option) {
 	if o == nil {
 		return
@@ -45,10 +58,12 @@ func (g *Generator) AddOption(o *Option) {
 	g.options = append(g.options, o)
 }
 
+// CleanOptions 清空所有选项
 func (g *Generator) CleanOptions() {
 	g.options = GeneratorOptions{}
 }
 
+// ValidateOptions 验证选项的有效性，返回错误信息字符串，如果没有错误则返回空字符串
 func (g *Generator) ValidateOptions() string {
 	if len(g.options) == 0 {
 		return "no tables selected"
@@ -66,6 +81,7 @@ func (g *Generator) ValidateOptions() string {
 	return ""
 }
 
+// GetValidateOptions 获取通过验证的选项列表
 func (g *Generator) GetValidateOptions() GeneratorOptions {
 	var options GeneratorOptions
 	for _, opt := range g.options {
@@ -76,4 +92,74 @@ func (g *Generator) GetValidateOptions() GeneratorOptions {
 		}
 	}
 	return options
+}
+
+// GenerateCode 生成代码
+func (g *Generator) GenerateCode(
+	ctx context.Context,
+	dbConfig database.DBConfig,
+	ormType string,
+	rootPath string,
+	projectName string,
+) error {
+	opts := g.GetValidateOptions()
+	if len(opts) == 0 {
+		runtime.LogErrorf(ctx, "没有可用的表选项进行代码生成")
+		return nil
+	}
+
+	mapOpts := make(map[string]GeneratorOptions)
+	for _, opt := range opts {
+		mapOpts[opt.Service] = append(mapOpts[opt.Service], opt)
+	}
+
+	for serviceName, serviceOpts := range mapOpts {
+		var options sqlkratos.GeneratorOptions
+
+		options.OrmType = ormType
+		options.Driver = string(dbConfig.Type)
+
+		if dbConfig.SQLContent != "" {
+			options.Source = dbConfig.SQLContent
+		} else if dbConfig.UseDSN {
+			options.Source = dbConfig.DSN
+		} else {
+			// 构建 DSN
+			dsn, err := database.BuildDSN(dbConfig)
+			if err != nil {
+				runtime.LogErrorf(ctx, "构建数据库连接字符串失败: %v", err)
+				return err
+			}
+			options.Source = dsn
+		}
+
+		options.UseRepo = true
+		options.GenerateProto = true
+		options.GenerateORM = true
+		options.GenerateData = true
+		options.GenerateService = true
+		options.GenerateServer = true
+
+		options.Servers = []string{"grpc"}
+
+		options.ProjectName = projectName
+		options.ServiceName = serviceName
+
+		options.SourceModuleName = serviceName
+		options.ModuleName = serviceName
+		options.ModuleVersion = "v1"
+
+		options.OutputPath = rootPath
+
+		for _, opt := range serviceOpts {
+			options.IncludedTables = append(options.IncludedTables, opt.TableName)
+		}
+
+		if err := sqlkratos.Generate(ctx, options); err != nil {
+			runtime.LogErrorf(ctx, "生成代码失败: %v", err)
+			return err
+		}
+	}
+
+	return nil
 }

@@ -31,6 +31,8 @@ type DBConfig struct {
 	UseDSN bool   `json:"useDSN,omitempty"` // 是否使用自定义 DSN
 	DSN    string `json:"dsn,omitempty"`    // 自定义 DSN（仅当 UseDSN=true 时生效）
 
+	SQLContent string `json:"sqlContent,omitempty"` // 导入的 SQL 内容
+
 	// 连接参数（可选）
 	Timeout      time.Duration `json:"timeout,omitempty"`      // 连接超时（秒）
 	MaxOpenConns int           `json:"maxOpenConns,omitempty"` // 最大连接数

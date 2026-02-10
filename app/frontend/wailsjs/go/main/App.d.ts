@@ -4,9 +4,13 @@ import {generator} from '../models';
 import {database} from '../models';
 import {detect} from '../models';
 
+export function CleanConfig():Promise<void>;
+
 export function EditGeneratorOption(arg1:generator.Option):Promise<void>;
 
-export function GenerateCode(arg1:database.DBConfig,arg2:string):Promise<string>;
+export function GenerateCode(arg1:string):Promise<string>;
+
+export function GetDBConfig():Promise<database.DBConfig>;
 
 export function GetDatabaseTables(arg1:database.DBConfig):Promise<Array<database.TableInfo>>;
 
@@ -23,6 +27,8 @@ export function ImportSqlTables(arg1:string):Promise<string>;
 export function OpenProject(arg1:string):Promise<detect.ProjectInfo>;
 
 export function SelectFolder():Promise<string>;
+
+export function SetDBConfig(arg1:database.DBConfig):Promise<void>;
 
 export function SetGeneratorOption(arg1:generator.GeneratorOptions):Promise<void>;
 

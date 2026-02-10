@@ -1,20 +1,23 @@
 package main
 
 import (
-	"app/internal/database"
-	"app/internal/detect"
-	"app/internal/generator"
 	"context"
 
 	ddlparser "github.com/tx7do/go-utils/ddl_parser"
-	sqlkratos "github.com/tx7do/kratos-cli/sql-kratos"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+
+	"app/internal/database"
+	"app/internal/detect"
+	"app/internal/generator"
 )
 
 // App struct
 type App struct {
-	ctx             context.Context
-	projectInfo     *detect.ProjectInfo
+	ctx context.Context
+
+	projectInfo *detect.ProjectInfo
+	dbConfig    *database.DBConfig
+
 	projectDetector *detect.ProjectDetector
 	generator       *generator.Generator
 }
@@ -170,18 +173,39 @@ func (a *App) ImportDatabaseTables(cfg database.DBConfig) string {
 	return ""
 }
 
+// SetDBConfig 设置数据库连接配置
+func (a *App) SetDBConfig(cfg database.DBConfig) {
+	a.dbConfig = &cfg
+}
+
+// GetDBConfig 获取数据库连接配置
+func (a *App) GetDBConfig() *database.DBConfig {
+	return a.dbConfig
+}
+
+func (a *App) CleanConfig() {
+	a.projectInfo = nil
+	a.dbConfig = nil
+	a.generator.CleanOptions()
+
+	runtime.EventsEmit(a.ctx, "config-cleaned")
+}
+
 // GenerateCode 生成代码
-func (a *App) GenerateCode(cfg database.DBConfig, ormType string) string {
-	conn, err := database.Connect(cfg)
-	if err != nil {
-		runtime.LogErrorf(a.ctx, "连接数据库失败: %v", err)
-		return "连接数据库失败"
+func (a *App) GenerateCode(ormType string) string {
+	if a.projectInfo == nil {
+		runtime.LogErrorf(a.ctx, "未打开项目，无法生成代码")
+		return "未打开项目，无法生成代码"
 	}
-	defer conn.Close()
 
-	var options sqlkratos.GeneratorOptions
-	if err = sqlkratos.Generate(a.ctx, options); err != nil {
+	if a.dbConfig == nil {
+		runtime.LogErrorf(a.ctx, "未配置数据库连接，无法生成代码")
+		return "未配置数据库连接，无法生成代码"
+	}
 
+	if err := a.generator.GenerateCode(a.ctx, *a.dbConfig, ormType, a.projectInfo.Root, a.projectInfo.ModPath); err != nil {
+		runtime.LogErrorf(a.ctx, "生成代码失败: %v", err)
+		return "生成代码失败"
 	}
 
 	runtime.EventsEmit(a.ctx, "code-generated")

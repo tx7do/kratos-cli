@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import {reactive, ref, watch} from "vue";
 import {message} from "ant-design-vue";
-import {ImportDatabaseTables, TestDatabaseConnection} from "../../wailsjs/go/main/App";
+
+import {ImportDatabaseTables, SetDBConfig, TestDatabaseConnection} from "../../wailsjs/go/main/App";
 
 const props = defineProps<{
   open?: boolean
@@ -72,6 +73,12 @@ async function handleCommit() {
       message.error(`数据库导入失败：${res}`);
       return;
     }
+
+    await SetDBConfig({
+      dsn: formData['dsn'] || '',
+      type: formData['dbType'] || '',
+      useDSN: true,
+    });
 
     message.success('数据库导入成功！');
 
@@ -144,7 +151,8 @@ function resetForm() {
     <template #footer>
       <a-button @click="handleClose">取消</a-button>
       <a-button type="primary" :loading="testLoading" @click="testConnection">测试连接</a-button>
-      <a-button type="primary" :loading="importLoading" :disabled="!formData.dsn.trim()" @click="handleCommit">导入</a-button>
+      <a-button type="primary" :loading="importLoading" :disabled="!formData.dsn.trim()" @click="handleCommit">导入
+      </a-button>
     </template>
     <a-form
         ref="formRef"
