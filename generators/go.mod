@@ -8,5 +8,5 @@ require github.com/tx7do/go-utils v1.1.34
 
 require (
 	github.com/tx7do/go-utils/code_generator v0.0.1
-	golang.org/x/text v0.33.0
+	golang.org/x/text v0.34.0
 )
