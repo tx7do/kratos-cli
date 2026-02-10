@@ -6,7 +6,7 @@ import {detect} from '../models';
 
 export function EditGeneratorOption(arg1:generator.Option):Promise<void>;
 
-export function GenerateCode(arg1:database.DBConfig):Promise<string>;
+export function GenerateCode(arg1:database.DBConfig,arg2:string):Promise<string>;
 
 export function GetDatabaseTables(arg1:database.DBConfig):Promise<Array<database.TableInfo>>;
 

@@ -7,9 +7,11 @@ import {EventsOn} from "../../wailsjs/runtime";
 
 import DatabaseImporterModal from "./DatabaseImporterModal.vue";
 import SqlImporterModal from "./SqlImporterModal.vue";
+import CodeGenerateModal from "./CodeGenerateModal.vue";
 
 const openDatabaseImporter = ref<boolean>(false);
 const openSqlImporter = ref<boolean>(false);
+const codeGenerateImporter = ref<boolean>(false);
 
 // 快速选择服务
 const quickSelectService = ref<string>('');
@@ -21,7 +23,7 @@ const tableData = ref<Array<{ id: number; tableName: string; service: string; ex
 const serviceOptions = reactive<Array<{ label: string; value: string }>>([])
 
 function handleGenerateCode() {
-
+  codeGenerateImporter.value = true;
 }
 
 function handleDatabaseImport() {
@@ -165,6 +167,8 @@ EventsOn('table-imported', () => {
   />
   <SqlImporterModal
       v-model:open="openSqlImporter"/>
+  <CodeGenerateModal
+      v-model:open="codeGenerateImporter"/>
 </template>
 
 <style scoped>

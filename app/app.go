@@ -170,13 +170,15 @@ func (a *App) ImportDatabaseTables(cfg database.DBConfig) string {
 }
 
 // GenerateCode 生成代码
-func (a *App) GenerateCode(cfg database.DBConfig) string {
+func (a *App) GenerateCode(cfg database.DBConfig, ormType string) string {
 	conn, err := database.Connect(cfg)
 	if err != nil {
 		runtime.LogErrorf(a.ctx, "连接数据库失败: %v", err)
 		return "连接数据库失败"
 	}
 	defer conn.Close()
+
+	//sqlkratos.Generate(a.ctx, conn, cfg.Type, ormType, a.generator.GetOptions())
 
 	runtime.EventsEmit(a.ctx, "code-generated")
 

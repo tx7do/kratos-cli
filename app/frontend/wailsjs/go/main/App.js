@@ -6,8 +6,8 @@ export function EditGeneratorOption(arg1) {
   return window['go']['main']['App']['EditGeneratorOption'](arg1);
 }
 
-export function GenerateCode(arg1) {
-  return window['go']['main']['App']['GenerateCode'](arg1);
+export function GenerateCode(arg1, arg2) {
+  return window['go']['main']['App']['GenerateCode'](arg1, arg2);
 }
 
 export function GetDatabaseTables(arg1) {

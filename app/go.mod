@@ -14,8 +14,9 @@ require (
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/sijms/go-ora/v2 v2.9.0
-	github.com/tx7do/go-utils/ddl_parser v0.0.2
+	github.com/tx7do/go-utils/ddl_parser v0.0.3
 	github.com/wailsapp/wails/v2 v2.11.0
+	github.com/tx7do/kratos-cli/sql-kratos v0.0.10
 	modernc.org/sqlite v1.45.0
 )
 
@@ -53,12 +54,12 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/wailsapp/go-webview2 v1.0.23 // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
-	golang.org/x/crypto v0.47.0 // indirect
+	golang.org/x/crypto v0.48.0 // indirect
 	golang.org/x/exp v0.0.0-20260209203927-2842357ff358 // indirect
-	golang.org/x/net v0.49.0 // indirect
+	golang.org/x/net v0.50.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.41.0 // indirect
-	golang.org/x/text v0.33.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
 	modernc.org/libc v1.67.7 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
