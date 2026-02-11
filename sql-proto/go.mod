@@ -13,7 +13,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/tx7do/go-utils v1.1.34
 	github.com/tx7do/go-utils/code_generator v0.0.1
-	github.com/tx7do/go-utils/ddl_parser v0.0.4
+	github.com/tx7do/go-utils/ddl_parser v0.0.5
 	github.com/tx7do/kratos-cli/generators v0.0.10
 )
 

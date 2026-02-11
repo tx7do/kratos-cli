@@ -43,7 +43,7 @@ func NewEntClient(ctx *bootstrap.Context) (*entCrud.EntClient[*ent.Client], func
 
 		// run the auto migration tool
 		if cfg.Data.Database.GetMigrate() {
-			if err := client.Schema.Create(context.Background(), migrate.WithForeignKeys(true)); err != nil {
+			if err := client.Schema.Create(ctx.Context(), migrate.WithForeignKeys(true)); err != nil {
 				l.Fatalf("[ENT] failed creating schema resources: %v", err)
 			}
 		}

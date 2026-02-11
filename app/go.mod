@@ -15,7 +15,7 @@ require (
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/labstack/gommon v0.4.2
 	github.com/sijms/go-ora/v2 v2.9.0
-	github.com/tx7do/go-utils/ddl_parser v0.0.4
+	github.com/tx7do/go-utils/ddl_parser v0.0.5
 	github.com/tx7do/kratos-cli/sql-kratos v0.0.16
 	github.com/wailsapp/wails/v2 v2.11.0
 	modernc.org/sqlite v1.45.0

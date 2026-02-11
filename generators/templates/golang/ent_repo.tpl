@@ -12,7 +12,7 @@ import (
 	"github.com/tx7do/go-utils/mapper"
 
 	pagination "github.com/tx7do/go-crud/api/gen/go/pagination/v1"
-	entCurd "github.com/tx7do/go-crud/entgo"
+	entCrud "github.com/tx7do/go-crud/entgo"
 
 	"{{.Module}}/app/{{lower .Service}}/service/internal/data/ent"
 	"{{.Module}}/app/{{lower .Service}}/service/internal/data/ent/predicate"
@@ -26,7 +26,7 @@ type {{.ClassName}} struct {
 	log          *log.Helper
 
 	mapper     *mapper.CopierMapper[{{.ApiPackage}}.{{pascal .Model}}, ent.{{pascal .Model}}]
-	repository *entCurd.Repository[
+	repository *entCrud.Repository[
 		ent.{{pascal .Model}}Query, ent.{{pascal .Model}}Select,
 		ent.{{pascal .Model}}Create, ent.{{pascal .Model}}CreateBulk,
 		ent.{{pascal .Model}}Update, ent.{{pascal .Model}}UpdateOne,
@@ -49,7 +49,7 @@ func New{{.ClassName}}(ctx *bootstrap.Context, entClient *entCrud.EntClient[*ent
 }
 
 func (r *{{.ClassName}}) init() {
-	r.repository = entCurd.NewRepository[
+	r.repository = entCrud.NewRepository[
 		ent.{{pascal .Model}}Query, ent.{{pascal .Model}}Select,
 		ent.{{pascal .Model}}Create, ent.{{pascal .Model}}CreateBulk,
 		ent.{{pascal .Model}}Update, ent.{{pascal .Model}}UpdateOne,
@@ -133,25 +133,13 @@ func (r *{{.ClassName}}) Get(ctx context.Context, req *{{.ApiPackage}}.Get{{pasc
 
 func (r *{{.ClassName}}) Create(ctx context.Context, req *{{.ApiPackage}}.Create{{pascal .Model}}Request) (*{{.ApiPackage}}.{{pascal .Model}}, error) {
 	if req == nil || req.Data == nil {
-		return {{.ApiPackage}}.ErrorBadRequest("invalid parameter")
+		return nil, {{.ApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
 
 	builder := r.entClient.Client().{{pascal .Model}}.Create()
 
 	builder{{range .Fields}}.{{newline}}		{{.EntSetNillableFunc}}
 {{- end}}
-
-    builder.SetNillableCreateBy(req.Data.CreateBy)
-
-	if req.Data.CreateTime == nil {
-		builder.SetCreateTime(time.Now())
-	} else {
-		builder.SetNillableCreateTime(timeutil.StringTimeToTime(req.Data.CreateTime))
-	}
-
-	if req.Data.Id != nil {
-		builder.SetID(req.Data.GetId())
-	}
 
 	if ret, err := builder.Save(ctx); err != nil {
 		r.log.Errorf("insert one data failed: %s", err.Error())
@@ -163,19 +151,17 @@ func (r *{{.ClassName}}) Create(ctx context.Context, req *{{.ApiPackage}}.Create
 
 func (r *{{.ClassName}}) Update(ctx context.Context, req *{{.ApiPackage}}.Update{{pascal .Model}}Request) (*{{.ApiPackage}}.{{pascal .Model}}, error) {
 	if req == nil || req.Data == nil {
-		return {{.ApiPackage}}.ErrorBadRequest("invalid parameter")
+		return nil, {{.ApiPackage}}.ErrorBadRequest("invalid parameter")
 	}
 
 	// 如果不存在则创建
 	if req.GetAllowMissing() {
 		exist, err := r.IsExist(ctx, req.GetData().GetId())
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if !exist {
 			createReq := &{{.ApiPackage}}.Create{{pascal .Model}}Request{Data: req.Data}
-			createReq.Data.CreateBy = createReq.Data.UpdateBy
-			createReq.Data.UpdateBy = nil
 			return r.Create(ctx, createReq)
 		}
 	}
@@ -183,8 +169,8 @@ func (r *{{.ClassName}}) Update(ctx context.Context, req *{{.ApiPackage}}.Update
 	builder := r.entClient.Client().{{pascal .Model}}.UpdateOneID(req.Data.GetId())
 	result, err := r.repository.UpdateOne(ctx, builder, req.Data, req.GetUpdateMask(),
 		func(dto *{{.ApiPackage}}.{{pascal .Model}}) {
-			builder.
-				SetUpdatedAt(time.Now())
+            builder{{range .Fields}}.{{newline}}		{{.EntSetNillableFunc}}
+        {{- end}}
 		},
 	)
 
@@ -201,5 +187,5 @@ func (r *{{.ClassName}}) Delete(ctx context.Context, req *{{.ApiPackage}}.Delete
 		s.Where(sql.EQ({{lower .Model}}.FieldID, req.GetId()))
 	})
 
-	return nil
+	return err
 }

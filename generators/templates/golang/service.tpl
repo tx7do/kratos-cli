@@ -8,9 +8,9 @@ import (
 {{if not .IsGrpc}}
 	"github.com/tx7do/go-utils/trans"
 {{end}}
+	paginationV1 "github.com/tx7do/go-crud/api/gen/go/pagination/v1"
 	"google.golang.org/protobuf/types/known/emptypb"
-	pagination "github.com/tx7do/go-crud/api/gen/go/pagination/v1"
-{{if not .IsGrpc}}
+{{if .UseRepo}}
 	"{{.Module}}/app/{{.Service}}/service/internal/data"
 {{end}}
 	{{.TargetApiPackage}} "{{.Module}}/api/gen/go/{{lower .TargetApiPackageName}}/service/{{lower .TargetApiPackageVersion}}"
@@ -41,7 +41,7 @@ func New{{.ClassName}}(
 	}
 }
 
-func (s *{{.ClassName}}) List(ctx context.Context, req *pagination.PagingRequest) (*{{.SourceApiPackage}}.List{{pascal .Model}}Response, error) {
+func (s *{{.ClassName}}) List(ctx context.Context, req *paginationV1.PagingRequest) (*{{.SourceApiPackage}}.List{{pascal .Model}}Response, error) {
 	return s.{{.DataSourceVar}}.List(ctx, req)
 }
 

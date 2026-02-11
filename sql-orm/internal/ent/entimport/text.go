@@ -123,7 +123,7 @@ func (t *Text) InspectSchema(ctx context.Context, sqlContent string, opts *schem
 		}
 
 		for _, col := range tbl.Columns {
-			log.Printf("列名: %v, 类型: %v\n", col.Name, col.Type)
+			log.Printf("列名: %v, 类型: %v, NULL: %v\n", col.Name, col.Type, col.Nullable)
 
 			colType, err := t.toColumnType(col)
 			if err != nil {
