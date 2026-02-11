@@ -26,26 +26,19 @@ import (
 	applogging "{{.Module}}/pkg/middleware/logging"
 )
 
-// NewWhiteListMatcher 创建jwt白名单
-func newRestWhiteListMatcher() selector.MatchFunc {
-	whiteList := make(map[string]bool)
-	return func(ctx context.Context, operation string) bool {
-		if _, ok := whiteList[operation]; ok {
-			return false
-		}
-		return true
-	}
-}
+type RestMiddlewares []middleware.Middleware
 
-// NewMiddleware 创建中间件
-func newRestMiddleware(
-	logger log.Logger,
+// NewRestMiddleware 创建中间件
+func NewRestMiddleware(
+	ctx *bootstrap.Context,
 	authenticator authnEngine.Authenticator,
-	authorizer authzEngine.Engine,
-) []middleware.Middleware {
+	authorizer *authorizer.Authorizer,
+) RestMiddlewares {
 	var ms []middleware.Middleware
+	ms = append(ms, logging.Server(ctx.GetLogger()))
 
-	ms = append(ms, logging.Server(logger))
+	// add white list for authentication.
+	rpc.AddWhiteList()
 
 	ms = append(ms, selector.Server(
 		authn.Server(authenticator),
@@ -60,7 +53,7 @@ func newRestMiddleware(
 func NewRestServer(
 	ctx *bootstrap.Context,
 
-	authenticator authnEngine.Authenticator,
+    middlewares []middleware.Middleware,
 	authorizer authzEngine.Engine,
 {{range $key, $value := .Services}}
     {{lower $key}}Service *service.{{pascal $key}}Service,
@@ -72,7 +65,7 @@ func NewRestServer(
 		return nil, nil
 	}
 
-	srv, err := rpc.CreateRestServer(cfg, newRestMiddleware(ctx.GetLogger(), authenticator, authorizer)...)
+	srv, err := rpc.CreateRestServer(cfg, middlewares...)
 	if err != nil {
 		return nil, err
 	}
@@ -87,6 +80,9 @@ func NewRestServer(
 			swaggerUI.WithMemoryData(assets.OpenApiData, "yaml"),
 		)
 	}
+
+    if authorizer != nil {
+    }
 
 	return srv, nil
 }

@@ -14,6 +14,14 @@ import (
 {{- end}}
 )
 
+type GrpcMiddlewares []middleware.Middleware
+
+func NewGrpcMiddleware(ctx *bootstrap.Context) GrpcMiddlewares {
+	var ms []middleware.Middleware
+	ms = append(ms, logging.Server(ctx.GetLogger()))
+	return ms
+}
+
 // NewGrpcServer creates a gRPC server.
 func NewGrpcServer(
 	ctx *bootstrap.Context,
