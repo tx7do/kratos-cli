@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
+	"regexp"
+	"strings"
 
 	"github.com/tx7do/go-utils/code_generator"
 	"github.com/tx7do/go-utils/stringcase"
@@ -52,12 +55,42 @@ func (g *GoGenerator) GenerateWireSet(ctx context.Context, opts code_generator.O
 		packageName, _ = v.(string)
 	}
 
+	// 构建完整的函数调用列表
+	var fullFunctionCalls []string
 	if _, ok := opts.Vars["NewFunctions"]; ok && packageName != "" {
 		newFunctions, _ := opts.Vars["NewFunctions"].([]string)
-		for i, fn := range newFunctions {
-			newFunctions[i] = fmt.Sprintf("%s.%s", packageName, fn)
+		for _, fn := range newFunctions {
+			fullFunctionCalls = append(fullFunctionCalls, fmt.Sprintf("%s.%s", packageName, fn))
 		}
-		opts.Vars["NewFunctions"] = newFunctions
+	}
+
+	// 构建输出路径
+	outputPath = opts.OutDir
+	if opts.OutputName != "" {
+		outputPath = filepath.Join(opts.OutDir, opts.OutputName)
+	} else {
+		outputPath = filepath.Join(opts.OutDir, "wire_set.go")
+	}
+
+	// 检查文件是否存在
+	if _, err = os.Stat(outputPath); err == nil {
+		// 文件存在，使用 UpsertProviderSetFunctions 追加
+		if len(fullFunctionCalls) > 0 {
+			err = g.UpsertProviderSetFunctions(outputPath, fullFunctionCalls)
+			if err != nil {
+				return "", fmt.Errorf("failed to upsert provider set functions: %w", err)
+			}
+		}
+		return outputPath, nil
+	} else if !os.IsNotExist(err) {
+		// 其他错误
+		return "", fmt.Errorf("failed to check file existence: %w", err)
+	}
+
+	// 文件不存在，使用模板全新创建
+	// 更新 opts.Vars 以供模板使用
+	if len(fullFunctionCalls) > 0 {
+		opts.Vars["NewFunctions"] = fullFunctionCalls
 	}
 
 	return g.Generate(ctx, opts, "wire_set.tpl")
@@ -196,7 +229,7 @@ func (g *GoGenerator) GenerateService(ctx context.Context, opts code_generator.O
 		if isGrpcService {
 			opts.Vars["ServiceInterface"] = fmt.Sprintf("%s.Unimplemented%sServiceServer",
 				opts.Vars["TargetApiPackage"].(string),
-				stringcase.ToPascalCase(opts.Vars["Service"].(string)))
+				stringcase.ToPascalCase(opts.Vars["Model"].(string)))
 		} else {
 			opts.Vars["ServiceInterface"] = fmt.Sprintf("%s.%sServiceHTTPServer",
 				opts.Vars["TargetApiPackage"].(string),
@@ -246,4 +279,99 @@ func (g *GoGenerator) GenerateAssets(ctx context.Context, opts code_generator.Op
 	opts.OutputName = "assets.go"
 
 	return g.Generate(ctx, opts, "assets.tpl")
+}
+
+// UpsertProviderSetFunction 向 ProviderSet 中添加函数，如果不存在则新增
+// filePath: wire.go 文件路径
+// functionCall: 要添加的函数调用，如 "server.NewRestServer"
+func (g *GoGenerator) UpsertProviderSetFunction(filePath string, functionCall string) error {
+	// 读取文件内容
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return fmt.Errorf("failed to read file: %w", err)
+	}
+
+	fileContent := string(content)
+
+	// 查找 ProviderSet 定义
+	// 匹配 var ProviderSet = wire.NewSet(...) 的模式
+	providerSetPattern := regexp.MustCompile(`(var\s+ProviderSet\s*=\s*wire\.NewSet\s*\(\s*)((?:[^)]+|\n)+)(\s*\))`)
+
+	matches := providerSetPattern.FindStringSubmatch(fileContent)
+	if matches == nil {
+		return fmt.Errorf("ProviderSet definition not found in file")
+	}
+
+	prefix := matches[1]        // "var ProviderSet = wire.NewSet("
+	existingFuncs := matches[2] // 现有的函数列表
+	suffix := matches[3]        // ")"
+
+	// 检查函数是否已存在
+	funcPattern := regexp.MustCompile(`\b` + regexp.QuoteMeta(functionCall) + `\b`)
+	if funcPattern.MatchString(existingFuncs) {
+		// 函数已存在，不需要添加
+		return nil
+	}
+
+	// 准备新的函数列表
+	// 先去除首尾空白，但保留内部结构
+	trimmedFuncs := strings.TrimSpace(existingFuncs)
+
+	// 添加新函数
+	var newFuncs string
+	if trimmedFuncs == "" {
+		// 如果是空的 NewSet，直接添加
+		newFuncs = "\n\t" + functionCall + ",\n"
+	} else {
+		// 确保现有函数列表以逗号结尾（如果不是空行）
+		// 移除可能的尾部逗号和空白，然后统一添加
+		trimmedFuncs = strings.TrimRight(trimmedFuncs, ", \t\n")
+		// 在现有函数后添加，确保格式正确
+		newFuncs = trimmedFuncs + ",\n\n\t" + functionCall + ",\n"
+	}
+
+	// 重新组合内容
+	newProviderSet := prefix + newFuncs + suffix
+	newContent := providerSetPattern.ReplaceAllString(fileContent, newProviderSet)
+
+	// 写回文件
+	err = os.WriteFile(filePath, []byte(newContent), 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write file: %w", err)
+	}
+
+	return nil
+}
+
+// UpsertProviderSetFunctions 批量向 ProviderSet 中添加函数
+func (g *GoGenerator) UpsertProviderSetFunctions(filePath string, functionCalls []string) error {
+	for _, funcCall := range functionCalls {
+		if err := g.UpsertProviderSetFunction(filePath, funcCall); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// CheckProviderSetFunctionExists 检查 ProviderSet 中是否存在指定函数
+func (g *GoGenerator) CheckProviderSetFunctionExists(filePath string, functionCall string) (bool, error) {
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return false, fmt.Errorf("failed to read file: %w", err)
+	}
+
+	fileContent := string(content)
+
+	// 查找 ProviderSet 定义
+	providerSetPattern := regexp.MustCompile(`var\s+ProviderSet\s*=\s*wire\.NewSet\s*\(\s*((?:[^)]+|\n)+)\s*\)`)
+	matches := providerSetPattern.FindStringSubmatch(fileContent)
+	if matches == nil {
+		return false, fmt.Errorf("ProviderSet definition not found in file")
+	}
+
+	existingFuncs := matches[1]
+
+	// 检查函数是否存在
+	funcPattern := regexp.MustCompile(`\b` + regexp.QuoteMeta(functionCall) + `\b`)
+	return funcPattern.MatchString(existingFuncs), nil
 }

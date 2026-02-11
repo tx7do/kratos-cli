@@ -105,7 +105,7 @@ func (s *{{.ClassName}}) Delete(ctx context.Context, req *{{.SourceApiPackage}}.
     if req == nil {
         return nil, {{.SourceApiPackage}}.ErrorBadRequest("invalid parameter")
     }
-{{if not .UseRepo}}
+{{if .UseRepo}}
 	if err := s.{{.DataSourceVar}}.Delete(ctx, req); err != nil {
 		return nil, err
 	}

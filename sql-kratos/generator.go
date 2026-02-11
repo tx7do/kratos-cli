@@ -304,6 +304,13 @@ func (g *Generator) generateDataPackageCode(
 		}
 	}
 
+	switch orm {
+	case "ent":
+		_ = g.WriteWireSetCode(outputPath, projectName, serviceName, "data", "Client", []string{"Ent"})
+	case "gorm":
+		_ = g.WriteWireSetCode(outputPath, projectName, serviceName, "data", "Client", []string{"Gorm"})
+	}
+
 	return g.WriteWireSetCode(outputPath, projectName, serviceName, "data", "Repo", services)
 }
 

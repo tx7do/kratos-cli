@@ -2,7 +2,6 @@
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -10,7 +9,6 @@ import (
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 
 	"github.com/tx7do/go-utils/copierutil"
-	"github.com/tx7do/go-utils/crypto"
 	"github.com/tx7do/go-utils/mapper"
 
 	pagination "github.com/tx7do/go-crud/api/gen/go/pagination/v1"
