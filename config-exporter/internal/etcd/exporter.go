@@ -3,6 +3,7 @@ package etcd
 import (
 	"context"
 	"fmt"
+	"path"
 	"path/filepath"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -70,7 +71,7 @@ func (i *Exporter) writeConfigToEtcd(key string, value []byte) error {
 
 // getServiceConfigFolder 获取某一个服务的配置文件夹路径
 func (i *Exporter) getServiceConfigFolder(root, app string) string {
-	return root + "app/" + app + "/service/configs/"
+	return path.Join(root, "app/", app, "/service/configs/")
 }
 
 // getServiceConfigEtcdKey 获取配置的 Etcd Key
@@ -80,6 +81,6 @@ func (i *Exporter) getServiceConfigEtcdKey(project, app, fileName string) string
 
 // getConfigFileList 获取配置文件列表
 func (i *Exporter) getConfigFileList(root, app string) []string {
-	path := i.getServiceConfigFolder(root, app)
-	return utils.GetFileList(path)
+	p := i.getServiceConfigFolder(root, app)
+	return utils.GetFileList(p)
 }

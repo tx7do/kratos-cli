@@ -91,7 +91,9 @@ func (g *Generator) Generate(ctx context.Context, opts GeneratorOptions) error {
 
 	// 生成service层代码
 	if opts.GenerateService {
-		servicePackagePath := fmt.Sprintf("%s/app/%s/service/internal/", opts.OutputPath, opts.ModuleName)
+		servicePackagePath := fmt.Sprintf("%s/app/%s/service/internal/service/", opts.OutputPath, opts.ModuleName)
+		servicePackagePath = path.Clean(servicePackagePath)
+		log.Printf("Generating service package code at: %s", servicePackagePath)
 		if err = g.generateServicePackageCode(
 			servicePackagePath,
 			opts.ProjectName,
@@ -107,7 +109,9 @@ func (g *Generator) Generate(ctx context.Context, opts GeneratorOptions) error {
 
 	// 生成server层代码
 	if opts.GenerateServer {
-		serverPackagePath := fmt.Sprintf("%s/app/%s/service/internal/", opts.OutputPath, opts.ModuleName)
+		serverPackagePath := fmt.Sprintf("%s/app/%s/service/internal/server/", opts.OutputPath, opts.ModuleName)
+		serverPackagePath = path.Clean(serverPackagePath)
+		log.Printf("Generating server package code at: %s", serverPackagePath)
 		if err = g.generateServerPackageCode(
 			serverPackagePath,
 			opts.ProjectName,
@@ -180,10 +184,10 @@ func (g *Generator) generateOrmCode(
 	var daoPath string
 	switch opts.OrmType {
 	case "ent":
-		schemaPath = serviceRootPath + "/data/ent/schema"
+		schemaPath = path.Join(serviceRootPath, "/data/ent/schema")
 	case "gorm":
-		schemaPath = serviceRootPath + "/data/gorm/schema"
-		daoPath = serviceRootPath + "/data/gorm/dao"
+		schemaPath = path.Join(serviceRootPath, "/data/gorm/schema")
+		daoPath = path.Join(serviceRootPath, "/data/gorm/dao")
 	}
 
 	if err = sqlorm.Importer(

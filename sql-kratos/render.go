@@ -3,6 +3,7 @@ package sqlkratos
 import (
 	"context"
 	"errors"
+	"log"
 	"path/filepath"
 	"strings"
 
@@ -173,6 +174,8 @@ func (g *Generator) WriteServicePackageCode(
 			"UseRepo": useRepo,
 		},
 	}
+
+	log.Printf("Generating service package code for model: %s %s", name, outputPath)
 
 	if _, err := g.goGenerator.GenerateService(context.Background(), o); err != nil {
 		return err
