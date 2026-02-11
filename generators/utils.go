@@ -4,18 +4,15 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/tx7do/go-utils/stringcase"
+
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
 
 // SnakeToPascal converts a snake_case string to PascalCase.
 func SnakeToPascal(snake string) string {
-	parts := strings.Split(snake, "_")
-	titleCaser := cases.Title(language.Und)
-	for i := 0; i < len(parts); i++ { // 从第一个部分开始转换
-		parts[i] = titleCaser.String(parts[i])
-	}
-	return strings.Join(parts, "")
+	return stringcase.ToPascalCase(snake)
 }
 
 func SnakeToPascalPlus(snake string) string {
@@ -39,6 +36,11 @@ func MakeEntSetNillableFunc(fieldName string) string {
 func MakeEntSetNillableFuncWithTransfer(fieldName string, transFunc string) string {
 	inputVar := "req.Data." + SnakeToPascal(fieldName)
 	return "SetNillable" + SnakeToPascalPlus(fieldName) + "(" + transFunc + "(" + inputVar + "))"
+}
+
+func MakeEntSetFunc(fieldName string) string {
+	inputVar := "req.Data.Get" + SnakeToPascal(fieldName) + "()"
+	return "Set" + SnakeToPascalPlus(fieldName) + "(" + inputVar + ")"
 }
 
 func RemoveTableCommentSuffix(input string) string {
