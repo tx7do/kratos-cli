@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
-	"strings"
 
 	"github.com/google/uuid"
 	ddlparser "github.com/tx7do/go-utils/ddl_parser"
@@ -123,11 +123,11 @@ func (t *Text) InspectSchema(ctx context.Context, sqlContent string, opts *schem
 		}
 
 		for _, col := range tbl.Columns {
-			fmt.Printf("列名: %v, 类型: %v\n", col.Name, col.Type)
+			log.Printf("列名: %v, 类型: %v\n", col.Name, col.Type)
 
 			colType, err := t.toColumnType(col)
 			if err != nil {
-				fmt.Printf("解析失败: %v\n", err)
+				log.Printf("解析失败: %v\n", err)
 				continue
 			}
 
@@ -184,17 +184,9 @@ func (t *Text) SchemaMutations(ctx context.Context) ([]schemast.Mutator, error) 
 
 	var s schema.Schema
 
-	// 分割 SQL 语句
-	queries := strings.Split(sqlText, ";")
-	for _, query := range queries {
-		query = strings.TrimSpace(query)
-		if query == "" {
-			continue // 跳过空查询
-		}
-		_, err := t.InspectSchema(ctx, query, inspectOptions, &s)
-		if err != nil {
-			return nil, err
-		}
+	_, err := t.InspectSchema(ctx, sqlText, inspectOptions, &s)
+	if err != nil {
+		return nil, err
 	}
 
 	tables := s.Tables

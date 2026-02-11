@@ -81,8 +81,9 @@ async function handleCommit() {
   message.success('SQL导入成功！');
 
   await SetDBConfig({
+    database: "", dbPath: "", host: "", password: "", port: 0, ssl: false, username: "",
     sqlContent: trimmed,
-    type: props.dbType || '',
+    type: props.dbType || ''
   });
 
   emit('submit', trimmed)

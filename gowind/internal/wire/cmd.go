@@ -3,6 +3,7 @@ package wire
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -53,7 +54,7 @@ func RunGenerate(cmd *cobra.Command, args []string) error {
 				_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: generate for service %s failed: %v\033[m\n", svc, genErr)
 				lastErr = genErr
 			} else {
-				fmt.Printf("Generated wire for service %s successfully.\n", svc)
+				log.Printf("Generated wire for service %s successfully.\n", svc)
 			}
 		}
 		if processed == 0 {

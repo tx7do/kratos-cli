@@ -1,9 +1,9 @@
-﻿package pkg
+package pkg
 
 import (
 	"bytes"
-	"fmt"
 	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -101,7 +101,7 @@ func ReplaceTemplateInCurrentDir(rootDir, source, target string) (int, error) {
 			return err
 		}
 
-		//fmt.Printf("scanning: %s\n", path)
+		//log.Printf("scanning: %s\n", path)
 
 		// 跳过 .git 和 vendor 目录
 		if d.IsDir() {
@@ -114,35 +114,35 @@ func ReplaceTemplateInCurrentDir(rootDir, source, target string) (int, error) {
 		}
 
 		if !isFileExtIncluded(path, includeFileExt) {
-			//fmt.Printf("skipped (ext): %s\n", path)
+			//log.Printf("skipped (ext): %s\n", path)
 			return nil
 		}
 
 		info, err := d.Info()
 		if err != nil {
-			fmt.Printf("failed to get file info: %s, error: %v\n", path, err)
+			log.Printf("failed to get file info: %s, error: %v\n", path, err)
 			return err
 		}
 
 		data, err := os.ReadFile(path)
 		if err != nil {
-			fmt.Printf("failed to read file: %s, error: %v\n", path, err)
+			log.Printf("failed to read file: %s, error: %v\n", path, err)
 			return err
 		}
 
 		if !bytes.Contains(data, []byte(source)) {
-			fmt.Printf("skipped: %s\n", path)
+			log.Printf("skipped: %s\n", path)
 			return nil
 		}
 
 		newData := bytes.ReplaceAll(data, []byte(source), []byte(target))
 		if err = os.WriteFile(path, newData, info.Mode().Perm()); err != nil {
-			fmt.Printf("failed to write file: %s, error: %v\n", path, err)
+			log.Printf("failed to write file: %s, error: %v\n", path, err)
 			return err
 		}
 
 		updated++
-		fmt.Printf("updated: %s\n", path)
+		log.Printf("updated: %s\n", path)
 		return nil
 	})
 

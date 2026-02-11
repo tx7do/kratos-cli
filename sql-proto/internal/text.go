@@ -3,8 +3,8 @@ package internal
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
-	"strings"
 
 	"ariga.io/atlas/sql/mysql"
 	"ariga.io/atlas/sql/postgres"
@@ -72,10 +72,16 @@ func (t *Text) toColumnType(col ddlparser.ColumnDef) (*schema.ColumnType, error)
 		return nil, err
 	}
 
+	// PRIMARY KEY columns are always NOT NULL
+	isNullable := col.Nullable
+	if col.PrimaryKey {
+		isNullable = false
+	}
+
 	return &schema.ColumnType{
 		Type: parsedType,
 		Raw:  col.Type,
-		Null: col.Nullable,
+		Null: isNullable,
 	}, nil
 }
 
@@ -116,11 +122,11 @@ func (t *Text) InspectSchema(sqlContent string, s *schema.Schema) (*schema.Schem
 		}
 
 		for _, col := range tbl.Columns {
-			fmt.Printf("列名: %v, 类型: %v\n", col.Name, col.Type)
+			log.Printf("列名: %v, 类型: %v\n", col.Name, col.Type)
 
 			colType, err := t.toColumnType(col)
 			if err != nil {
-				fmt.Printf("解析失败: %v\n", err)
+				log.Printf("解析失败: %v\n", err)
 				continue
 			}
 
@@ -163,45 +169,53 @@ func (t *Text) InspectSchema(sqlContent string, s *schema.Schema) (*schema.Schem
 	return s, nil
 }
 
-func (t *Text) SchemaTables(ctx context.Context) ([]*TableData, error) {
+func (t *Text) SchemaTables(_ context.Context) ([]*TableData, error) {
 	// 加载 SQL 文本
 	sqlText := t.loadSQLFromFile()
 	if sqlText == "" {
 		return nil, fmt.Errorf("无法加载 SQL 文件: %v", t.schemaPath)
 	}
 
-	//inspectOptions := &schema.InspectOptions{
-	//	Tables: t.includedTables,
-	//}
-
 	var s schema.Schema
+	_, err := t.InspectSchema(sqlText, &s)
+	if err != nil {
+		return nil, err
+	}
 
-	// 分割 SQL 语句
-	queries := strings.Split(sqlText, ";")
-	for _, query := range queries {
-		query = strings.TrimSpace(query)
-		if query == "" {
-			continue // 跳过空查询
-		}
-		_, err := t.InspectSchema(query, &s)
-		if err != nil {
-			return nil, err
-		}
+	// If no tables were parsed successfully, return an error
+	if len(s.Tables) == 0 {
+		return nil, fmt.Errorf("无效的 SQL: 无法解析任何有效的表")
 	}
 
 	tables := s.Tables
-	if t.excludedTables != nil {
-		tables = nil
-		excludedTableNames := make(map[string]bool)
-		for _, t := range t.excludedTables {
-			excludedTableNames[t] = true
+
+	// Filter by includedTables if specified
+	if t.includedTables != nil && len(t.includedTables) > 0 {
+		includedTableNames := make(map[string]bool)
+		for _, tableName := range t.includedTables {
+			includedTableNames[tableName] = true
 		}
-		// filter out tables that are in excludedTables:
-		for _, t := range s.Tables {
-			if !excludedTableNames[t.Name] {
-				tables = append(tables, t)
+		tables = nil
+		for _, table := range s.Tables {
+			if includedTableNames[table.Name] {
+				tables = append(tables, table)
 			}
 		}
+	}
+
+	// Filter out excludedTables
+	if t.excludedTables != nil && len(t.excludedTables) > 0 {
+		excludedTableNames := make(map[string]bool)
+		for _, tableName := range t.excludedTables {
+			excludedTableNames[tableName] = true
+		}
+		filteredTables := make([]*schema.Table, 0)
+		for _, table := range tables {
+			if !excludedTableNames[table.Name] {
+				filteredTables = append(filteredTables, table)
+			}
+		}
+		tables = filteredTables
 	}
 
 	return schemaTables(t.fieldType, tables)

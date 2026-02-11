@@ -75,9 +75,10 @@ async function handleCommit() {
     }
 
     await SetDBConfig({
+      database: "", dbPath: "", host: "", password: "", port: 0, ssl: false, username: "",
       dsn: formData['dsn'] || '',
       type: formData['dbType'] || '',
-      useDSN: true,
+      useDSN: true
     });
 
     message.success('数据库导入成功！');

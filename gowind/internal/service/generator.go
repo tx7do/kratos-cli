@@ -209,7 +209,7 @@ func (g *Generator) generateDataPackageCode(
 	for _, dbClient := range dbClients {
 		functions = append(functions, fmt.Sprintf("New%sClient", stringcase.UpperCamelCase(dbClient)))
 	}
-	//fmt.Printf("functions: %v\n", functions)
+	//log.Printf("functions: %v\n", functions)
 	return g.writeWireSetFunctionCode(outputPath, projectModule, serviceName, "data", functions)
 }
 

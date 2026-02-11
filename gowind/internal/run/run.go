@@ -46,7 +46,7 @@ func Run(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		//fmt.Printf("[%s] hasCmd: %v, hasConfigs: %v\n", wd, hasCmd, hasConfigs)
+		//log.Printf("[%s] hasCmd: %v, hasConfigs: %v\n", wd, hasCmd, hasConfigs)
 
 		if hasCmd && hasConfigs {
 			// 当前目录即为服务目录
