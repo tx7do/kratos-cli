@@ -31,6 +31,7 @@ func main() {
 		Debug: options.Debug{
 			OpenInspectorOnStartup: true,
 		},
+		DisablePanicRecovery: true,
 	})
 
 	if err != nil {

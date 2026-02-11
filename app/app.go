@@ -203,6 +203,8 @@ func (a *App) GenerateCode(ormType string) string {
 		return "未配置数据库连接，无法生成代码"
 	}
 
+	runtime.LogDebugf(a.ctx, "生成代码，ORM 类型: %v", ormType)
+
 	if err := a.generator.GenerateCode(a.ctx, *a.dbConfig, ormType, a.projectInfo.Root, a.projectInfo.ModPath); err != nil {
 		runtime.LogErrorf(a.ctx, "生成代码失败: %v", err)
 		return "生成代码失败"

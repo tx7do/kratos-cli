@@ -62,8 +62,10 @@ func Convert(
 		return nil, err
 	}
 	defer func() {
-		if err := convertDriver.Close(); err != nil {
-			log.Printf("sqlproto: warning - failed to close driver: %v", err)
+		if convertDriver != nil {
+			if err = convertDriver.Close(); err != nil {
+				log.Printf("sqlproto: warning - failed to close driver: %v", err)
+			}
 		}
 	}()
 

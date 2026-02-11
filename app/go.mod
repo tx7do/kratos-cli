@@ -13,9 +13,10 @@ replace (
 require (
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/jackc/pgx/v5 v5.8.0
+	github.com/labstack/gommon v0.4.2
 	github.com/sijms/go-ora/v2 v2.9.0
-	github.com/tx7do/go-utils/ddl_parser v0.0.3
-	github.com/tx7do/kratos-cli/sql-kratos v0.0.14
+	github.com/tx7do/go-utils/ddl_parser v0.0.4
+	github.com/tx7do/kratos-cli/sql-kratos v0.0.15
 	github.com/wailsapp/wails/v2 v2.11.0
 	modernc.org/sqlite v1.45.0
 )
@@ -58,7 +59,6 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/compress v1.18.4 // indirect
 	github.com/labstack/echo/v4 v4.13.3 // indirect
-	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/leaanthony/go-ansi-parser v1.6.1 // indirect
 	github.com/leaanthony/gosod v1.0.4 // indirect
 	github.com/leaanthony/slicer v1.6.0 // indirect
@@ -83,8 +83,8 @@ require (
 	github.com/tx7do/go-utils v1.1.34 // indirect
 	github.com/tx7do/go-utils/code_generator v0.0.1 // indirect
 	github.com/tx7do/kratos-cli/generators v0.0.10 // indirect
-	github.com/tx7do/kratos-cli/sql-orm v0.0.11 // indirect
-	github.com/tx7do/kratos-cli/sql-proto v0.0.23 // indirect
+	github.com/tx7do/kratos-cli/sql-orm v0.0.12 // indirect
+	github.com/tx7do/kratos-cli/sql-proto v0.0.24 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/wailsapp/go-webview2 v1.0.22 // indirect

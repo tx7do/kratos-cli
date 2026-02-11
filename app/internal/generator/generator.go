@@ -2,7 +2,9 @@ package generator
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/labstack/gommon/log"
 	sqlkratos "github.com/tx7do/kratos-cli/sql-kratos"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
@@ -105,7 +107,7 @@ func (g *Generator) GenerateCode(
 	opts := g.GetValidateOptions()
 	if len(opts) == 0 {
 		runtime.LogErrorf(ctx, "没有可用的表选项进行代码生成")
-		return nil
+		return fmt.Errorf("没有可用的表选项进行代码生成")
 	}
 
 	mapOpts := make(map[string]GeneratorOptions)
@@ -115,6 +117,8 @@ func (g *Generator) GenerateCode(
 
 	for serviceName, serviceOpts := range mapOpts {
 		var options sqlkratos.GeneratorOptions
+
+		log.Info("开始为服务生成代码: ", serviceName)
 
 		options.OrmType = ormType
 		options.Driver = string(dbConfig.Type)

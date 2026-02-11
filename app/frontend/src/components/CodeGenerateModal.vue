@@ -59,10 +59,10 @@ async function handleCommit() {
     // 模拟处理过程
     await new Promise(resolve => setTimeout(resolve, 500))
 
-    message.success('代码生成配置已确认！');
-
     const res = await GenerateCode(formData.ormType);
     if (res == "") {
+      message.success('代码生成成功');
+
       emit('success', {ormType: formData.ormType})
     } else {
       message.error('代码生成失败: ' + res)
