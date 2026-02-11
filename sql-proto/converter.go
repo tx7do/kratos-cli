@@ -5,12 +5,32 @@ import (
 	"errors"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/tx7do/kratos-cli/sql-proto/internal"
 	"github.com/tx7do/kratos-cli/sql-proto/internal/mux"
 )
 
 type TableDataArray []*internal.TableData
+
+// normalizeDSN normalizes the DSN to ensure it has a valid scheme.
+// If the input is a file path, it will be prefixed with "file://".
+// If it's SQL text content, it will be prefixed with "text://".
+// If it already has a scheme (mysql://, postgres://, etc.), it's returned as-is.
+func normalizeDSN(dsn string) string {
+	// Check if it already has a scheme
+	if strings.Contains(dsn, "://") {
+		return dsn
+	}
+
+	// Check if it's a file path
+	if _, err := os.Stat(dsn); err == nil {
+		return "file://" + dsn
+	}
+
+	// Treat it as SQL text content
+	return "text://" + dsn
+}
 
 // Convert converts the database schema into a protocol buffer definition.
 func Convert(
@@ -33,18 +53,25 @@ func Convert(
 
 	_ = os.MkdirAll(*outputPath, os.ModePerm)
 
-	convertDriver, err := mux.Default.OpenConvert(*dsn)
+	// Normalize the DSN to ensure it has a valid scheme
+	normalizedDSN := normalizeDSN(*dsn)
+
+	convertDriver, err := mux.Default.OpenConvert(normalizedDSN)
 	if err != nil {
 		log.Fatalf("sqlproto: failed to create import driver - %v", err)
 		return nil, err
 	}
-	defer convertDriver.Close()
+	defer func() {
+		if err := convertDriver.Close(); err != nil {
+			log.Printf("sqlproto: warning - failed to close driver: %v", err)
+		}
+	}()
 
 	i, err := internal.NewConvert(
 		internal.WithIncludedTables(includeTables),
 		internal.WithExcludedTables(excludeTables),
 		internal.WithDriver(convertDriver),
-		internal.WithSchemaPath(*dsn),
+		internal.WithSchemaPath(normalizedDSN),
 	)
 	if err != nil {
 		log.Fatalf("sqlproto: create importer failed: %v", err)

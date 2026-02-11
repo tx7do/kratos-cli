@@ -3,8 +3,8 @@ git tag generators/v0.0.10 --force
 git tag config-exporter/v0.0.8 --force
 
 git tag sql-orm/v0.0.11 --force
-git tag sql-proto/v0.0.22 --force
-git tag sql-kratos/v0.0.13 --force
+git tag sql-proto/v0.0.23 --force
+git tag sql-kratos/v0.0.14 --force
 
 git tag gowind/v0.0.11 --force
 
