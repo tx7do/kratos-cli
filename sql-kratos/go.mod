@@ -10,7 +10,7 @@ require (
 	github.com/tx7do/go-utils/code_generator v0.0.1
 	github.com/tx7do/kratos-cli/generators v0.0.10
 	github.com/tx7do/kratos-cli/sql-orm v0.0.12
-	github.com/tx7do/kratos-cli/sql-proto v0.0.24
+	github.com/tx7do/kratos-cli/sql-proto v0.0.25
 )
 
 require (
