@@ -35,7 +35,7 @@ CREATE TABLE users1 (
 	mutations, err := text.SchemaMutations(context.Background())
 	assert.Nil(t, err)
 
-	schemaPath := "schema"
+	schemaPath := ".\\schema"
 	if err = WriteSchema(mutations, WithSchemaPath(schemaPath)); err != nil {
 		log.Fatalf("entimport: schema writing failed - %v", err)
 	}

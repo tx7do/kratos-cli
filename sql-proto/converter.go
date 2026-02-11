@@ -13,25 +13,6 @@ import (
 
 type TableDataArray []*internal.TableData
 
-// normalizeDSN normalizes the DSN to ensure it has a valid scheme.
-// If the input is a file path, it will be prefixed with "file://".
-// If it's SQL text content, it will be prefixed with "text://".
-// If it already has a scheme (mysql://, postgres://, etc.), it's returned as-is.
-func normalizeDSN(dsn string) string {
-	// Check if it already has a scheme
-	if strings.Contains(dsn, "://") {
-		return dsn
-	}
-
-	// Check if it's a file path
-	if _, err := os.Stat(dsn); err == nil {
-		return "file://" + dsn
-	}
-
-	// Treat it as SQL text content
-	return "text://" + dsn
-}
-
 // Convert converts the database schema into a protocol buffer definition.
 func Convert(
 	ctx context.Context,
@@ -62,11 +43,11 @@ func Convert(
 		return nil, err
 	}
 	defer func() {
-		if convertDriver != nil {
-			if err = convertDriver.Close(); err != nil {
-				log.Printf("sqlproto: warning - failed to close driver: %v", err)
-			}
-		}
+		//if convertDriver != nil {
+		//	if err = convertDriver.Close(); err != nil {
+		//		log.Printf("sqlproto: warning - failed to close driver: %v", err)
+		//	}
+		//}
 	}()
 
 	i, err := internal.NewConvert(
@@ -98,4 +79,23 @@ func Convert(
 	}
 
 	return tableDatas, nil
+}
+
+// normalizeDSN normalizes the DSN to ensure it has a valid scheme.
+// If the input is a file path, it will be prefixed with "file://".
+// If it's SQL text content, it will be prefixed with "text://".
+// If it already has a scheme (mysql://, postgres://, etc.), it's returned as-is.
+func normalizeDSN(dsn string) string {
+	// Check if it already has a scheme
+	if strings.Contains(dsn, "://") {
+		return dsn
+	}
+
+	// Check if it's a file path
+	if _, err := os.Stat(dsn); err == nil {
+		return "file://" + dsn
+	}
+
+	// Treat it as SQL text content
+	return "text://" + dsn
 }

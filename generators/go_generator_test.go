@@ -13,7 +13,7 @@ func TestGoGenerator_Template_Main(t *testing.T) {
 	opts := code_generator.Options{
 		OutDir: "./output",
 		Module: "github.com/example/myproject",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service":                  "user",
 			"ServerImports":            []string{"github.com/example/myproject/server"},
 			"ServerFormalParameters":   []string{"hs http.Server"},
@@ -32,7 +32,7 @@ func TestGoGenerator_Template_Wire(t *testing.T) {
 	opts := code_generator.Options{
 		OutDir: "./output",
 		Module: "github.com/example/myproject",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service": "user",
 		},
 	}
@@ -48,7 +48,7 @@ func TestGoGenerator_Template_WireSet(t *testing.T) {
 	opts := code_generator.Options{
 		OutDir: "./output",
 		Module: "github.com/example/myproject",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service":      "user",
 			"Package":      "data",
 			"NewFunctions": []string{"NewUserRepo", "NewOrderRepo"},
@@ -66,7 +66,7 @@ func TestGoGenerator_Template_EntClient(t *testing.T) {
 	opts := code_generator.Options{
 		OutDir: "./output",
 		Module: "github.com/example/myproject",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service": "user",
 		},
 	}
@@ -82,7 +82,7 @@ func TestGoGenerator_Template_EntRepo(t *testing.T) {
 	opts := code_generator.Options{
 		OutDir: "./output",
 		Module: "github.com/example/myproject",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service":    "user",
 			"ApiPackage": "userV1",
 			"Model":      "user",
@@ -100,7 +100,7 @@ func TestGoGenerator_Template_GormClient(t *testing.T) {
 	opts := code_generator.Options{
 		OutDir: "./output",
 		Module: "github.com/example/myproject",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service": "user",
 		},
 	}
@@ -117,7 +117,7 @@ func TestGoGenerator_Template_GormInit(t *testing.T) {
 		OutDir:     "./output",
 		OutputName: "gorm_init.go",
 		Module:     "github.com/example/myproject",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service": "user",
 		},
 	}
@@ -133,7 +133,7 @@ func TestGoGenerator_Template_GormRepo(t *testing.T) {
 	opts := code_generator.Options{
 		OutDir: "./output",
 		Module: "github.com/example/myproject",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service":    "user",
 			"ApiPackage": "userV1",
 			"Model":      "user",
@@ -151,7 +151,7 @@ func TestGoGenerator_Template_GrpcServer(t *testing.T) {
 	opts := code_generator.Options{
 		OutDir: "./output",
 		Module: "github.com/example/myproject",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service":  "user",
 			"Packages": []string{"user"},
 			"Services": map[string]string{"user": "userV1", "role": "userV1"},
@@ -169,7 +169,7 @@ func TestGoGenerator_Template_RedisClient(t *testing.T) {
 	opts := code_generator.Options{
 		OutDir: "./output",
 		Module: "github.com/example/myproject",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service": "user",
 		},
 	}
@@ -185,7 +185,7 @@ func TestGoGenerator_Template_RestServer(t *testing.T) {
 	opts := code_generator.Options{
 		OutDir: "./output",
 		Module: "github.com/example/myproject",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service":  "admin",
 			"Services": map[string]string{"user": "userV1", "role": "userV1"},
 		},
@@ -202,7 +202,7 @@ func TestGoGenerator_Template_Service(t *testing.T) {
 	opts1 := code_generator.Options{
 		OutDir: "./output",
 		Module: "github.com/example/myproject",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"TargetApiPackageName":    "user",
 			"TargetApiPackageVersion": "v1",
 
@@ -222,7 +222,7 @@ func TestGoGenerator_Template_Service(t *testing.T) {
 	opts2 := code_generator.Options{
 		OutDir: "./output",
 		Module: "github.com/example/myproject",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"TargetApiPackageName":    "admin",
 			"TargetApiPackageVersion": "v1",
 

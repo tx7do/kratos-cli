@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"path"
 
 	"github.com/jinzhu/inflection"
 	"github.com/tx7do/kratos-cli/generators"
@@ -139,7 +140,7 @@ func (g *Generator) generateProtobufCode(ctx context.Context, opts GeneratorOpti
 	var err error
 	var tables sqlproto.TableDataArray
 
-	protoPath := opts.OutputPath + "/api/protos/"
+	protoPath := path.Join(opts.OutputPath, "/api/protos/")
 
 	for _, server := range opts.Servers {
 		if server != "grpc" && server != "rest" {

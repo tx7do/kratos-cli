@@ -60,7 +60,7 @@ func (g *Generator) writeEntClientCode(
 	opts := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectModule,
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service": serviceName,
 		},
 	}
@@ -77,7 +77,7 @@ func (g *Generator) writeGormClientCode(
 	opts1 := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectModule,
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service": serviceName,
 		},
 	}
@@ -89,7 +89,7 @@ func (g *Generator) writeGormClientCode(
 	opts2 := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectModule,
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service": serviceName,
 		},
 	}
@@ -113,7 +113,7 @@ func (g *Generator) writeEntRepoCode(
 	opts := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectModule,
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service":    serviceName,
 			"ApiPackage": stringcase.LowerCamelCase(apiPackageName) + stringcase.UpperCamelCase(apiPackageVersion),
 			"Model":      model,
@@ -137,7 +137,7 @@ func (g *Generator) writeGormRepoCode(
 	opts := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectModule,
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service":    serviceName,
 			"ApiPackage": stringcase.LowerCamelCase(apiPackageName) + stringcase.UpperCamelCase(apiPackageVersion),
 			"Model":      model,
@@ -160,7 +160,7 @@ func (g *Generator) WriteServicePackageCode(
 	o := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectName,
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"TargetApiPackageName":    targetModuleName,
 			"TargetApiPackageVersion": moduleVersion,
 
@@ -193,7 +193,7 @@ func (g *Generator) WriteServerPackageCode(
 		o := code_generator.Options{
 			OutDir: outputPath,
 			Module: projectName,
-			Vars: map[string]interface{}{
+			Vars: map[string]any{
 				"Service":  serviceName,
 				"Services": services,
 			},
@@ -206,7 +206,7 @@ func (g *Generator) WriteServerPackageCode(
 		o := code_generator.Options{
 			OutDir: outputPath,
 			Module: projectName,
-			Vars: map[string]interface{}{
+			Vars: map[string]any{
 				"Service":  serviceName,
 				"Services": services,
 			},
@@ -239,7 +239,7 @@ func (g *Generator) WriteWireSetCode(
 	opts := code_generator.Options{
 		OutDir: filepath.Join(outputPath, "providers"),
 		Module: projectModule,
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service":      serviceName,
 			"Package":      packageName,
 			"NewFunctions": newFunctions,
@@ -258,7 +258,7 @@ func (g *Generator) WriteWireCode(
 	opts := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectName,
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service": serviceName,
 		},
 	}
@@ -277,7 +277,7 @@ func (g *Generator) WriteMainCode(
 	opts := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectName,
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service":                  serviceName,
 			"ServerImports":            generators.ServerImportPaths(servers),
 			"ServerFormalParameters":   generators.ServerFormalParameters(servers),

@@ -1,4 +1,4 @@
-﻿package generators
+package generators
 
 import (
 	"context"
@@ -12,7 +12,7 @@ func TestProtoGenerator_Template_GrpcServiceProto(t *testing.T) {
 
 	opts := code_generator.Options{
 		OutDir: "./output",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Package":   "user.service.v1",
 			"Model":     "user",
 			"ModelName": "用户",
@@ -34,7 +34,7 @@ func TestProtoGenerator_Template_RestServiceProto(t *testing.T) {
 
 	opts := code_generator.Options{
 		OutDir: "./output",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"TargetPackage": "admin.service.v1",
 			"SourcePackage": "user.service.v1",
 			"SourceProto":   "user/service/v1/user.proto",

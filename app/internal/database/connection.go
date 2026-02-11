@@ -133,12 +133,12 @@ func (conn *DBConnection) Close() {
 }
 
 // Exec 执行 SQL（INSERT/UPDATE/DELETE）
-func (conn *DBConnection) Exec(ctx context.Context, sql string, args ...interface{}) (sql.Result, error) {
+func (conn *DBConnection) Exec(ctx context.Context, sql string, args ...any) (sql.Result, error) {
 	return conn.db.ExecContext(ctx, sql, args...)
 }
 
 // Query 执行查询（SELECT）
-func (conn *DBConnection) Query(ctx context.Context, sql string, args ...interface{}) (*sql.Rows, error) {
+func (conn *DBConnection) Query(ctx context.Context, sql string, args ...any) (*sql.Rows, error) {
 	return conn.db.QueryContext(ctx, sql, args...)
 }
 

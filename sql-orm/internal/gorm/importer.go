@@ -43,7 +43,7 @@ func Importer(_ context.Context, drv, dsn, schemaPath, daoPath *string, tables, 
 
 	g.UseDB(db) // 设置数据库连接
 
-	var models []interface{}
+	var models []any
 	if len(tables) > 0 {
 		for _, t := range tables {
 			models = append(models, g.GenerateModel(t))

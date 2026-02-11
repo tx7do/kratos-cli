@@ -134,7 +134,7 @@ func GetTables(conn *DBConnection, dbType DbType) ([]TableInfo, error) {
 // GetColumns 获取表的列信息
 func GetColumns(conn *DBConnection, dbType DbType, tableName string) ([]ColumnInfo, error) {
 	var query string
-	args := []interface{}{tableName}
+	args := []any{tableName}
 
 	switch dbType {
 	case DbTypeMySQL:
@@ -170,7 +170,7 @@ func GetColumns(conn *DBConnection, dbType DbType, tableName string) ([]ColumnIn
 			WHERE a.attrelid = $1::regclass AND a.attnum > 0 AND NOT a.attisdropped
 			ORDER BY a.attnum
 		`
-		args = []interface{}{tableName}
+		args = []any{tableName}
 	case DbTypeSQLite:
 		query = fmt.Sprintf("PRAGMA table_info(%s)", quoteSQLiteIdentifier(tableName))
 		// SQLite 需要特殊处理
@@ -196,7 +196,7 @@ func GetColumns(conn *DBConnection, dbType DbType, tableName string) ([]ColumnIn
 			WHERE table_name = :1 AND owner = USER
 			ORDER BY column_id
 		`
-		args = []interface{}{tableName}
+		args = []any{tableName}
 	}
 
 	rows, err := conn.db.Query(query, args...)

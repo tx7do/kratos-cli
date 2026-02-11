@@ -2,6 +2,7 @@ package entimport
 
 import (
 	"fmt"
+	"os"
 
 	"ariga.io/atlas/sql/schema"
 
@@ -58,6 +59,9 @@ func WriteSchema(mutations []schemast.Mutator, opts ...ImportOption) error {
 	for _, apply := range opts {
 		apply(i)
 	}
+	if err := os.MkdirAll(i.schemaPath, os.ModePerm); err != nil {
+		return err
+	}
 	ctx, err := schemast.Load(i.schemaPath)
 	if err != nil {
 		return err
@@ -107,7 +111,9 @@ func entEdge(nodeName, nodeType string, currentNode *schemast.UpsertSchema, dir 
 	default:
 	}
 
-	desc.Type = nodeType
+	if desc != nil {
+		desc.Type = nodeType
+	}
 
 	return e
 }

@@ -73,6 +73,8 @@ func WriteServicesProto(
 			})
 		}
 
+		//log.Printf("Generating proto for table: [%s] [%s]", table.Name, table.Comment)
+
 		if err := WriteServiceProto(
 			outputPath,
 			serviceType,

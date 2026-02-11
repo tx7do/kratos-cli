@@ -64,7 +64,7 @@ func (i *Exporter) init() {
 	}
 
 	// 创建配置客户端
-	configClient, err := clients.CreateConfigClient(map[string]interface{}{
+	configClient, err := clients.CreateConfigClient(map[string]any{
 		"serverConfigs": serverConfig,
 		"clientConfig":  clientConfig,
 	})

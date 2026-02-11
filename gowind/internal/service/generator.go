@@ -142,7 +142,7 @@ func (g *Generator) generateServerPackageCode(
 			o := code_generator.Options{
 				OutDir: outputPath,
 				Module: projectModule,
-				Vars: map[string]interface{}{
+				Vars: map[string]any{
 					"Service": serviceName,
 				},
 			}
@@ -153,7 +153,7 @@ func (g *Generator) generateServerPackageCode(
 			o := code_generator.Options{
 				OutDir: outputPath,
 				Module: projectModule,
-				Vars: map[string]interface{}{
+				Vars: map[string]any{
 					"Service": serviceName,
 				},
 			}
@@ -186,7 +186,7 @@ func (g *Generator) generateDataPackageCode(
 	o := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectModule,
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service": serviceName,
 		},
 	}
@@ -221,7 +221,7 @@ func (g *Generator) generateMainPackageCode(
 	opts := code_generator.Options{
 		OutDir: outputPath,
 		Module: moduleName,
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service":                  serviceName,
 			"ServerImports":            generators.ServerImportPaths(servers),
 			"ServerFormalParameters":   generators.ServerFormalParameters(servers),
@@ -385,7 +385,7 @@ func (g *Generator) writeWireSetCode(
 	opts := code_generator.Options{
 		OutDir: filepath.Join(outputPath, "providers"),
 		Module: projectModule,
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service":      serviceName,
 			"Package":      packageName,
 			"NewFunctions": newFunctions,
@@ -405,7 +405,7 @@ func (g *Generator) writeWireSetFunctionCode(
 	opts := code_generator.Options{
 		OutDir: filepath.Join(outputPath, "providers"),
 		Module: projectModule,
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service":      serviceName,
 			"Package":      packageName,
 			"NewFunctions": functions,
@@ -423,7 +423,7 @@ func (g *Generator) writeWireCode(
 	opts := code_generator.Options{
 		OutDir: outputPath,
 		Module: projectName,
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"Service": serviceName,
 		},
 	}

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/mux"
 )
@@ -20,16 +21,27 @@ func Importer(ctx context.Context, dsn, schemaPath *string, includeTables, exclu
 
 	_ = os.MkdirAll(*schemaPath, os.ModePerm)
 
-	drv, err := mux.Default.OpenImport(*dsn)
+	// Normalize the DSN to ensure it has a valid scheme
+	normalizedDSN := normalizeDSN(*dsn)
+
+	drv, err := mux.Default.OpenImport(normalizedDSN)
 	if err != nil {
 		log.Fatalf("entimport: failed to create import driver - %v", err)
 	}
-	defer drv.Close()
+	defer func(drv *mux.ImportDriver) {
+		//if drv != nil {
+		//	err = drv.Close()
+		//	if err != nil {
+		//		log.Fatalf("entimport: failed to close import driver - %v", err)
+		//	}
+		//}
+	}(drv)
 
 	i, err := NewImport(
 		WithTables(includeTables),
 		WithExcludedTables(excludeTables),
 		WithDriver(drv),
+		WithSchemaPath(normalizedDSN),
 	)
 	if err != nil {
 		log.Fatalf("entimport: create importer failed: %v", err)
@@ -45,4 +57,23 @@ func Importer(ctx context.Context, dsn, schemaPath *string, includeTables, exclu
 	}
 
 	return nil
+}
+
+// normalizeDSN normalizes the DSN to ensure it has a valid scheme.
+// If the input is a file path, it will be prefixed with "file://".
+// If it's SQL text content, it will be prefixed with "text://".
+// If it already has a scheme (mysql://, postgres://, etc.), it's returned as-is.
+func normalizeDSN(dsn string) string {
+	// Check if it already has a scheme
+	if strings.Contains(dsn, "://") {
+		return dsn
+	}
+
+	// Check if it's a file path
+	if _, err := os.Stat(dsn); err == nil {
+		return "file://" + dsn
+	}
+
+	// Treat it as SQL text content
+	return "text://" + dsn
 }

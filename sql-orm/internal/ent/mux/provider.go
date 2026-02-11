@@ -22,10 +22,13 @@ func mysqlProvider(dsn string) (*ImportDriver, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer db.Close()
+
 	drv, err := atlasmysql.Open(db)
 	if err != nil {
 		return nil, err
 	}
+
 	// dsn example: root:pass@tcp(localhost:3308)/test?parseTime=True
 	cfg, err := mysql.ParseDSN(dsn)
 	if err != nil {
@@ -45,10 +48,13 @@ func postgresProvider(dsn string) (*ImportDriver, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer db.Close()
+
 	drv, err := postgres.Open(db)
 	if err != nil {
 		return nil, err
 	}
+
 	// dsn example: postgresql://user:pass@localhost:5432/atlas?search_path=some_schema
 	parsed, err := url.Parse(dsn)
 	if err != nil {

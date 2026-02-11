@@ -93,8 +93,8 @@ type ColumnInfo struct {
 
 // QueryResult SQL 查询结果
 type QueryResult struct {
-	Columns      []string        `json:"columns"` // 列名
-	Rows         [][]interface{} `json:"rows"`    // 行数据
-	RowsAffected int64           `json:"rowsAffected"`
-	Duration     int64           `json:"duration"` // 毫秒
+	Columns      []string `json:"columns"` // 列名
+	Rows         [][]any  `json:"rows"`    // 行数据
+	RowsAffected int64    `json:"rowsAffected"`
+	Duration     int64    `json:"duration"` // 毫秒
 }
