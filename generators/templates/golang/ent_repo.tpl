@@ -61,16 +61,18 @@ func (r *{{.ClassName}}) init() {
 	r.mapper.AppendConverters(copierutil.NewTimeTimestamppbConverterPair())
 }
 
-func (r *{{.ClassName}}) Count(ctx context.Context, whereCond []func(s *sql.Selector)) (int, error) {
+func (r *{{.ClassName}}) Count(ctx context.Context, req *paginationV1.PagingRequest) (int, error) {
 	builder := r.entClient.Client().{{pascal .Model}}.Query()
-	if len(whereCond) != 0 {
-		builder.Modify(whereCond...)
+
+	whereSelectors, _, err := r.repository.BuildListSelectorWithPaging(builder, req)
+	if len(whereSelectors) != 0 {
+		builder.Modify(whereSelectors...)
 	}
 
 	count, err := builder.Count(ctx)
 	if err != nil {
-		r.log.Errorf("query count failed: %s", err.Error())
-		return 0, {{.ApiPackage}}.ErrorInternalServerError("query count failed")
+		r.log.Errorf("query {{lower .Model}} count failed: %s", err.Error())
+		return 0, {{.ApiPackage}}.ErrorInternalServerError("query {{lower .Model}} count failed")
 	}
 
 	return count, nil
@@ -102,8 +104,8 @@ func (r *{{.ClassName}}) IsExist(ctx context.Context, id uint32) (bool, error) {
 		Where({{lower .Model}}.IDEQ(id)).
 		Exist(ctx)
 	if err != nil {
-		r.log.Errorf("query exist failed: %s", err.Error())
-		return false, {{.ApiPackage}}.ErrorInternalServerError("query exist failed")
+		r.log.Errorf("query {{lower .Model}} exist failed: %s", err.Error())
+		return false, {{.ApiPackage}}.ErrorInternalServerError("query {{lower .Model}} exist failed")
 	}
 	return exist, nil
 }
@@ -115,7 +117,7 @@ func (r *{{.ClassName}}) Get(ctx context.Context, req *{{.ApiPackage}}.Get{{pasc
 
     var whereCond []func(s *sql.Selector)
     switch req.QueryBy.(type) {
-    case *{{.ApiPackage}}.GetUserRequest_Id:
+    case *{{.ApiPackage}}.Get{{pascal .Model}}Request_Id:
         whereCond = append(whereCond, {{lower .Model}}.IDEQ(req.GetId()))
     default:
         whereCond = append(whereCond, {{lower .Model}}.IDEQ(req.GetId()))

@@ -15,6 +15,9 @@ service {{pascal .Model}}Service {
   // 查询{{.ModelName}}列表
   rpc List (pagination.PagingRequest) returns (List{{pascal .Model}}Response) {}
 
+  // 统计{{.ModelName}}数量
+  rpc Count (pagination.PagingRequest) returns (Count{{pascal .Model}}Response) {}
+
   // 查询{{.ModelName}}详情
   rpc Get (Get{{pascal .Model}}Request) returns ({{pascal .Model}}) {}
 
@@ -94,4 +97,8 @@ message BatchCreate{{pascal .Model}}Request {
 }
 message BatchCreate{{pascal .Model}}Response {
   repeated {{pascal .Model}} data = 1;
+}
+
+message Count{{pascal .Model}}Response {
+  uint64 count = 1;
 }
