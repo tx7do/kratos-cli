@@ -89,7 +89,12 @@ message Update{{pascal .Model}}Request {
 }
 
 message Delete{{pascal .Model}}Request {
-  uint32 id = 1;
+  oneof delete_by {
+    uint32 id = 1 [
+      (gnostic.openapi.v3.property) = {description: "ID", read_only: true},
+      json_name = "id"
+    ]; // ID
+  }
 }
 
 message BatchCreate{{pascal .Model}}Request {

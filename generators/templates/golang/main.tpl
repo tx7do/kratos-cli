@@ -36,7 +36,7 @@ import (
 
 	//_ "github.com/tx7do/kratos-bootstrap/tracer"
 
-	"{{.Module}}/pkg/service"
+	"{{.Module}}/pkg/serviceid"
 )
 
 var version = "1.0.0"
@@ -54,8 +54,8 @@ func runApp() error {
 	ctx := bootstrap.NewContext(
 		context.Background(),
 		&conf.AppInfo{
-			Project: service.Project,
-			AppId:   service.{{renderServiceName .Service}},
+			Project: serviceid.ProjectName,
+			AppId:   serviceid.{{renderServiceName .Service}},
 			Version: version,
 		},
 	)
