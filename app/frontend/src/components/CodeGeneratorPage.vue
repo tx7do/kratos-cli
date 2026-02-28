@@ -7,11 +7,16 @@ import {EventsOn} from "../../wailsjs/runtime";
 
 import DatabaseImporterModal from "./DatabaseImporterModal.vue";
 import SqlImporterModal from "./SqlImporterModal.vue";
-import CodeGenerateModal from "./CodeGenerateModal.vue";
+import GRPCCodeGenerateModal from "./GRPCCodeGenerateModal.vue";
+import RESTCodeGenerateModal from "./RESTCodeGenerateModal.vue";
+import FrontendCodeGenerateModal from "./FrontendCodeGenerateModal.vue";
 
 const openDatabaseImporter = ref<boolean>(false);
 const openSqlImporter = ref<boolean>(false);
-const codeGenerateImporter = ref<boolean>(false);
+
+const grpcCodeGenerateImporter = ref<boolean>(false);
+const restCodeGenerateImporter = ref<boolean>(false);
+const frontendCodeGenerateImporter = ref<boolean>(false);
 
 // 快速选择服务
 const quickSelectService = ref<string>('');
@@ -22,8 +27,16 @@ const tableData = ref<Array<{ id: number; tableName: string; service: string; ex
 // 服务选项
 const serviceOptions = reactive<Array<{ label: string; value: string }>>([])
 
-function handleGenerateCode() {
-  codeGenerateImporter.value = true;
+function handleGenerateGRPCCode() {
+  grpcCodeGenerateImporter.value = true;
+}
+
+function handleGenerateRESTCode() {
+  restCodeGenerateImporter.value = true;
+}
+
+function handleGenerateFrontendCode() {
+  frontendCodeGenerateImporter.value = true;
 }
 
 function handleDatabaseImport() {
@@ -115,7 +128,9 @@ EventsOn('table-imported', () => {
         <a-space>
           <a-button type="primary" @click="handleDatabaseImport">数据库导入</a-button>
           <a-button type="primary" @click="handleSQLImport">SQL导入</a-button>
-          <a-button type="primary" danger @click="handleGenerateCode">生成代码</a-button>
+          <a-button type="primary" danger @click="handleGenerateGRPCCode">生成gRPC代码</a-button>
+          <a-button type="primary" danger @click="handleGenerateRESTCode">生成REST代码</a-button>
+          <a-button type="primary" danger @click="handleGenerateFrontendCode">生成前端代码</a-button>
         </a-space>
       </template>
 
@@ -167,8 +182,12 @@ EventsOn('table-imported', () => {
   />
   <SqlImporterModal
       v-model:open="openSqlImporter"/>
-  <CodeGenerateModal
-      v-model:open="codeGenerateImporter"/>
+  <GRPCCodeGenerateModal
+      v-model:open="grpcCodeGenerateImporter"/>
+  <RESTCodeGenerateModal
+      v-model:open="restCodeGenerateImporter"/>
+  <FrontendCodeGenerateModal
+      v-model:open="frontendCodeGenerateImporter"/>
 </template>
 
 <style scoped>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref, watch, reactive} from "vue";
 import {message} from "ant-design-vue";
-import {GenerateCode} from "../../wailsjs/go/main/App";
+import {GenerateFrontendCode} from "../../wailsjs/go/main/App";
 
 const props = defineProps<{
   open?: boolean
@@ -9,7 +9,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
-  (e: 'success', value: { ormType: string }): void
+  (e: 'success', value: { serviceName: string }): void
 }>()
 
 const innerOpen = ref(false)
@@ -17,17 +17,23 @@ const formRef = ref()
 const confirmLoading = ref(false)
 
 const formData = reactive({
-  ormType: 'ent'
+  serviceName: 'admin',
+  frontendType: 'vue'
 })
 
-const ormTypes = [
-  {value: 'ent', label: 'Ent'},
-  {value: 'gorm', label: 'GORM'}
+const frontendTypes = [
+  {value: 'vue', label: 'Vue3'},
+  {value: 'react', label: 'React'},
+  {value: 'dart', label: 'Dart'},
+  {value: 'qt', label: 'Qt6'}
 ]
 
 const formRules = {
-  ormType: [
-    {required: true, message: '请选择 ORM 类型', trigger: 'change'}
+  serviceName: [
+    {required: true, message: '请输入REST服务名', trigger: 'change'}
+  ],
+  frontendType: [
+    {required: true, message: '请选择前端类型', trigger: 'change'}
   ]
 }
 
@@ -44,7 +50,7 @@ function handleClose() {
 
 // 重置表单
 function resetForm() {
-  formData.ormType = 'ent'
+  formData.serviceName = 'admin'
   formRef.value?.clearValidate()
 }
 
@@ -56,14 +62,11 @@ async function handleCommit() {
 
     confirmLoading.value = true
 
-    // 模拟处理过程
-    await new Promise(resolve => setTimeout(resolve, 500))
-
-    const res = await GenerateCode(formData.ormType);
+    const res = await GenerateFrontendCode(formData.serviceName);
     if (res == "") {
       message.success('代码生成成功');
 
-      emit('success', {ormType: formData.ormType})
+      emit('success', {serviceName: formData.serviceName})
     } else {
       message.error('代码生成失败: ' + res)
     }
@@ -80,7 +83,7 @@ async function handleCommit() {
 <template>
   <a-modal
       v-model:open="innerOpen"
-      title="代码生成配置"
+      title="生成前端代码"
       :width="500"
       @cancel="handleClose"
   >
@@ -91,19 +94,25 @@ async function handleCommit() {
         :label-col="{ span: 6 }"
         :wrapper-col="{ span: 16 }"
     >
-      <a-form-item label="ORM 类型" name="ormType">
+      <a-form-item label="前端类型" name="frontendType">
         <a-select
-            v-model:value="formData.ormType"
-            placeholder="请选择 ORM 类型"
+            v-model:value="formData.frontendType"
+            placeholder="请选择前端类型"
         >
           <a-select-option
-              v-for="item in ormTypes"
+              v-for="item in frontendTypes"
               :key="item.value"
               :value="item.value"
           >
             {{ item.label }}
           </a-select-option>
         </a-select>
+      </a-form-item>
+
+      <a-form-item label="REST服务名" name="serviceName">
+        <a-input
+            v-model:value="formData.serviceName">
+        </a-input>
       </a-form-item>
     </a-form>
 

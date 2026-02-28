@@ -96,8 +96,8 @@ func (g *Generator) GetValidateOptions() GeneratorOptions {
 	return options
 }
 
-// GenerateCode 生成代码
-func (g *Generator) GenerateCode(
+// GenerateGrpcCode 生成代码
+func (g *Generator) GenerateGrpcCode(
 	ctx context.Context,
 	dbConfig database.DBConfig,
 	ormType string,
@@ -151,6 +151,76 @@ func (g *Generator) GenerateCode(
 
 		options.SourceModuleName = serviceName
 		options.ModuleName = serviceName
+		options.ModuleVersion = "v1"
+
+		options.OutputPath = rootPath
+
+		for _, opt := range serviceOpts {
+			options.IncludedTables = append(options.IncludedTables, opt.TableName)
+		}
+
+		if err := sqlkratos.Generate(ctx, options); err != nil {
+			runtime.LogErrorf(ctx, "生成代码失败: %v", err)
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (g *Generator) GenerateRestCode(
+	ctx context.Context,
+	restServiceName string,
+	dbConfig database.DBConfig,
+	rootPath string,
+	projectName string,
+) error {
+	opts := g.GetValidateOptions()
+	if len(opts) == 0 {
+		runtime.LogErrorf(ctx, "没有可用的表选项进行代码生成")
+		return fmt.Errorf("没有可用的表选项进行代码生成")
+	}
+
+	mapOpts := make(map[string]GeneratorOptions)
+	for _, opt := range opts {
+		mapOpts[opt.Service] = append(mapOpts[opt.Service], opt)
+	}
+
+	for serviceName, serviceOpts := range mapOpts {
+		var options sqlkratos.GeneratorOptions
+
+		log.Info("开始为服务生成代码: ", serviceName)
+
+		options.Driver = string(dbConfig.Type)
+
+		if dbConfig.SQLContent != "" {
+			options.Source = dbConfig.SQLContent
+		} else if dbConfig.UseDSN {
+			options.Source = dbConfig.DSN
+		} else {
+			// 构建 DSN
+			dsn, err := database.BuildDSN(dbConfig)
+			if err != nil {
+				runtime.LogErrorf(ctx, "构建数据库连接字符串失败: %v", err)
+				return err
+			}
+			options.Source = dsn
+		}
+
+		options.UseRepo = true
+		options.GenerateProto = true
+		options.GenerateORM = false
+		options.GenerateData = true
+		options.GenerateService = true
+		options.GenerateServer = true
+
+		options.Servers = []string{"rest"}
+
+		options.ProjectName = projectName
+		options.ServiceName = restServiceName
+
+		options.SourceModuleName = serviceName
+		options.ModuleName = restServiceName
 		options.ModuleVersion = "v1"
 
 		options.OutputPath = rootPath

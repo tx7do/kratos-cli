@@ -8,7 +8,11 @@ export function CleanConfig():Promise<void>;
 
 export function EditGeneratorOption(arg1:generator.Option):Promise<void>;
 
-export function GenerateCode(arg1:string):Promise<string>;
+export function GenerateFrontendCode(arg1:string,arg2:string):Promise<string>;
+
+export function GenerateGrpcCode(arg1:string):Promise<string>;
+
+export function GenerateRestCode(arg1:string):Promise<string>;
 
 export function GetDBConfig():Promise<database.DBConfig>;
 

@@ -191,8 +191,13 @@ func (a *App) CleanConfig() {
 	runtime.EventsEmit(a.ctx, "config-cleaned")
 }
 
-// GenerateCode 生成代码
-func (a *App) GenerateCode(ormType string) string {
+// GenerateGrpcCode 生成代码
+func (a *App) GenerateGrpcCode(ormType string) string {
+	if ormType == "" {
+		runtime.LogErrorf(a.ctx, "ORM 类型不能为空")
+		return "ORM 类型不能为空"
+	}
+
 	if a.projectInfo == nil {
 		runtime.LogErrorf(a.ctx, "未打开项目，无法生成代码")
 		return "未打开项目，无法生成代码"
@@ -205,9 +210,76 @@ func (a *App) GenerateCode(ormType string) string {
 
 	runtime.LogDebugf(a.ctx, "生成代码，ORM 类型: %v", ormType)
 
-	if err := a.generator.GenerateCode(a.ctx, *a.dbConfig, ormType, a.projectInfo.Root, a.projectInfo.ModPath); err != nil {
+	if err := a.generator.GenerateGrpcCode(
+		a.ctx,
+		*a.dbConfig,
+		ormType,
+		a.projectInfo.Root,
+		a.projectInfo.ModPath,
+	); err != nil {
 		runtime.LogErrorf(a.ctx, "生成代码失败: %v", err)
 		return "生成代码失败"
+	}
+
+	runtime.EventsEmit(a.ctx, "code-generated")
+
+	return ""
+}
+
+// GenerateRestCode 生成代码
+func (a *App) GenerateRestCode(serviceName string) string {
+	if len(serviceName) == 0 {
+		runtime.LogErrorf(a.ctx, "服务名称不能为空")
+		return "服务名称不能为空"
+	}
+
+	if a.projectInfo == nil {
+		runtime.LogErrorf(a.ctx, "未打开项目，无法生成代码")
+		return "未打开项目，无法生成代码"
+	}
+
+	if a.dbConfig == nil {
+		runtime.LogErrorf(a.ctx, "未配置数据库连接，无法生成代码")
+		return "未配置数据库连接，无法生成代码"
+	}
+
+	runtime.LogDebugf(a.ctx, "生成代码，服务名称: %v", serviceName)
+
+	if err := a.generator.GenerateRestCode(
+		a.ctx,
+		serviceName,
+		*a.dbConfig,
+		a.projectInfo.Root,
+		a.projectInfo.ModPath,
+	); err != nil {
+		runtime.LogErrorf(a.ctx, "生成代码失败: %v", err)
+		return "生成代码失败"
+	}
+
+	runtime.EventsEmit(a.ctx, "code-generated")
+
+	return ""
+}
+
+func (a *App) GenerateFrontendCode(serviceName string, frontendType string) string {
+	if len(serviceName) == 0 {
+		runtime.LogErrorf(a.ctx, "服务名称不能为空")
+		return "服务名称不能为空"
+	}
+
+	if len(frontendType) == 0 {
+		runtime.LogErrorf(a.ctx, "前端类型不能为空")
+		return "前端类型不能为空"
+	}
+
+	if a.projectInfo == nil {
+		runtime.LogErrorf(a.ctx, "未打开项目，无法生成代码")
+		return "未打开项目，无法生成代码"
+	}
+
+	if a.dbConfig == nil {
+		runtime.LogErrorf(a.ctx, "未配置数据库连接，无法生成代码")
+		return "未配置数据库连接，无法生成代码"
 	}
 
 	runtime.EventsEmit(a.ctx, "code-generated")

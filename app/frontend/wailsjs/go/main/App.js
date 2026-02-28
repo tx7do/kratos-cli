@@ -10,8 +10,16 @@ export function EditGeneratorOption(arg1) {
   return window['go']['main']['App']['EditGeneratorOption'](arg1);
 }
 
-export function GenerateCode(arg1) {
-  return window['go']['main']['App']['GenerateCode'](arg1);
+export function GenerateFrontendCode(arg1, arg2) {
+  return window['go']['main']['App']['GenerateFrontendCode'](arg1, arg2);
+}
+
+export function GenerateGrpcCode(arg1) {
+  return window['go']['main']['App']['GenerateGrpcCode'](arg1);
+}
+
+export function GenerateRestCode(arg1) {
+  return window['go']['main']['App']['GenerateRestCode'](arg1);
 }
 
 export function GetDBConfig() {
