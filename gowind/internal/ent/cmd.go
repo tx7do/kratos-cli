@@ -11,64 +11,116 @@ import (
 )
 
 func RunGenerate(cmd *cobra.Command, args []string) error {
+	cmdArgs, _ := pkg.SplitArgs(cmd, args)
+
 	inspector, err := pkg.NewModuleInspectorFromGo("")
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
 		return err
 	}
 
+	// 先在模块根目录运行 `go mod tidy`
 	if err = pkg.GoModTidy(cmd.Context(), inspector.Root); err != nil {
 		return err
 	}
 
-	// 如果没有传入 service 或者为空，则遍历所有 service
-	if len(args) == 0 || strings.TrimSpace(args[0]) == "" {
-		appDir := filepath.Join(inspector.Root, "app")
-		entries, err := os.ReadDir(appDir)
+	var serviceName string
+
+	if len(cmdArgs) > 0 {
+		serviceName = strings.TrimSpace(cmdArgs[0])
+		if serviceName == "" {
+			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: service name is required\033[m\n")
+			return fmt.Errorf("service name is required")
+		}
+
+		var valid bool
+		valid, err = pkg.IsValidServiceName(inspector.Root, serviceName)
 		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: failed to read app directory: %s\033[m\n", err.Error())
-			return err
-		}
-
-		var lastErr error
-		var processed int
-		for _, entry := range entries {
-			if !entry.IsDir() {
-				continue
-			}
-
-			svc := entry.Name()
-			servicePath := filepath.Join(appDir, svc, "service")
-
-			entSchemaPath := filepath.Join(servicePath, "internal", "data", "ent", "schema")
-			if _, statErr := os.Stat(entSchemaPath); statErr != nil {
-				// 没有 service 子目录则跳过
-				continue
-			}
-
-			processed++
-			if genErr := generateEnt(servicePath); genErr != nil {
-				_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: generate for service %s failed: %v\033[m\n", svc, genErr)
-				lastErr = genErr
-			} else {
-				fmt.Printf("Generated ent for service %s successfully.\n", svc)
-			}
-		}
-		if processed == 0 {
-			err = fmt.Errorf("no services found under %s", appDir)
 			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
 			return err
 		}
-		return lastErr
+
+		if !valid {
+			err = fmt.Errorf("service '%s' does not exist or is not valid (missing cmd/server or configs)", serviceName)
+			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
+			return err
+		}
+	} else {
+		// 未指定服务名称，检查当前目录是否为服务目录
+
+		var wd string
+		wd, err = os.Getwd()
+		if err != nil {
+			fmt.Printf("os.Getwd error: %v\n", err)
+		}
+
+		serviceName, err = pkg.ExtractServiceName(inspector.Root, wd)
+		if err != nil {
+			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
+			return err
+		}
 	}
 
-	service := args[0]
-	servicePath := filepath.Join(inspector.Root, "app", service, "service")
-	return generateEnt(servicePath)
+	// 如果没有传入 service 或者为空，则遍历所有 service
+	if len(serviceName) == 0 {
+		return generateEntAllService(inspector.Root)
+	}
+
+	servicePath := filepath.Join(inspector.Root, "app", serviceName, "service")
+	err = generateEnt(servicePath)
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: generate for service %s failed: %v\033[m\n", serviceName, err)
+		return err
+	}
+
+	_, _ = fmt.Fprintf(os.Stdout, "Generated ent for service %s successfully.\n", serviceName)
+	return nil
 }
 
-func generateEnt(servicePath string) error {
-	target := filepath.Join(servicePath, "internal", "data", "ent", "schema")
+// generateEntAllService 在模块根目录下查找 app 目录，并对其中每个包含 internal/data/ent/schema 的服务目录执行 generateEnt。
+func generateEntAllService(projectRootPath string) error {
+	appDir := filepath.Join(projectRootPath, "app")
+	entries, err := os.ReadDir(appDir)
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: failed to read app directory: %s\033[m\n", err.Error())
+		return err
+	}
+
+	var lastErr error
+	var processed int
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+
+		serviceName := entry.Name()
+		servicePath := filepath.Join(appDir, serviceName, "service")
+
+		entSchemaPath := filepath.Join(servicePath, "internal", "data", "ent", "schema")
+		if _, statErr := os.Stat(entSchemaPath); statErr != nil {
+			// 没有 service 子目录则跳过
+			continue
+		}
+
+		processed++
+		if genErr := generateEnt(servicePath); genErr != nil {
+			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: generate for service %s failed: %v\033[m\n", serviceName, genErr)
+			lastErr = genErr
+		} else {
+			_, _ = fmt.Fprintf(os.Stdout, "Generated ent for service %s successfully.\n", serviceName)
+		}
+	}
+	if processed == 0 {
+		err = fmt.Errorf("no services found under %s", appDir)
+		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
+		return err
+	}
+	return lastErr
+}
+
+// generateEnt 在指定服务目录下执行 ent code generation，要求该目录下存在 internal/data/ent/schema 目录。
+func generateEnt(serviceRootPath string) error {
+	target := filepath.Join(serviceRootPath, "internal", "data", "ent", "schema")
 	e := NewEntCmd(target)
 	return e.RunGenerate(
 		"--feature", "privacy",

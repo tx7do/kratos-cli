@@ -69,22 +69,16 @@ gow run admin
 
 ### Ent Code Generation
 
-add ent schema for a microservice, for example `admin` service:
-
-```shell
-gow ent add admin User,Group
-```
-
 generate ent code for all microservices:
 
 ```shell
-gow ent generate
+gow ent
 ```
 
 generate ent code for a specified microservice, for example `admin` service:
 
 ```shell
-gow ent generate admin
+gow ent admin
 ```
 
 ## Wire Code Generation

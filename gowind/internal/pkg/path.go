@@ -192,7 +192,7 @@ func ExtractServiceName(projectRootPath, currentDir string) (string, error) {
 
 // IsValidServiceName 检查 serviceName 是否为 projectRootPath 下的有效服务名称，即 app/{serviceName}/service/cmd/server 存在，并且 app/{serviceName}/configs 目录存在。
 func IsValidServiceName(projectRootPath, serviceName string) (bool, error) {
-	serviceRootPath := filepath.Join(projectRootPath, "app", serviceName)
+	serviceRootPath := filepath.Join(projectRootPath, "app", serviceName, "service")
 	hasCmd, hasConfigs, err := HasCmdAndConfigs(serviceRootPath)
 	if err != nil {
 		return false, err
