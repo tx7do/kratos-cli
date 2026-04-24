@@ -1,7 +1,6 @@
 package ent
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,16 +10,14 @@ import (
 	"github.com/tx7do/kratos-cli/gowind/internal/pkg"
 )
 
-func RunGenerate(_ *cobra.Command, args []string) error {
-	ctx := context.Background()
-
+func RunGenerate(cmd *cobra.Command, args []string) error {
 	inspector, err := pkg.NewModuleInspectorFromGo("")
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
 		return err
 	}
 
-	if err = pkg.GoModTidy(ctx, inspector.Root); err != nil {
+	if err = pkg.GoModTidy(cmd.Context(), inspector.Root); err != nil {
 		return err
 	}
 

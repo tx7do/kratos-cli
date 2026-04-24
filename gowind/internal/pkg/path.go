@@ -152,3 +152,51 @@ func HasCmdAndConfigs(dir string) (bool, bool, error) {
 
 	return hasMain, hasConfigs, nil
 }
+
+// ExtractServiceName 从 currentDir 中提取服务名称，前提是 currentDir 位于 projectRootPath 之下，并且路径结构符合 app/{service}/service/cmd/server。
+func ExtractServiceName(projectRootPath, currentDir string) (string, error) {
+	relativePath := strings.TrimPrefix(currentDir, projectRootPath)
+	if relativePath == currentDir {
+		return "", fmt.Errorf("current directory is not within the project root")
+	}
+
+	pathParts := strings.Split(relativePath, string(os.PathSeparator))
+	if len(pathParts) < 4 {
+		return "", nil
+	}
+
+	if strings.TrimSpace(pathParts[1]) != "app" || strings.TrimSpace(pathParts[3]) != "service" {
+		log.Printf("[%s][%s][%s][%s]\n", pathParts[0], pathParts[1], pathParts[2], pathParts[3])
+		return "", fmt.Errorf("current directory does not match expected structure 'app/{service}/service/cmd/server'")
+	}
+
+	serviceName := strings.TrimSpace(pathParts[2]) // app/{service}/service/cmd/server
+	if serviceName == "" {
+		return "", fmt.Errorf("service name is empty")
+	}
+
+	serviceRootPath := filepath.Join(projectRootPath, "app", serviceName, "service")
+	hasCmd, hasConfigs, err := HasCmdAndConfigs(serviceRootPath)
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
+		return "", err
+	}
+
+	if !hasCmd || !hasConfigs {
+		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: current directory does not contain a valid service (missing cmd/server or configs)\033[m\n")
+		return "", nil
+	}
+
+	return serviceName, nil
+}
+
+// IsValidServiceName 检查 serviceName 是否为 projectRootPath 下的有效服务名称，即 app/{serviceName}/service/cmd/server 存在，并且 app/{serviceName}/configs 目录存在。
+func IsValidServiceName(projectRootPath, serviceName string) (bool, error) {
+	serviceRootPath := filepath.Join(projectRootPath, "app", serviceName)
+	hasCmd, hasConfigs, err := HasCmdAndConfigs(serviceRootPath)
+	if err != nil {
+		return false, err
+	}
+
+	return hasCmd && hasConfigs, nil
+}

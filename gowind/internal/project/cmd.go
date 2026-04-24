@@ -66,7 +66,7 @@ func init() {
 	CmdProject.Flags().BoolVarP(&nomod, "nomod", "", nomod, "retain go mod")
 }
 
-func run(_ *cobra.Command, args []string) {
+func run(cmd *cobra.Command, args []string) {
 	wd, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -77,7 +77,7 @@ func run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), t)
+	ctx, cancel := context.WithTimeout(cmd.Context(), t)
 	defer cancel()
 
 	name := ""

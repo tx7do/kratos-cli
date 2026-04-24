@@ -92,13 +92,13 @@ gow ent generate admin
 generate wire code for all microservices:
 
 ```shell
-gow wire generate
+gow wire
 ```
 
 generate wire code for a specified microservice, for example `admin` service:
 
 ```shell
-gow wire generate admin
+gow wire admin
 ```
 
 ## Proto Code Generation

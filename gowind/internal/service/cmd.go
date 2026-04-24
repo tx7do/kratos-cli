@@ -1,7 +1,6 @@
-﻿package service
+package service
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"path"
@@ -82,7 +81,7 @@ func run(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	_ = Generate(context.Background(), GeneratorOptions{
+	_ = Generate(cmd.Context(), GeneratorOptions{
 		GenerateMain:     true,
 		GenerateServer:   true,
 		GenerateService:  true,

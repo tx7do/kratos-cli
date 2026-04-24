@@ -20,11 +20,22 @@ var CmdRun = &cobra.Command{
 	Run:   Run,
 }
 
-var serviceName string
-
 // Run service.
 func Run(cmd *cobra.Command, args []string) {
 	cmdArgs, _ := pkg.SplitArgs(cmd, args)
+
+	inspector, err := pkg.NewModuleInspectorFromGo("")
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
+		return
+	}
+
+	// 先在模块根目录运行 `go mod tidy`
+	if err = pkg.GoModTidy(cmd.Context(), inspector.Root); err != nil {
+		return
+	}
+
+	var serviceName string
 
 	if len(cmdArgs) > 0 {
 		serviceName = strings.TrimSpace(cmdArgs[0])
@@ -32,15 +43,30 @@ func Run(cmd *cobra.Command, args []string) {
 			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: service name is required\033[m\n")
 			return
 		}
+
+		var valid bool
+		valid, err = pkg.IsValidServiceName(inspector.Root, serviceName)
+		if err != nil {
+			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
+			return
+		}
+
+		if !valid {
+			err = fmt.Errorf("service '%s' does not exist or is not valid (missing cmd/server or configs)", serviceName)
+			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
+			return
+		}
 	} else {
 		// 未指定服务名称，检查当前目录是否为服务目录
 
-		wd, err := os.Getwd()
+		var wd string
+		wd, err = os.Getwd()
 		if err != nil {
 			fmt.Printf("os.Getwd error: %v\n", err)
 		}
 
-		hasCmd, hasConfigs, err := pkg.HasCmdAndConfigs(wd)
+		var hasCmd, hasConfigs bool
+		hasCmd, hasConfigs, err = pkg.HasCmdAndConfigs(wd)
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
 			return
@@ -57,12 +83,6 @@ func Run(cmd *cobra.Command, args []string) {
 		}
 
 		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: this is not a valid service folder\033[m\n")
-		return
-	}
-
-	inspector, err := pkg.NewModuleInspectorFromGo("")
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
 		return
 	}
 

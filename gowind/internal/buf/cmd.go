@@ -20,9 +20,7 @@ const (
 	defaultBufGenConfigFile = "buf.gen.yaml"
 )
 
-func RunGenerate(_ *cobra.Command, args []string) error {
-	ctx := context.Background()
-
+func RunGenerate(cmd *cobra.Command, args []string) error {
 	inspector, err := pkg.NewModuleInspectorFromGo("")
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "\033[31mERROR: %s\033[m\n", err.Error())
@@ -30,12 +28,15 @@ func RunGenerate(_ *cobra.Command, args []string) error {
 	}
 
 	// 先在模块根目录运行 `go mod tidy`
-	if err = pkg.GoModTidy(ctx, inspector.Root); err != nil {
+	if err = pkg.GoModTidy(cmd.Context(), inspector.Root); err != nil {
 		return err
 	}
 
 	// 确保 buf 已安装
-	ensureBufInstalled(ctx)
+	ensureBufInstalled(cmd.Context())
+
+	printBufVersion(cmd.Context())
+	printProtocVersion(cmd.Context())
 
 	apiPath := filepath.Join(inspector.Root, "api")
 	if !isDirExists(apiPath) {
@@ -43,7 +44,7 @@ func RunGenerate(_ *cobra.Command, args []string) error {
 		return fmt.Errorf("api directory does not exist: %s", apiPath)
 	}
 
-	return GenerateFromPath(ctx, apiPath)
+	return GenerateFromPath(cmd.Context(), apiPath)
 }
 
 // GenerateFromPath 从指定路径生成 Protobuf 代码。
@@ -159,7 +160,7 @@ func isDirExists(path string) bool {
 	return false
 }
 
-// checkBufInstalled 执行 `buf --version` 来探测 buf 是否安装。
+// checkBuffInstalled 执行 `buf --version` 来探测 buf 是否安装。
 // 返回版本字符串（例: "buf v1.0.0"）或执行失败的错误。
 func checkBufInstalled(ctx context.Context) (string, error) {
 	cmd := exec.CommandContext(ctx, "buf", "--version")
@@ -172,8 +173,8 @@ func checkBufInstalled(ctx context.Context) (string, error) {
 
 // ensureBufInstalled 检查 buf 是否已安装，若未安装则尝试通过 go install 安装。
 func ensureBufInstalled(ctx context.Context) {
-	if ver, err := checkBufInstalled(ctx); err == nil {
-		fmt.Printf("buf is already installed: %s\n", ver)
+	if _, err := checkBufInstalled(ctx); err == nil {
+		//fmt.Printf("buf is already installed: %s\n", ver)
 		return
 	}
 
@@ -200,4 +201,24 @@ func isBufConfigExists(apiPath string) bool {
 		return false
 	}
 	return !info.IsDir()
+}
+
+// printBufVersion 检查 buf 是否安装，并打印版本信息或错误消息。
+func printBufVersion(ctx context.Context) {
+	if ver, err := checkBufInstalled(ctx); err == nil {
+		fmt.Printf("buf version: %s\n", ver)
+	} else {
+		fmt.Printf("buf is not installed: %s\n", err.Error())
+	}
+}
+
+// printProtocVersion 检查 protoc 是否安装，并打印版本信息或错误消息。
+func printProtocVersion(ctx context.Context) {
+	cmd := exec.CommandContext(ctx, "protoc", "--version")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Printf("protoc is not installed: %s\n", err.Error())
+		return
+	}
+	fmt.Printf("protoc version: %s\n", strings.TrimSpace(string(out)))
 }
