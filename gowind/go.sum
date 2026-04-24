@@ -48,8 +48,8 @@ github.com/tx7do/go-utils v1.1.37 h1:4gQJ6hYMjfzorNHXLK4Ld2RqwavmzN94s6YpiWch1/s
 github.com/tx7do/go-utils v1.1.37/go.mod h1:A5zjhW0UTM6veYuCbq7/mcwDXaBw8UhBnvaLSwURBRg=
 github.com/tx7do/go-utils/code_generator v0.0.1 h1:PPZT0iL7tuXtXYPyp6c69h5g2anFJ+1oREvD7++y0yg=
 github.com/tx7do/go-utils/code_generator v0.0.1/go.mod h1:C29vTME26K6JvT82g21b3Jdf/6b031ZSBcdWyIJpHv8=
-github.com/tx7do/kratos-cli/generators v0.0.10 h1:JAUA4AjSM87bXXIC/ilRqys+qrruqQoEsKiwZ3K/OEw=
-github.com/tx7do/kratos-cli/generators v0.0.10/go.mod h1:hd/CSg1elH/L0oujxqO7kVJZWW1xXND8oB4bWlPYM5U=
+github.com/tx7do/kratos-cli/generators v0.0.11 h1:NInwCNZMD1lfcz635xXMC2Lwcjh+92bPOUsLlUlgReI=
+github.com/tx7do/kratos-cli/generators v0.0.11/go.mod h1:iHF8fHY3AdC8YpDPHKngaQqMANkVPYvBc79PQtkg5kE=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 go.yaml.in/yaml/v3 v3.0.4/go.mod h1:DhzuOOF2ATzADvBadXxruRBLzYTpT36CKvDb3+aBEFg=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
