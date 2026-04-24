@@ -108,7 +108,7 @@ func (g *Generator) Generate(_ context.Context, opts GeneratorOptions) error {
 
 	// 追加服务名称常量定义
 	{
-		servicePackagePath := filepath.Join(opts.OutputPath, "/pkg/service")
+		servicePackagePath := filepath.Join(opts.OutputPath, "/pkg/serviceid")
 		if err = g.appendServiceName(
 			servicePackagePath,
 			opts.ProjectName,
@@ -288,10 +288,10 @@ func (g *Generator) writeConfigs(outputPath string) error {
 	return nil
 }
 
-// appendServiceName 向 pkg/service/name.go 文件追加服务名称常量定义。
+// appendServiceName 向 pkg/serviceid/service_id.go 文件追加服务名称常量定义。
 func (g *Generator) appendServiceName(outputPath string, projectName, serviceName string, isBff bool) error {
 	if err := os.MkdirAll(outputPath, os.ModePerm); err != nil {
-		return fmt.Errorf("create pkg/service dir: %w", err)
+		return fmt.Errorf("create pkg/serviceid dir: %w", err)
 	}
 
 	servicePostfix := "service"
@@ -306,7 +306,7 @@ func (g *Generator) appendServiceName(outputPath string, projectName, serviceNam
 	// 行格式，带缩进
 	fieldLine := fmt.Sprintf("    %s = %q", constName, constValue)
 
-	serviceNamePath := filepath.Join(outputPath, "name.go")
+	serviceNamePath := filepath.Join(outputPath, "service_id.go")
 
 	// 文件不存在：创建包含 const 块的初始文件
 	if !pkg.IsFileExists(serviceNamePath) {

@@ -1,7 +1,6 @@
 package generators
 
 import (
-	"context"
 	"testing"
 
 	"github.com/tx7do/go-utils/code_generator"
@@ -21,7 +20,7 @@ func TestGoGenerator_Template_Main(t *testing.T) {
 		},
 	}
 
-	if _, err := g.GenerateMain(context.Background(), opts); err != nil {
+	if _, err := g.GenerateMain(t.Context(), opts); err != nil {
 		t.Fatalf("Generate main.go failed: %v", err)
 	}
 }
@@ -37,7 +36,7 @@ func TestGoGenerator_Template_Wire(t *testing.T) {
 		},
 	}
 
-	if _, err := g.GenerateWire(context.Background(), opts); err != nil {
+	if _, err := g.GenerateWire(t.Context(), opts); err != nil {
 		t.Fatalf("Generate wire.go failed: %v", err)
 	}
 }
@@ -55,7 +54,7 @@ func TestGoGenerator_Template_WireSet(t *testing.T) {
 		},
 	}
 
-	if _, err := g.GenerateWireSet(context.Background(), opts); err != nil {
+	if _, err := g.GenerateWireSet(t.Context(), opts); err != nil {
 		t.Fatalf("Generate init.go failed: %v", err)
 	}
 }
@@ -71,7 +70,7 @@ func TestGoGenerator_Template_EntClient(t *testing.T) {
 		},
 	}
 
-	if _, err := g.GenerateEntClient(context.Background(), opts); err != nil {
+	if _, err := g.GenerateEntClient(t.Context(), opts); err != nil {
 		t.Fatalf("Generate ent_client.go failed: %v", err)
 	}
 }
@@ -89,7 +88,7 @@ func TestGoGenerator_Template_EntRepo(t *testing.T) {
 		},
 	}
 
-	if _, err := g.GenerateEntRepo(context.Background(), opts); err != nil {
+	if _, err := g.GenerateEntRepo(t.Context(), opts); err != nil {
 		t.Fatalf("Generate ent_repo.go failed: %v", err)
 	}
 }
@@ -105,7 +104,7 @@ func TestGoGenerator_Template_GormClient(t *testing.T) {
 		},
 	}
 
-	if _, err := g.GenerateGormClient(context.Background(), opts); err != nil {
+	if _, err := g.GenerateGormClient(t.Context(), opts); err != nil {
 		t.Fatalf("Generate gorm_client.go failed: %v", err)
 	}
 }
@@ -122,7 +121,7 @@ func TestGoGenerator_Template_GormInit(t *testing.T) {
 		},
 	}
 
-	if _, err := g.GenerateGormInit(context.Background(), opts); err != nil {
+	if _, err := g.GenerateGormInit(t.Context(), opts); err != nil {
 		t.Fatalf("Generate gorm_init.go failed: %v", err)
 	}
 }
@@ -140,7 +139,7 @@ func TestGoGenerator_Template_GormRepo(t *testing.T) {
 		},
 	}
 
-	if _, err := g.GenerateGormRepo(context.Background(), opts); err != nil {
+	if _, err := g.GenerateGormRepo(t.Context(), opts); err != nil {
 		t.Fatalf("Generate gorm_repo.go failed: %v", err)
 	}
 }
@@ -158,7 +157,7 @@ func TestGoGenerator_Template_GrpcServer(t *testing.T) {
 		},
 	}
 
-	if _, err := g.GenerateGrpcServer(context.Background(), opts); err != nil {
+	if _, err := g.GenerateGrpcServer(t.Context(), opts); err != nil {
 		t.Fatalf("Generate grpc_server.go failed: %v", err)
 	}
 }
@@ -174,7 +173,7 @@ func TestGoGenerator_Template_RedisClient(t *testing.T) {
 		},
 	}
 
-	if _, err := g.GenerateRedisClient(context.Background(), opts); err != nil {
+	if _, err := g.GenerateRedisClient(t.Context(), opts); err != nil {
 		t.Fatalf("Generate redis_client.go failed: %v", err)
 	}
 }
@@ -191,7 +190,7 @@ func TestGoGenerator_Template_RestServer(t *testing.T) {
 		},
 	}
 
-	if _, err := g.GenerateRestServer(context.Background(), opts); err != nil {
+	if _, err := g.GenerateRestServer(t.Context(), opts); err != nil {
 		t.Fatalf("Generate rest_server.go failed: %v", err)
 	}
 }
@@ -215,7 +214,7 @@ func TestGoGenerator_Template_Service(t *testing.T) {
 		},
 	}
 
-	if _, err := g.GenerateService(context.Background(), opts1); err != nil {
+	if _, err := g.GenerateService(t.Context(), opts1); err != nil {
 		t.Fatalf("Generate service.go failed: %v", err)
 	}
 
@@ -235,7 +234,7 @@ func TestGoGenerator_Template_Service(t *testing.T) {
 		},
 	}
 
-	if _, err := g.GenerateService(context.Background(), opts2); err != nil {
+	if _, err := g.GenerateService(t.Context(), opts2); err != nil {
 		t.Fatalf("Generate service.go failed: %v", err)
 	}
 }
