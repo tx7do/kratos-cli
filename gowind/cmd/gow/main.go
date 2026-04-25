@@ -1,12 +1,12 @@
-﻿package main
+package main
 
 import (
 	"log"
 
 	"github.com/spf13/cobra"
 
-	"github.com/tx7do/kratos-cli/gowind/internal/project"
-	"github.com/tx7do/kratos-cli/gowind/internal/run"
+	"github.com/tx7do/go-wind-toolkit/gowind/internal/project"
+	"github.com/tx7do/go-wind-toolkit/gowind/internal/run"
 )
 
 var rootCmd = &cobra.Command{
@@ -18,6 +18,7 @@ var rootCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(project.CmdProject)
 	rootCmd.AddCommand(run.CmdRun)
+	rootCmd.AddCommand(versionCmd)
 }
 
 func main() {

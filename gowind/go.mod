@@ -1,4 +1,4 @@
-module github.com/tx7do/kratos-cli/gowind
+module github.com/tx7do/go-wind-toolkit/gowind
 
 go 1.25.0
 
@@ -9,7 +9,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/tx7do/go-utils v1.1.37
 	github.com/tx7do/go-utils/code_generator v0.0.1
-	github.com/tx7do/kratos-cli/generators v0.0.11
+	github.com/tx7do/go-wind-toolkit/generators v0.1.0
 	golang.org/x/mod v0.35.0
 )
 

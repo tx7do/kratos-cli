@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/tx7do/kratos-cli/gowind/internal/buf"
+	"github.com/tx7do/go-wind-toolkit/gowind/internal/buf"
 )
 
 var bufCmd = &cobra.Command{

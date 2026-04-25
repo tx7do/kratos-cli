@@ -1,104 +1,192 @@
-# GoWind
+# GoWind CLI (gow)
 
+GoWind CLI (gow) 是 GoWind Toolkit 的核心命令行入口，提供项目脚手架、微服务管理、代码生成、一键运行等全流程能力，覆盖从项目创建到开发运维的完整生命周期。
 
-## How To Use
+[English](./README.en-US.md) | **中文**
 
-### Install GoWind CLI
+## 安装
 
 ```shell
-go install github.com/tx7do/kratos-cli/gowind/cmd/gow@latest
+go install github.com/tx7do/go-wind-toolkit/gowind/cmd/gow@latest
 ```
 
-### Create a New Project
+验证安装：
 
 ```shell
+gow version
+gow help
+```
+
+## 快速开始
+
+### 1. 创建新项目
+
+```shell
+# 基础创建
 gow new myproject
 cd myproject
 go mod tidy
 ```
 
-or you can use `-m` to specify the module name:
-
 ```shell
+# 指定模块名
 gow new myproject -m github.com/yourusername/myproject
 cd myproject
 go mod tidy
 ```
 
-### Add a New Microservice
+### 2. 添加微服务
 
 ```shell
+# 添加基础服务
 gow add service admin
 gow add service user
 go mod tidy
 ```
 
-You can also specify the server type and orm type when adding a new microservice:
+#### 高级选项
 
 ```shell
-# add microservice with grpc
+# gRPC 服务
 gow add service order -s grpc
 
-# add microservice with rest
+# REST 服务
 gow add service admin -s rest
 
-# add microservice with rest and grpc servers
+# 同时支持 gRPC + REST
 gow add service admin -s rest -s grpc
 
-# add microservice with gorm orm and grpc server
+# 指定 ORM（gorm/ent）+ gRPC
 gow add svc payment -d gorm -s grpc
 
-# add microservice with rest, grpc servers and gorm, redis daos
+# 多数据源 + 多协议
 gow add service admin -s rest -s grpc -d gorm -d redis
 ```
 
-### Run The Microservice Application
-
-You can directly execute the microservice in the current path without parameters, For example you are currently in '
-app/admin/service':
+### 3. 运行微服务
 
 ```shell
+# 当前目录直接运行（需在 app/xxx/service 下）
 gow run
 ```
 
-or run a specified microservice, for example `admin` service:
-
 ```shell
+# 指定服务运行
 gow run admin
 ```
 
-### Ent Code Generation
+### 4. 代码生成
 
-generate ent code for all microservices:
+#### Ent 代码生成
 
 ```shell
+# 为所有服务生成 Ent
 gow ent
-```
 
-generate ent code for a specified microservice, for example `admin` service:
-
-```shell
+# 为指定服务生成 Ent
 gow ent admin
 ```
 
-## Wire Code Generation
-
-generate wire code for all microservices:
+#### Wire 依赖注入生成
 
 ```shell
+# 为所有服务生成 Wire
 gow wire
-```
 
-generate wire code for a specified microservice, for example `admin` service:
-
-```shell
+# 为指定服务生成 Wire
 gow wire admin
 ```
 
-## Proto Code Generation
+#### Protobuf / API 代码生成
 
-generate proto code for all microservices:
+```shell
+# 为所有服务生成 Proto & API
+gow api
+```
+
+## 完整命令参考
+
+### `gow new` — 项目初始化
+
+```shell
+gow new <project-name> [flags]
+
+Flags:
+  -m, --module string   Go module 名称（默认：项目名）
+```
+
+### `gow add` — 新增组件
+
+```shell
+gow add service <service-name> [flags]
+
+Flags:
+  -s, --server strings   服务类型：grpc / rest（可多选）
+  -d, --dao strings      数据访问层：gorm / ent / redis（可多选）
+  -o, --orm string       ORM 类型：gorm / ent（默认：ent）
+```
+
+### `gow run` — 运行服务
+
+```shell
+gow run [service-name]
+```
+
+### `gow ent` — Ent 代码生成
+
+```shell
+gow ent [service-name]
+```
+
+### `gow wire` — Wire 代码生成
+
+```shell
+gow wire [service-name]
+```
+
+### `gow api` — Protobuf / API 代码生成
 
 ```shell
 gow api
 ```
+
+### gow version — 查看版本
+
+```shell
+gow version
+```
+
+### gow help — 帮助
+
+```shell
+gow help
+gow help <command>
+```
+
+### 项目结构（生成后）
+
+```shell
+myproject/
+├── app/
+│   ├── admin/
+│   │     └── service/
+│   └── user/
+│          └── service/
+│   │            └── internal/
+│   │                   └── data/
+│   │                          └── ent/
+├── api/
+│   └── protos/
+├── go.mod
+└── go.sum
+```
+
+## 特性总结
+
+- ✅ 一键创建 Kratos 标准项目
+- ✅ 一键添加多协议微服务（gRPC + REST）
+- ✅ 自动生成 Ent / GORM 模型
+- ✅ 自动生成 Protobuf & API 定义
+- ✅ 自动生成 Wire 依赖注入
+- ✅ 一键运行、热重载支持
+- ✅ 统一 CLI 入口，降低学习成本

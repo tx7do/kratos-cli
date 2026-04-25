@@ -6,7 +6,7 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/tx7do/kratos-cli/gowind/internal/pkg"
+	"github.com/tx7do/go-wind-toolkit/gowind/internal/pkg"
 )
 
 const (

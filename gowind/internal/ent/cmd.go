@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/tx7do/kratos-cli/gowind/internal/pkg"
+	"github.com/tx7do/go-wind-toolkit/gowind/internal/pkg"
 )
 
 func RunGenerate(cmd *cobra.Command, args []string) error {

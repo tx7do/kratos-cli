@@ -10,7 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/tx7do/kratos-cli/gowind/internal/pkg"
+	"github.com/tx7do/go-wind-toolkit/gowind/internal/pkg"
 )
 
 // RunGenerate 用于 cobra 的 RunE：校验参数并在服务目录执行 wire 命令。

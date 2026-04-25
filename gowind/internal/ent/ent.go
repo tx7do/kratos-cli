@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/tx7do/kratos-cli/gowind/internal/pkg"
+	"github.com/tx7do/go-wind-toolkit/gowind/internal/pkg"
 )
 
 // EntCmd 封装 ent 命令调用的数据和行为。
