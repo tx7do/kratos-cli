@@ -8,8 +8,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	sqlproto "github.com/tx7do/kratos-cli/sql-proto"
-	"github.com/tx7do/kratos-cli/sql-proto/internal"
+	sqlproto "github.com/tx7do/go-wind-toolkit/sql-proto"
+	"github.com/tx7do/go-wind-toolkit/sql-proto/internal"
 )
 
 var rootCmd = &cobra.Command{

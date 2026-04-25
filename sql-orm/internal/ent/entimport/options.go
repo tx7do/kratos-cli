@@ -9,7 +9,7 @@ import (
 	"entgo.io/contrib/schemast"
 	"entgo.io/ent"
 
-	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/mux"
+	"github.com/tx7do/go-wind-toolkit/sql-orm/internal/ent/mux"
 )
 
 const (

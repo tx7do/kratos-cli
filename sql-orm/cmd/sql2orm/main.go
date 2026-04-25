@@ -10,8 +10,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/tx7do/kratos-cli/sql-orm"
-	"github.com/tx7do/kratos-cli/sql-orm/internal"
+	"github.com/tx7do/go-wind-toolkit/sql-orm"
+	"github.com/tx7do/go-wind-toolkit/sql-orm/internal"
 )
 
 var rootCmd = &cobra.Command{

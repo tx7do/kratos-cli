@@ -1,4 +1,4 @@
-module github.com/tx7do/kratos-cli/sql-orm
+module github.com/tx7do/go-wind-toolkit/sql-orm
 
 go 1.24.11
 

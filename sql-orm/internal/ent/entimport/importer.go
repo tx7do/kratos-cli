@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/mux"
+	"github.com/tx7do/go-wind-toolkit/sql-orm/internal/ent/mux"
 )
 
 // Importer imports the schema from the database specified by the DSN and writes it to the schemaPath.

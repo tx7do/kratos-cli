@@ -4,10 +4,10 @@ import (
 	"errors"
 	"log"
 
-	"github.com/tx7do/kratos-cli/config-exporter/internal"
-	"github.com/tx7do/kratos-cli/config-exporter/internal/consul"
-	"github.com/tx7do/kratos-cli/config-exporter/internal/etcd"
-	"github.com/tx7do/kratos-cli/config-exporter/internal/nacos"
+	"github.com/tx7do/go-wind-toolkit/config-exporter/internal"
+	"github.com/tx7do/go-wind-toolkit/config-exporter/internal/consul"
+	"github.com/tx7do/go-wind-toolkit/config-exporter/internal/etcd"
+	"github.com/tx7do/go-wind-toolkit/config-exporter/internal/nacos"
 )
 
 func NewExporter(

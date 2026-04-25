@@ -5,8 +5,8 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/entimport"
-	"github.com/tx7do/kratos-cli/sql-orm/internal/gorm"
+	"github.com/tx7do/go-wind-toolkit/sql-orm/internal/ent/entimport"
+	"github.com/tx7do/go-wind-toolkit/sql-orm/internal/gorm"
 )
 
 func Importer(

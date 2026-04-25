@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/tx7do/kratos-cli/sql-proto/internal/mux"
+	"github.com/tx7do/go-wind-toolkit/sql-proto/internal/mux"
 )
 
 // TestTextSchemaTables tests parsing SQL text and converting to table data

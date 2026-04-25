@@ -10,7 +10,7 @@ Support Remote Config Systems Exporter for Kratos CLI:
 ## HOW TO INSTALL
 
 ```shell
-go install github.com/tx7do/kratos-cli/config-exporter/cmd/cfgexp@latest
+go install github.com/tx7do/go-wind-toolkit/config-exporter/cmd/cfgexp@latest
 ```
 
 ## HOW TO USE

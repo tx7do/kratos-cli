@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/tx7do/go-utils/code_generator"
-	"github.com/tx7do/kratos-cli/generators"
+	"github.com/tx7do/go-wind-toolkit/generators"
 )
 
 // WriteGrpcServiceProto write gRPC service proto file

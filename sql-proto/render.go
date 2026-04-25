@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/jinzhu/inflection"
-	"github.com/tx7do/kratos-cli/generators"
+	"github.com/tx7do/go-wind-toolkit/generators"
 
-	"github.com/tx7do/kratos-cli/sql-proto/internal/render"
+	"github.com/tx7do/go-wind-toolkit/sql-proto/internal/render"
 )
 
 type ProtoField generators.ProtoField

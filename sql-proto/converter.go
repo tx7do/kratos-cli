@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tx7do/kratos-cli/sql-proto/internal"
-	"github.com/tx7do/kratos-cli/sql-proto/internal/mux"
+	"github.com/tx7do/go-wind-toolkit/sql-proto/internal"
+	"github.com/tx7do/go-wind-toolkit/sql-proto/internal/mux"
 )
 
 type TableDataArray []*internal.TableData

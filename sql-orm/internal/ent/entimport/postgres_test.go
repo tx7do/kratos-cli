@@ -17,7 +17,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/entimport"
+	"github.com/tx7do/go-wind-toolkit/sql-orm/internal/ent/entimport"
 )
 
 func TestPostgres(t *testing.T) {

@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/tx7do/kratos-cli/config-exporter"
-	"github.com/tx7do/kratos-cli/config-exporter/internal"
+	"github.com/tx7do/go-wind-toolkit/config-exporter"
+	"github.com/tx7do/go-wind-toolkit/config-exporter/internal"
 )
 
 var rootCmd = &cobra.Command{

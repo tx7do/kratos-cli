@@ -5,7 +5,7 @@ This tool imports the SQL database schemas and generates ORM code for use in Kra
 ## HOW TO INSTALL
 
 ```shell
-go install github.com/tx7do/kratos-cli/sql-orm/cmd/sql2orm@latest
+go install github.com/tx7do/go-wind-toolkit/sql-orm/cmd/sql2orm@latest
 ```
 
 ## HOW TO USE

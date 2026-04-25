@@ -12,8 +12,8 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 
-	"github.com/tx7do/kratos-cli/config-exporter/internal"
-	"github.com/tx7do/kratos-cli/config-exporter/internal/utils"
+	"github.com/tx7do/go-wind-toolkit/config-exporter/internal"
+	"github.com/tx7do/go-wind-toolkit/config-exporter/internal/utils"
 )
 
 type Exporter struct {

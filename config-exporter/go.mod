@@ -1,4 +1,4 @@
-module github.com/tx7do/kratos-cli/config-exporter
+module github.com/tx7do/go-wind-toolkit/config-exporter
 
 go 1.25.5
 

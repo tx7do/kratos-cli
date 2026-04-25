@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"github.com/tx7do/kratos-cli/sql-proto/internal/mux"
+	"github.com/tx7do/go-wind-toolkit/sql-proto/internal/mux"
 )
 
 type Options struct {

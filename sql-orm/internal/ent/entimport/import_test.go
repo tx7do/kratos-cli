@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/tx7do/kratos-cli/sql-orm/internal/ent/mux"
+	"github.com/tx7do/go-wind-toolkit/sql-orm/internal/ent/mux"
 )
 
 func MockMySQLTableNameDoesNotUsePluralForm() *schema.Schema {

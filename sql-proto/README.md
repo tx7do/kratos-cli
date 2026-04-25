@@ -5,7 +5,7 @@ This tool imports the SQL database schemas and generates Protobuf code for use i
 ## HOW TO INSTALL
 
 ```shell
-go install github.com/tx7do/kratos-cli/sql-proto/cmd/sql2proto@latest
+go install github.com/tx7do/go-wind-toolkit/sql-proto/cmd/sql2proto@latest
 ```
 
 ## HOW TO USE
