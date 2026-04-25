@@ -77,7 +77,7 @@ async function handleCommit() {
 <template>
   <a-modal
       v-model:open="innerOpen"
-      title="生成gRPC代码"
+      title="生成gRPC服务"
       :width="500"
       @cancel="handleClose"
   >

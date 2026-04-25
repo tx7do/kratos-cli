@@ -72,7 +72,7 @@ async function handleCommit() {
 <template>
   <a-modal
       v-model:open="innerOpen"
-      title="生成REST代码"
+      title="生成REST服务"
       :width="500"
       @cancel="handleClose"
   >
