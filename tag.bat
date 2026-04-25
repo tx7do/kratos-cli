@@ -1,11 +1,11 @@
-git tag generators/v0.0.11 --force
+git tag generators/v0.1.0 --force
 
-git tag config-exporter/v0.0.8 --force
+git tag config-exporter/v0.1.0 --force
 
-git tag sql-orm/v0.0.13 --force
-git tag sql-proto/v0.0.25 --force
-git tag sql-kratos/v0.0.16 --force
+git tag sql-orm/v0.1.0 --force
+git tag sql-proto/v0.1.0 --force
+git tag sql-kratos/v0.1.0 --force
 
-git tag gowind/v0.0.12 --force
+git tag gowind/v0.1.0 --force
 
 git push origin --tags

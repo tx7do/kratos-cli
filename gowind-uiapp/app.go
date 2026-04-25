@@ -6,9 +6,9 @@ import (
 	ddlparser "github.com/tx7do/go-utils/ddl_parser"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
-	"app/internal/database"
-	"app/internal/detect"
-	"app/internal/generator"
+	"github.com/tx7do/go-wind-toolkit/gowind-uiapp/internal/database"
+	"github.com/tx7do/go-wind-toolkit/gowind-uiapp/internal/detect"
+	"github.com/tx7do/go-wind-toolkit/gowind-uiapp/internal/generator"
 )
 
 // App struct

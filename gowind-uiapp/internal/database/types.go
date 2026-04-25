@@ -70,14 +70,14 @@ func (e *DBError) Error() string {
 
 // TableInfo 表元数据
 type TableInfo struct {
-	Name       string    `json:"table_name"`
-	Type       string    `json:"table_type"`    // BASE TABLE, VIEW...
-	Engine     string    `json:"table_engine"`  // InnoDB, MyISAM...
-	Rows       uint64    `json:"table_rows"`    // 行数（估算）
-	Comment    string    `json:"table_comment"` // 表注释
-	Columns    int       `json:"table_columns"` // 列数量
-	Indexes    int       `json:"table_indexes"` // 索引数量
-	CreateTime time.Time `json:"create_time"`   // 创建时间
+	Name       string `json:"table_name"`
+	Type       string `json:"table_type"`    // BASE TABLE, VIEW...
+	Engine     string `json:"table_engine"`  // InnoDB, MyISAM...
+	Rows       uint64 `json:"table_rows"`    // 行数（估算）
+	Comment    string `json:"table_comment"` // 表注释
+	Columns    int    `json:"table_columns"` // 列数量
+	Indexes    int    `json:"table_indexes"` // 索引数量
+	CreateTime string `json:"create_time"`   // 创建时间（格式化字符串）
 }
 
 // ColumnInfo 列元数据

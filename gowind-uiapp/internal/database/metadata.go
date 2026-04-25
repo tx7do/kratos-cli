@@ -117,7 +117,9 @@ func GetTables(conn *DBConnection, dbType DbType) ([]TableInfo, error) {
 			table.Rows = uint64(tableRows.Int64)
 		}
 		if createTime.Valid {
-			table.CreateTime = createTime.Time
+			table.CreateTime = createTime.Time.Format("2006-01-02 15:04:05")
+		} else {
+			table.CreateTime = ""
 		}
 		if tableComment.Valid {
 			table.Comment = tableComment.String

@@ -62,7 +62,7 @@ async function handleCommit() {
 
     confirmLoading.value = true
 
-    const res = await GenerateFrontendCode(formData.serviceName);
+    const res = await GenerateFrontendCode(formData.serviceName, formData.frontendType);
     if (res == "") {
       message.success('代码生成成功');
 

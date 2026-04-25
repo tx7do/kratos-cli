@@ -129,8 +129,7 @@ export namespace database {
 	    table_comment: string;
 	    table_columns: number;
 	    table_indexes: number;
-	    // Go type: time
-	    create_time: any;
+	    create_time: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new TableInfo(source);
@@ -145,26 +144,8 @@ export namespace database {
 	        this.table_comment = source["table_comment"];
 	        this.table_columns = source["table_columns"];
 	        this.table_indexes = source["table_indexes"];
-	        this.create_time = this.convertValues(source["create_time"], null);
+	        this.create_time = source["create_time"];
 	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
 	}
 
 }
