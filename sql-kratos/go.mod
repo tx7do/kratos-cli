@@ -1,23 +1,23 @@
-module github.com/tx7do/kratos-cli/sql-kratos
+module github.com/tx7do/go-wind-toolkit/sql-kratos
 
-go 1.24.11
+go 1.25.0
 
 require (
 	github.com/jinzhu/inflection v1.0.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
-	github.com/tx7do/go-utils v1.1.34
+	github.com/tx7do/go-utils v1.1.37
 	github.com/tx7do/go-utils/code_generator v0.0.1
-	github.com/tx7do/kratos-cli/generators v0.0.10
-	github.com/tx7do/kratos-cli/sql-orm v0.0.12
-	github.com/tx7do/kratos-cli/sql-proto v0.0.25
+	github.com/tx7do/go-wind-toolkit/generators v0.1.0
+	github.com/tx7do/go-wind-toolkit/sql-orm v0.1.0
+	github.com/tx7do/go-wind-toolkit/sql-proto v0.1.0
 )
 
 require (
 	ariga.io/atlas v1.1.0 // indirect
 	entgo.io/contrib v0.7.0 // indirect
 	entgo.io/ent v0.14.5 // indirect
-	filippo.io/edwards25519 v1.1.0 // indirect
+	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/ClickHouse/ch-go v0.71.0 // indirect
 	github.com/ClickHouse/clickhouse-go/v2 v2.43.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
@@ -62,11 +62,11 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.48.0 // indirect
-	golang.org/x/mod v0.33.0 // indirect
-	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.41.0 // indirect
-	golang.org/x/text v0.34.0 // indirect
-	golang.org/x/tools v0.42.0 // indirect
+	golang.org/x/mod v0.34.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
+	golang.org/x/text v0.36.0 // indirect
+	golang.org/x/tools v0.43.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260209200024-4cfbd4190f57 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

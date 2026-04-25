@@ -9,7 +9,7 @@ import (
 
 	"github.com/tx7do/go-utils/code_generator"
 	"github.com/tx7do/go-utils/stringcase"
-	"github.com/tx7do/kratos-cli/generators"
+	"github.com/tx7do/go-wind-toolkit/generators"
 )
 
 func (g *Generator) WriteDataPackageCode(

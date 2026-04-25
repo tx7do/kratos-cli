@@ -5,7 +5,7 @@ This tool imports the SQL database schemas and generates Kratos microservice cod
 ## HOW TO INSTALL
 
 ```shell
-go install github.com/tx7do/kratos-cli/sql-kratos/cmd/sql2kratos@latest
+go install github.com/tx7do/go-wind-toolkit/sql-kratos/cmd/sql2kratos@latest
 ```
 
 ## HOW TO USE

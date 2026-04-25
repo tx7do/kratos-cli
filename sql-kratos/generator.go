@@ -7,10 +7,10 @@ import (
 	"path"
 
 	"github.com/jinzhu/inflection"
-	"github.com/tx7do/kratos-cli/generators"
+	"github.com/tx7do/go-wind-toolkit/generators"
 
-	sqlorm "github.com/tx7do/kratos-cli/sql-orm"
-	sqlproto "github.com/tx7do/kratos-cli/sql-proto"
+	sqlorm "github.com/tx7do/go-wind-toolkit/sql-orm"
+	sqlproto "github.com/tx7do/go-wind-toolkit/sql-proto"
 )
 
 func Generate(ctx context.Context, opts GeneratorOptions) error {

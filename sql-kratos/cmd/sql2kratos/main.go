@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	sqlkratos "github.com/tx7do/kratos-cli/sql-kratos"
+	sqlkratos "github.com/tx7do/go-wind-toolkit/sql-kratos"
 )
 
 var rootCmd = &cobra.Command{
