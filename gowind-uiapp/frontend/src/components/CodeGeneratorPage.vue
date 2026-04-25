@@ -129,7 +129,7 @@ EventsOn('table-imported', () => {
           <a-button type="primary" @click="handleDatabaseImport">数据库导入</a-button>
           <a-button type="primary" @click="handleSQLImport">SQL导入</a-button>
           <a-button type="primary" danger @click="handleGenerateGRPCCode">生成gRPC服务</a-button>
-          <a-button type="primary" danger @click="handleGenerateRESTCode">生成REST服务</a-button>
+          <a-button type="primary" danger @click="handleGenerateRESTCode">生成BFF服务</a-button>
           <a-button type="primary" danger @click="handleGenerateFrontendCode">生成前端代码</a-button>
         </a-space>
       </template>
