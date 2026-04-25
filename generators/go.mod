@@ -1,4 +1,4 @@
-module github.com/tx7do/kratos-cli/generators
+module github.com/tx7do/go-wind-toolkit/generators
 
 go 1.25.0
 

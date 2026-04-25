@@ -1,4 +1,4 @@
-﻿package generators
+package generators
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/tx7do/go-utils/code_generator"
 
-	"github.com/tx7do/kratos-cli/generators/templates/yaml"
+	"github.com/tx7do/go-wind-toolkit/generators/templates/yaml"
 )
 
 // YamlGenerator 使用 TemplateEngine 渲染并将结果写入磁盘
