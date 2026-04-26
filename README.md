@@ -32,7 +32,7 @@ Features:
 ```shell
 go install github.com/tx7do/go-wind-toolkit/gowind/cmd/gow@latest
 ```
-`
+
 ### cfgexp – Configuration Exporter
 
 Export local configuration files to remote configuration centers (Consul, Etcd, Nacos) for distributed systems.
@@ -67,7 +67,6 @@ Automatically generate Protobuf, gRPC & REST service definitions from SQL tables
 ```shell
 go install github.com/tx7do/go-wind-toolkit/sql-proto/cmd/sql2proto@latest
 ```
-
 
 ## sql2kratos – SQL → Full Kratos Service
 
